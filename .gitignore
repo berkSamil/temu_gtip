@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+output/
+mappings/
+*.db-journal
+data/chrome_debug/
+data/browser_profile/
+data/*.db
+scripts/_test_live.py

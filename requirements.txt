@@ -1,0 +1,4 @@
+xlrd>=2.0
+openpyxl>=3.1
+anthropic>=0.40
+playwright>=1.40
