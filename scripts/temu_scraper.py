@@ -9,8 +9,8 @@ Kullanim:
   2) Temu hesabiniza giris yapin (ilk seferde)
   3) Scripti calistirin:
        python temu_scraper.py data/input.xlsx
-       python temu_scraper.py data/input.xlsx -o output/result.xlsx
-       python temu_scraper.py data/input.xlsx --images
+       python temu_scraper.py data/input.xlsx --delay 12 --jitter 8
+       (Yavas = daha az "sold out" yaniltmasi; Temu hizli otomasyonu kisitlar.)
 """
 
 import sys
@@ -18,6 +18,7 @@ import os
 import re
 import json
 import time
+import random
 import argparse
 import urllib.parse
 import urllib.request
@@ -34,9 +35,19 @@ except ImportError:
     print("playwright yuklu degil: pip install playwright && playwright install chromium")
     sys.exit(1)
 
-DETAIL_WAIT_MS = 15000
-PAGE_TIMEOUT_MS = 30000
+DETAIL_WAIT_MS = 18000
+PAGE_TIMEOUT_MS = 45000
 CAPTCHA_TIMEOUT = 120
+
+
+def detect_captcha(page):
+    """Detect Temu security challenge (English UI even when region changes)."""
+    return page.evaluate('''() => {
+        const t = (document.body?.innerText || '').toLowerCase();
+        if (t.includes('security verification')) return true;
+        const el = document.querySelector('[class*="captcha" i], [class*="verify-wrap"], [id*="captcha" i]');
+        return !!el;
+    }''')
 
 
 def extract_goods_id(url):
@@ -54,19 +65,13 @@ def extract_gallery_url(url):
 
 def wait_for_captcha(page, timeout=CAPTCHA_TIMEOUT):
     """Detect CAPTCHA and wait for user to solve it."""
-    has_captcha = page.evaluate('''() => {
-        return (document.body?.innerText || '').includes('Security Verification');
-    }''')
-    if not has_captcha:
+    if not detect_captcha(page):
         return False
 
     print("\n  *** CAPTCHA! Chrome penceresinde cozun... ***", end="", flush=True)
     for _ in range(timeout // 2):
         time.sleep(2)
-        still = page.evaluate('''() => {
-            return (document.body?.innerText || '').includes('Security Verification');
-        }''')
-        if not still:
+        if not detect_captcha(page):
             print(" OK", flush=True)
             time.sleep(2)
             return True
@@ -134,21 +139,51 @@ def extract_product_data(page):
     return result, meta
 
 
+def _raw_signal(page):
+    """Status + goodsProperty count (Temu status 5 = sold out / unavailable in session)."""
+    return page.evaluate('''() => {
+        try {
+            const s = window.rawData?.store;
+            if (!s) return { status: null, gp: 0, hasRaw: false };
+            const st = s.goods?.status;
+            const gp = (s.goodsProperty || []).length;
+            return { status: st, gp, hasRaw: true };
+        } catch(e) { return { status: null, gp: 0, hasRaw: false }; }
+    }''')
+
+
+def human_activity(page):
+    """Light activity so Temu sees less like a bare script."""
+    try:
+        page.mouse.move(random.randint(80, 280), random.randint(80, 280))
+        time.sleep(random.uniform(0.25, 0.6))
+        page.evaluate('window.scrollTo(0, 200 + Math.floor(Math.random()*200))')
+        time.sleep(random.uniform(0.3, 0.7))
+    except Exception:
+        pass
+
+
 def safe_goto(page, url, retries=3):
     """Navigate with retry on context-destroyed errors (redirects)."""
     for attempt in range(retries):
         try:
-            page.goto(url, wait_until='domcontentloaded', timeout=PAGE_TIMEOUT_MS)
-            time.sleep(2)
+            page.goto(url, wait_until='load', timeout=PAGE_TIMEOUT_MS)
+            time.sleep(random.uniform(1.8, 3.2))
             wait_for_captcha(page)
+            try:
+                page.wait_for_load_state('networkidle', timeout=10000)
+            except Exception:
+                pass
+            human_activity(page)
             return True
         except Exception as e:
             if 'context was destroyed' in str(e) or 'navigation' in str(e).lower():
                 time.sleep(3)
                 try:
-                    page.wait_for_load_state('domcontentloaded', timeout=15000)
+                    page.wait_for_load_state('load', timeout=20000)
                     time.sleep(2)
                     wait_for_captcha(page)
+                    human_activity(page)
                     return True
                 except Exception:
                     if attempt < retries - 1:
@@ -178,6 +213,36 @@ def scrape_product(page, url, delay=2.0):
 
         loaded = wait_for_product_data(page)
 
+        if not loaded:
+            if detect_captcha(page):
+                wait_for_captcha(page)
+                loaded = wait_for_product_data(page)
+            else:
+                page.evaluate('window.scrollTo(0, 500)')
+                time.sleep(5)
+                human_activity(page)
+                loaded = wait_for_product_data(page, timeout_ms=12000)
+
+        sig = _raw_signal(page)
+        if sig.get('status') == 5 or (sig.get('hasRaw') and sig.get('gp', 0) == 0):
+            time.sleep(random.uniform(4, 8))
+            wait_for_captcha(page)
+            try:
+                page.reload(wait_until='load', timeout=PAGE_TIMEOUT_MS)
+            except Exception:
+                pass
+            time.sleep(random.uniform(2.5, 4.5))
+            wait_for_captcha(page)
+            human_activity(page)
+            loaded = wait_for_product_data(page, timeout_ms=DETAIL_WAIT_MS)
+
+        sig = _raw_signal(page)
+        if not loaded or sig.get('gp', 0) == 0:
+            time.sleep(random.uniform(6, 12))
+            wait_for_captcha(page)
+            safe_goto(page, url, retries=2)
+            loaded = wait_for_product_data(page, timeout_ms=DETAIL_WAIT_MS)
+
         product, meta = extract_product_data(page)
 
         name = product.get('goodsName') or ''
@@ -185,7 +250,7 @@ def scrape_product(page, url, delay=2.0):
             name = meta.get('title', '')
             name = re.sub(r'\s*[-\u2013]\s*Temu\b.*$', '', name).strip()
             if name.lower() in ('temu', ''):
-                slug_m = re.search(r'temu\.com/(?:[a-z]{2}-[a-z]{2}/)?(.+?)(?:-g-\d+\.html|$)', url)
+                slug_m = re.search(r'temu\.com/(?:[a-z]{2}(?:-[a-z]{2})?/)?(.+?)(?:-g-\d+\.html|$)', url)
                 if slug_m:
                     name = slug_m.group(1).replace('-', ' ').strip()
         row['title'] = name
@@ -258,6 +323,115 @@ def write_output(results, output_path):
     wb.save(output_path)
 
 
+def _esc(text):
+    """Escape HTML special characters."""
+    return (text or '').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+
+
+def write_html(results, output_path):
+    html_path = os.path.splitext(output_path)[0] + '.html'
+
+    cards = []
+    for i, r in enumerate(results, 1):
+        details_html = ''
+        if r['product_details']:
+            rows = ''
+            for item in r['product_details'].split('; '):
+                parts = item.split(': ', 1)
+                if len(parts) == 2:
+                    rows += f'<tr><td class="prop-key">{_esc(parts[0])}</td><td>{_esc(parts[1])}</td></tr>'
+            details_html = f'<table class="props">{rows}</table>'
+
+        variants_html = ''
+        if r['properties']:
+            for v in r['properties'].split('; '):
+                variants_html += f'<span class="variant">{_esc(v)}</span> '
+
+        img_html = ''
+        if r['image_url']:
+            img_html = f'<img src="{_esc(r["image_url"])}" alt="{_esc(r["title"])}" loading="lazy">'
+
+        error_html = ''
+        if r['error']:
+            error_html = f'<div class="error">{_esc(r["error"])}</div>'
+
+        cards.append(f'''
+    <div class="card">
+      <div class="card-img">{img_html}</div>
+      <div class="card-body">
+        <div class="card-num">#{i}</div>
+        <h2><a href="{_esc(r['url'])}" target="_blank">{_esc(r['title']) or 'Untitled'}</a></h2>
+        <p class="desc">{_esc(r['description'])}</p>
+        {details_html}
+        {f'<div class="variants">{variants_html}</div>' if variants_html else ''}
+        <div class="meta">
+          <span>ID: {_esc(r['goods_id'])}</span>
+          {f'<span class="kw">{_esc(r["keywords"][:80])}</span>' if r['keywords'] else ''}
+        </div>
+        {error_html}
+      </div>
+    </div>''')
+
+    ok = sum(1 for r in results if not r['error'])
+    det = sum(1 for r in results if r['product_details'])
+
+    html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEMU Scrape Results ({len(results)} products)</title>
+<style>
+  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+  body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a1a; padding: 20px; }}
+  .header {{ max-width: 1100px; margin: 0 auto 24px; }}
+  .header h1 {{ font-size: 24px; font-weight: 700; }}
+  .header .stats {{ color: #666; margin-top: 4px; font-size: 14px; }}
+  .stats span {{ margin-right: 16px; }}
+  .card {{ max-width: 1100px; margin: 0 auto 16px; background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; overflow: hidden; }}
+  .card-img {{ width: 220px; min-height: 220px; flex-shrink: 0; background: #f7f7f7; display: flex; align-items: center; justify-content: center; }}
+  .card-img img {{ width: 100%; height: 100%; object-fit: cover; }}
+  .card-body {{ padding: 16px 20px; flex: 1; min-width: 0; }}
+  .card-num {{ font-size: 12px; color: #999; margin-bottom: 4px; }}
+  h2 {{ font-size: 16px; font-weight: 600; margin-bottom: 8px; line-height: 1.3; }}
+  h2 a {{ color: #1a1a1a; text-decoration: none; }}
+  h2 a:hover {{ color: #e67e00; }}
+  .desc {{ font-size: 13px; color: #555; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }}
+  .props {{ font-size: 13px; border-collapse: collapse; margin-bottom: 10px; }}
+  .props tr {{ border-bottom: 1px solid #f0f0f0; }}
+  .props td {{ padding: 3px 12px 3px 0; }}
+  .prop-key {{ font-weight: 600; color: #333; white-space: nowrap; }}
+  .variants {{ margin-bottom: 8px; }}
+  .variant {{ display: inline-block; background: #f0f2f5; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin: 2px 4px 2px 0; }}
+  .meta {{ font-size: 11px; color: #999; }}
+  .meta span {{ margin-right: 12px; }}
+  .kw {{ max-width: 300px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }}
+  .error {{ margin-top: 8px; padding: 6px 10px; background: #fff0f0; color: #c00; border-radius: 4px; font-size: 13px; }}
+  @media (max-width: 700px) {{
+    .card {{ flex-direction: column; }}
+    .card-img {{ width: 100%; height: 200px; }}
+  }}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>TEMU Scrape Results</h1>
+  <div class="stats">
+    <span>{len(results)} products</span>
+    <span>{ok} successful</span>
+    <span>{det} with details</span>
+  </div>
+</div>
+{"".join(cards)}
+</body>
+</html>'''
+
+    with open(html_path, 'w', encoding='utf-8') as f:
+        f.write(html)
+
+    return html_path
+
+
 def download_image(image_url, save_dir, goods_id):
     if not image_url:
         return ''
@@ -284,7 +458,10 @@ def main():
     parser.add_argument('input', help='Excel file with TEMU links')
     parser.add_argument('-o', '--output', help='Output Excel file')
     parser.add_argument('--images', action='store_true', help='Download product images')
-    parser.add_argument('--delay', type=float, default=3.0, help='Delay between pages (seconds)')
+    parser.add_argument('--delay', type=float, default=8.0,
+                        help='Base delay between products (seconds); Temu throttles fast runs')
+    parser.add_argument('--jitter', type=float, default=5.0,
+                        help='Random extra 0..jitter seconds added after each product')
     parser.add_argument('--port', type=int, default=9222, help='Chrome debugging port')
     args = parser.parse_args()
 
@@ -346,7 +523,8 @@ def main():
             results.append(row)
 
             if i < len(links):
-                time.sleep(args.delay)
+                pause = args.delay + random.uniform(0, max(0.0, args.jitter))
+                time.sleep(pause)
 
         page.close()
         browser.close()
@@ -358,6 +536,7 @@ def main():
                 download_image(r['image_url'], image_dir, r['goods_id'])
 
     write_output(results, output_path)
+    html_path = write_html(results, output_path)
 
     ok = len(results) - errors
     details = sum(1 for r in results if r['product_details'])
@@ -367,7 +546,8 @@ def main():
     print(f"Hata           : {errors}")
     print(f"Product Details: {details}/{ok}")
     print(f"Resim          : {imgs}/{ok}")
-    print(f"Cikti          : {output_path}")
+    print(f"Excel          : {output_path}")
+    print(f"HTML           : {html_path}")
 
 
 if __name__ == "__main__":
