@@ -10,7 +10,13 @@ Kullanim:
   3) Scripti calistirin:
        python temu_scraper.py data/input.xlsx
        python temu_scraper.py data/input.xlsx --delay 12 --jitter 8
-       (Yavas = daha az "sold out" yaniltmasi; Temu hizli otomasyonu kisitlar.)
+       python temu_scraper.py data/input.xlsx --warmup-every 12
+       python temu_scraper.py data/input.xlsx --skip 0 --limit 20 -o output/part1.xlsx
+       python temu_scraper.py data/input.xlsx --skip 20 --limit 20 -o output/part2.xlsx
+       (Yavas = daha az "sold out" yaniltmasi; --warmup-every ~12-15 sik softblock icin.)
+
+  Ipuclari: Chrome Debug profilinde mumkunse giris acik tutun; US IP + ulke uyumu;
+  cok hizli ardisik goods.html yuklemesi riskli — gecikmeyi artirin.
 """
 
 import sys
@@ -38,6 +44,7 @@ except ImportError:
 DETAIL_WAIT_MS = 18000
 PAGE_TIMEOUT_MS = 45000
 CAPTCHA_TIMEOUT = 120
+DEFAULT_WARMUP_URL = 'https://www.temu.com'
 
 
 def detect_captcha(page):
@@ -159,6 +166,28 @@ def human_activity(page):
         time.sleep(random.uniform(0.25, 0.6))
         page.evaluate('window.scrollTo(0, 200 + Math.floor(Math.random()*200))')
         time.sleep(random.uniform(0.3, 0.7))
+    except Exception:
+        pass
+
+
+def session_warmup(page, url=None):
+    """
+    Once oturumda Temu ana sayfasina git: soguk goods_id linkleri yerine
+    once first-party sayfa (elle paste oncesi gezinme davranisina yakin).
+    """
+    target = (url or DEFAULT_WARMUP_URL).strip()
+    if not target:
+        return
+    try:
+        page.goto(target, wait_until='load', timeout=PAGE_TIMEOUT_MS)
+        time.sleep(random.uniform(2.0, 5.0))
+        wait_for_captcha(page)
+        try:
+            page.wait_for_load_state('networkidle', timeout=12000)
+        except Exception:
+            pass
+        human_activity(page)
+        time.sleep(random.uniform(1.0, 2.5))
     except Exception:
         pass
 
@@ -463,6 +492,37 @@ def main():
     parser.add_argument('--jitter', type=float, default=5.0,
                         help='Random extra 0..jitter seconds added after each product')
     parser.add_argument('--port', type=int, default=9222, help='Chrome debugging port')
+    parser.add_argument(
+        '--no-warmup',
+        action='store_true',
+        help='Temu ana sayfa oturum isitmasini atla',
+    )
+    parser.add_argument(
+        '--warmup-url',
+        default=DEFAULT_WARMUP_URL,
+        help='Oturum isitma icin acilacak URL (varsayilan: https://www.temu.com)',
+    )
+    parser.add_argument(
+        '--warmup-every',
+        type=int,
+        default=0,
+        metavar='N',
+        help='Her N urunden sonra tekrar isit (0=sadece baslangicta). Or: 12-15 softblock icin',
+    )
+    parser.add_argument(
+        '--skip',
+        type=int,
+        default=0,
+        metavar='K',
+        help='Exceldeki link listesinde ilk K linki atla (20ser parti: 0, 20, 40, ...)',
+    )
+    parser.add_argument(
+        '--limit',
+        type=int,
+        default=None,
+        metavar='N',
+        help='En fazla N link isle (20ser parti icin: 20). Verilmezse skip sonrasi hepsi',
+    )
     args = parser.parse_args()
 
     if not os.path.isfile(args.input):
@@ -470,9 +530,15 @@ def main():
         sys.exit(1)
 
     output_path = args.output
+    base = os.path.splitext(os.path.basename(args.input))[0]
     if not output_path:
-        base = os.path.splitext(os.path.basename(args.input))[0]
-        output_path = os.path.join('output', f'{base}_scraped.xlsx')
+        if args.skip or args.limit is not None:
+            lim_part = args.limit if args.limit is not None else 'all'
+            output_path = os.path.join(
+                'output', f'{base}_skip{args.skip}_lim{lim_part}_scraped.xlsx'
+            )
+        else:
+            output_path = os.path.join('output', f'{base}_scraped.xlsx')
     os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
 
     image_dir = None
@@ -480,10 +546,19 @@ def main():
         image_dir = os.path.join(os.path.dirname(output_path), 'images')
         os.makedirs(image_dir, exist_ok=True)
 
-    links = read_links(args.input)
-    print(f"Toplam link: {len(links)}")
-    if not links:
+    all_links = read_links(args.input)
+    skip = max(0, args.skip)
+    if args.limit is not None:
+        links = all_links[skip : skip + max(0, args.limit)]
+    else:
+        links = all_links[skip:]
+
+    print(f"Excelde toplam link: {len(all_links)} | Bu kosu: {len(links)} (skip={skip})")
+    if not all_links:
         print("Hata: Excel'de TEMU linki bulunamadi")
+        sys.exit(1)
+    if not links:
+        print("Hata: --skip / --limit sonrasi islenecek link kalmadi")
         sys.exit(1)
 
     print(f"Chrome'a baglaniliyor (port {args.port})...", flush=True)
@@ -503,10 +578,24 @@ def main():
         page = ctx.new_page()
         print("Baglandi.\n")
 
+        if not args.no_warmup:
+            print("Oturum isitma (Temu)...", flush=True)
+            session_warmup(page, args.warmup_url)
+            print("", flush=True)
+
         results = []
         errors = 0
 
         for i, url in enumerate(links, 1):
+            if (
+                not args.no_warmup
+                and args.warmup_every > 0
+                and i > 1
+                and (i - 1) % args.warmup_every == 0
+            ):
+                print(f"  [oturum isitma #{i}]...", end=" ", flush=True)
+                session_warmup(page, args.warmup_url)
+
             gid = extract_goods_id(url)
             print(f"  [{i}/{len(links)}] {gid or url[:50]}...", end=" ", flush=True)
 

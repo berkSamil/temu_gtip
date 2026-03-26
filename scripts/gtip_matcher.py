@@ -1,12 +1,14 @@
 """
 GTIP Siniflandirici
 =====================
-TEMU scraper ciktisindaki urunleri GTIP veritabani ve fasil notlari
-kullanarak Claude API ile siniflandirir.
+TEMU scraper ciktisi veya manuel doldurulmus Excel (product url, product title,
+product details, ...) ile GTIP siniflandirma; Claude + SQLite cetvel.
 
 Kullanim:
     python gtip_matcher.py output/input_scraped.xlsx
     python gtip_matcher.py output/input_scraped.xlsx --db data/gtip_2026.db -o output/classified.xlsx
+    python gtip_matcher.py input.xlsx --refine --note-chars 6000
+    python gtip_matcher.py input.xlsx --model claude-sonnet-4-20250514 --max-tokens 1600
 """
 
 import sys
@@ -133,6 +135,94 @@ def search_gtip_fts(conn, query, limit=20):
         return []
 
 
+def _product_search_words(title, desc, keywords, product_details, max_words=20):
+    text = f"{title} {desc} {keywords} {product_details}".lower()
+    words = sorted(
+        set(re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ]{4,}', text)),
+        key=len,
+        reverse=True,
+    )
+    return [w for w in words if w.lower() not in _TEMU_STOP][:max_words]
+
+
+def retrieve_ranked_gtips(conn, title, desc, keywords, product_details, top_n=50, per_query=14):
+    """
+    Urun metninden kelimeler -> FTS; skorla birlestir. Cetvelde gercek satirlari getirir
+    (sadece fasil basi sirali liste yerine ilgili 392x/732x vb. satirlari modele sunar).
+    """
+    words = _product_search_words(title, desc, keywords, product_details, max_words=22)
+    scores = {}
+    for w in words:
+        rows = search_gtip_fts(conn, w, limit=per_query)
+        for idx, r in enumerate(rows):
+            code = r[0]
+            bump = max(1, per_query - idx)
+            scores[code] = scores.get(code, 0) + bump
+    if not scores:
+        return []
+    ordered = sorted(scores.keys(), key=lambda c: (-scores[c], c))[:top_n]
+    cur = conn.cursor()
+    out = []
+    for code in ordered:
+        row = cur.execute(
+            "SELECT gtip_code, tanim, tanim_hiyerarsi FROM gtip WHERE gtip_code = ?",
+            (code,),
+        ).fetchone()
+        if row:
+            out.append(row)
+    return out
+
+
+def _json_from_balanced_braces(s):
+    if not s:
+        return None
+    start = s.find('{')
+    if start < 0:
+        return None
+    depth = 0
+    in_str = False
+    esc = False
+    quote_ch = ''
+    for i in range(start, len(s)):
+        c = s[i]
+        if in_str:
+            if esc:
+                esc = False
+            elif c == '\\':
+                esc = True
+            elif c == quote_ch:
+                in_str = False
+            continue
+        if c in '"\'':
+            in_str = True
+            quote_ch = c
+            continue
+        if c == '{':
+            depth += 1
+        elif c == '}':
+            depth -= 1
+            if depth == 0:
+                try:
+                    return json.loads(s[start : i + 1])
+                except json.JSONDecodeError:
+                    return None
+    return None
+
+
+def extract_first_json_object(text):
+    """
+    Claude yaniti: ```json ... ``` bloklari veya metindeki ilk dengeli JSON nesnesi.
+    """
+    if not text:
+        return None
+    s = text.strip()
+    for block in re.findall(r'```(?:json)?\s*(.*?)```', s, re.DOTALL | re.IGNORECASE):
+        got = _json_from_balanced_braces(block.strip())
+        if got is not None:
+            return got
+    return _json_from_balanced_braces(s)
+
+
 _GTIP_RE = re.compile(r'^\d{4}\.\d{2}\.\d{2}\.\d{2}\.\d{2}$')
 
 
@@ -224,6 +314,10 @@ GENEL MUHAKEME (urun adi ezberleme yok; her kalemi basligin yasal tanimina gore 
 6) KOD KAYNAGI: gtip_code ve alternatifler SADECE bu mesajdaki TARIFE CETVELI listesindeki
    satirlardan birebir kopya olmali. Listede yoksa uydurma; en yakin gercek satiri sec veya bos birak.
 
+7) ONCELIKLI GTIP (varsa): "METNE GORE ONCELIKLI" bolumu yalnizca metin-kelime eslesmesiyle
+   siralanmistir; tek basina yeterli degildir. Nihai kod mutlaka fasil notu ve satir tanimiyla
+   uyumlu olmali; celisirse cetvel metnini esas al.
+
 Yanitini SADECE su JSON formatinda ver:
 {
   "gtip_code": "XXXX.XX.XX.XX.XX",
@@ -233,54 +327,104 @@ Yanitini SADECE su JSON formatinda ver:
   "alternatifler": ["YYYY.YY.YY.YY.YY"]
 }"""
 
+REFINE_SYSTEM_PROMPT = """Ayni gorev: Turk gumruk GTIP siniflandirmasi. Onceki JSON cevabi zayif veya eksik olabilir.
+TARIFE metnini tekrar dikkatle uygula; gtip_code ve alternatifler SADECE mesajdaki listede var olan
+12 haneli kodlardan secilsin. Yanit SADECE gecerli JSON (gtip_code, fasil, gerekce, guven, alternatifler)."""
 
-def classify_product(client, product_info, conn):
-    """Tek bir urunu Claude API ile siniflandir."""
+
+def _needs_refine(cls):
+    if cls.get('error') or cls.get('parse_hatasi'):
+        return False
+    if not cls.get('gtip_code'):
+        return True
+    g = (cls.get('guven') or '').lower()
+    return g in ('dusuk', 'orta')
+
+
+def build_tarife_context(
+    conn,
+    title,
+    desc,
+    keywords,
+    product_details,
+    note_max_chars,
+    gtip_rows_per_fasil,
+    retrieval_top_n,
+):
+    ranked = retrieve_ranked_gtips(
+        conn, title, desc, keywords, product_details, top_n=retrieval_top_n
+    )
+    parts = []
+    if ranked:
+        rlines = "\n".join(
+            f"  {g[0]}  {g[1]}" + (f"  [{g[2]}]" if g[2] else "")
+            for g in ranked
+        )
+        parts.append(f"=== METNE GORE ONCELIKLI GTIP (FTS skor) ===\n{rlines}")
+
+    candidate_fasils = get_candidate_fasils(conn, product_details, keywords, desc, title)
+    for fno in candidate_fasils[:6]:
+        gtips = get_fasil_gtip_list(conn, fno, limit=200)
+        if not gtips:
+            continue
+        note = get_fasil_notu(conn, fno)
+        excerpt = (note[:note_max_chars] if note else "(not yok)")
+
+        gtip_lines = "\n".join(
+            f"  {g[0]}  {g[1]}" + (f"  [{g[2]}]" if g[2] else "")
+            for g in gtips[:gtip_rows_per_fasil]
+        )
+        parts.append(
+            f"=== FASIL {fno} ===\n"
+            f"FASIL NOTU:\n{excerpt}\n\n"
+            f"GTIP KODLARI:\n{gtip_lines}"
+        )
+
+    return "\n\n".join(parts), candidate_fasils
+
+
+def _call_classify(client, model, max_tokens, system_prompt, user_msg):
+    return client.messages.create(
+        model=model,
+        max_tokens=max_tokens,
+        system=system_prompt,
+        messages=[{"role": "user", "content": user_msg}],
+    )
+
+
+def classify_product(client, product_info, conn, opts=None):
+    """
+    opts: dict — model, max_tokens, note_max_chars, gtip_rows_per_fasil, retrieval_top_n,
+    refine, refine_model, refine_max_tokens
+    """
+    opts = opts or {}
+    model = opts.get('model', 'claude-haiku-4-5-20251001')
+    max_tokens = int(opts.get('max_tokens', 1200))
+    note_max_chars = int(opts.get('note_max_chars', 8000))
+    gtip_rows_per_fasil = int(opts.get('gtip_rows_per_fasil', 120))
+    retrieval_top_n = int(opts.get('retrieval_top_n', 50))
+    do_refine = bool(opts.get('refine'))
+    refine_model = opts.get('refine_model', 'claude-sonnet-4-20250514')
+    refine_max_tokens = int(opts.get('refine_max_tokens', 1200))
+
     title = product_info.get('title', '')
     desc = product_info.get('description', '')
     keywords = product_info.get('keywords', '')
     product_details = product_info.get('product_details', '')
     sku_variants = product_info.get('sku_variants', '')
 
-    candidate_fasils = get_candidate_fasils(conn, product_details, keywords, desc, title)
+    tarife_context, _ = build_tarife_context(
+        conn,
+        title,
+        desc,
+        keywords,
+        product_details,
+        note_max_chars,
+        gtip_rows_per_fasil,
+        retrieval_top_n,
+    )
 
-    context_parts = []
-    for fno in candidate_fasils[:6]:
-        gtips = get_fasil_gtip_list(conn, fno, limit=200)
-        if not gtips:
-            continue
-        note = get_fasil_notu(conn, fno)
-        note_excerpt = note[:2500] if note else "(not yok)"
-
-        gtip_lines = "\n".join(
-            f"  {g[0]}  {g[1]}" + (f"  [{g[2]}]" if g[2] else "")
-            for g in gtips[:120]
-        )
-        context_parts.append(
-            f"=== FASIL {fno} ===\n"
-            f"FASIL NOTU:\n{note_excerpt}\n\n"
-            f"GTIP KODLARI:\n{gtip_lines}"
-        )
-
-    fts_blob = f"{title} {desc} {keywords} {product_details}"
-    fts_terms = re.sub(r'[^\w\s]', ' ', fts_blob).split()[:12]
-    fts_results = []
-    for term in fts_terms:
-        if len(term) > 3:
-            fts_results.extend(search_gtip_fts(conn, term, limit=5))
-    if fts_results:
-        seen = set()
-        unique = []
-        for r in fts_results:
-            if r[0] not in seen:
-                seen.add(r[0])
-                unique.append(r)
-        fts_lines = "\n".join(f"  {r[0]}  {r[1]}" for r in unique[:20])
-        context_parts.append(f"=== FTS ARAMA SONUCLARI ===\n{fts_lines}")
-
-    tarife_context = "\n\n".join(context_parts)
-
-    user_msg = f"""Asagidaki TEMU urunu icin dogru 12 haneli GTIP kodunu belirle.
+    user_msg = f"""Asagidaki urun icin dogru 12 haneli GTIP kodunu belirle.
 
 URUN BILGILERI:
 Baslik: {title}
@@ -295,42 +439,57 @@ TARIFE CETVELI VERILERI:
 
 Yanitini SADECE JSON olarak ver."""
 
-    try:
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=900,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_msg}],
-        )
-
+    def run_once(sys_p, mdl, mtok):
+        response = _call_classify(client, mdl, mtok, sys_p, user_msg)
         text = response.content[0].text.strip()
-        json_m = re.search(r'\{[^{}]*\}', text, re.DOTALL)
-        if json_m:
-            try:
-                return sanitize_classification(conn, json.loads(json_m.group()))
-            except json.JSONDecodeError:
-                return {"gtip_code": "", "gerekce": text[:200], "guven": "dusuk", "error": "JSON parse edilemedi"}
-        else:
-            return {"gtip_code": "", "gerekce": text[:200], "guven": "dusuk", "error": "JSON parse edilemedi"}
+        parsed = extract_first_json_object(text)
+        if parsed is None:
+            return {
+                "gtip_code": "",
+                "gerekce": text[:300],
+                "guven": "dusuk",
+                "error": "JSON parse edilemedi",
+                "parse_hatasi": True,
+            }
+        return sanitize_classification(conn, parsed)
+
+    try:
+        out = run_once(SYSTEM_PROMPT, model, max_tokens)
+        out.pop('parse_hatasi', None)
+        if do_refine and _needs_refine(out):
+            refined = run_once(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)
+            refined.pop('parse_hatasi', None)
+            if (
+                not refined.get('error')
+                and refined.get('gtip_code')
+                and gtip_exists(conn, refined['gtip_code'])
+            ):
+                refined['gerekce'] = (
+                    '[Ikinci gecis] ' + str(refined.get('gerekce', ''))
+                )[:2500]
+                return refined
+        return out
 
     except anthropic.RateLimitError:
         for wait in [30, 60]:
             print(f"\n    Rate limit, {wait}s bekleniyor...", end="", flush=True)
             time.sleep(wait)
             try:
-                response = client.messages.create(
-                    model="claude-haiku-4-5-20251001",
-                    max_tokens=900,
-                    system=SYSTEM_PROMPT,
-                    messages=[{"role": "user", "content": user_msg}],
-                )
-                text = response.content[0].text.strip()
-                json_m = re.search(r'\{[^{}]*\}', text, re.DOTALL)
-                if json_m:
-                    try:
-                        return sanitize_classification(conn, json.loads(json_m.group()))
-                    except json.JSONDecodeError:
-                        pass
+                out = run_once(SYSTEM_PROMPT, model, max_tokens)
+                out.pop('parse_hatasi', None)
+                if do_refine and _needs_refine(out):
+                    refined = run_once(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)
+                    refined.pop('parse_hatasi', None)
+                    if (
+                        not refined.get('error')
+                        and refined.get('gtip_code')
+                        and gtip_exists(conn, refined['gtip_code'])
+                    ):
+                        refined['gerekce'] = (
+                            '[Ikinci gecis] ' + str(refined.get('gerekce', ''))
+                        )[:2500]
+                        return refined
+                return out
             except anthropic.RateLimitError:
                 continue
             except Exception as e2:
@@ -344,6 +503,78 @@ Yanitini SADECE JSON olarak ver."""
 # Excel I/O
 # ---------------------------------------------------------------------------
 
+def _slug_header(name):
+    """Excel baslik hucrelerini karsilastirma icin normalize et."""
+    if name is None:
+        return ''
+    s = str(name).lower()
+    s = re.sub(r'[^a-z0-9]+', '_', s)
+    return s.strip('_')
+
+
+def normalize_product_row(row):
+    """
+    Scraper satiri veya manuel import (or. product_url, product_title, category_path,
+    thumbnail, product_details) -> classify_product / HTML icin tek sema.
+    """
+    by_slug = {}
+    for k, v in row.items():
+        if k is None:
+            continue
+        sk = _slug_header(k if isinstance(k, str) else str(k))
+        by_slug[sk] = v if v is not None else ''
+
+    def pick(*slugs):
+        for s in slugs:
+            if s in by_slug and str(by_slug[s]).strip():
+                return str(by_slug[s]).strip()
+        return ''
+
+    url = pick('url', 'product_url', 'product_link', 'link')
+    title = pick('title', 'product_title')
+    description = pick('description', 'aciklama', 'desc')
+    keywords = pick('keywords', 'keyword', 'category_path', 'category')
+    product_details = pick('product_details')
+    if not product_details:
+        for sk, val in by_slug.items():
+            if 'product' in sk and 'detail' in sk and str(val).strip():
+                product_details = str(val).strip()
+                break
+
+    image_url = pick('image_url', 'thumbnail_url', 'img_url')
+    if not image_url:
+        for sk, val in by_slug.items():
+            if 'thumbnail' in sk and str(val).strip():
+                image_url = str(val).strip()
+                break
+            if 'image' in sk and 'url' in sk and str(val).strip():
+                image_url = str(val).strip()
+                break
+
+    sku_variants = pick('sku_variants', 'properties', 'variants', 'varyantlar')
+    goods_id = pick('goods_id', 'goodsid', 'item_id')
+    if not goods_id and url:
+        m = re.search(r'goods_id=(\d+)', url) or re.search(r'-g-(\d+)\.html', url)
+        if m:
+            goods_id = m.group(1)
+
+    err = row.get('error', '')
+    if err is None:
+        err = ''
+
+    return {
+        'url': url,
+        'goods_id': goods_id,
+        'title': title,
+        'description': description,
+        'keywords': keywords,
+        'product_details': product_details,
+        'image_url': image_url,
+        'sku_variants': sku_variants,
+        'error': str(err),
+    }
+
+
 def read_scraped_excel(filepath):
     wb = openpyxl.load_workbook(filepath, data_only=True)
     ws = wb.active
@@ -354,7 +585,7 @@ def read_scraped_excel(filepath):
         for i, h in enumerate(headers):
             if h:
                 row[h.lower().replace(' ', '_')] = ws.cell(r, i + 1).value or ''
-        products.append(row)
+        products.append(normalize_product_row(row))
     return products
 
 
@@ -527,6 +758,44 @@ def main():
     parser.add_argument('-o', '--output', help='Cikti dosyasi')
     parser.add_argument('--db', default='data/gtip_2026.db', help='GTIP veritabani yolu')
     parser.add_argument('--delay', type=float, default=0.5, help='API istekleri arasi bekleme (saniye)')
+    parser.add_argument(
+        '--model',
+        default='claude-haiku-4-5-20251001',
+        help='Ilk gecis Claude model id',
+    )
+    parser.add_argument('--max-tokens', type=int, default=1200, help='Ilk gecis max_tokens')
+    parser.add_argument(
+        '--note-chars',
+        type=int,
+        default=8000,
+        metavar='N',
+        help='Fasil notundan modele giden max karakter (once 2500; artirdi)',
+    )
+    parser.add_argument(
+        '--gtip-rows',
+        type=int,
+        default=120,
+        metavar='N',
+        help='Her aday fasil icin GTIP satir sayisi',
+    )
+    parser.add_argument(
+        '--retrieval',
+        type=int,
+        default=50,
+        metavar='N',
+        help='Urun metnine gore FTS ile getirilecek oncelikli GTIP satiri',
+    )
+    parser.add_argument(
+        '--refine',
+        action='store_true',
+        help='guven dusuk/orta veya kod yoksa ikinci gecis (daha guclu model)',
+    )
+    parser.add_argument(
+        '--refine-model',
+        default='claude-sonnet-4-20250514',
+        help='Ikinci gecis model id',
+    )
+    parser.add_argument('--refine-max-tokens', type=int, default=1200)
     args = parser.parse_args()
 
     api_key = os.environ.get('ANTHROPIC_API_KEY', '')
@@ -560,6 +829,17 @@ def main():
     conn = sqlite3.connect(args.db)
     client = anthropic.Anthropic(api_key=api_key)
 
+    classify_opts = {
+        'model': args.model,
+        'max_tokens': args.max_tokens,
+        'note_max_chars': args.note_chars,
+        'gtip_rows_per_fasil': args.gtip_rows,
+        'retrieval_top_n': args.retrieval,
+        'refine': args.refine,
+        'refine_model': args.refine_model,
+        'refine_max_tokens': args.refine_max_tokens,
+    }
+
     products = read_scraped_excel(args.input)
     print(f"Toplam urun: {len(products)}")
 
@@ -574,7 +854,7 @@ def main():
         title = prod.get('title', '')[:50]
         print(f"  [{i}/{len(products)}] {title}...", end=" ", flush=True)
 
-        cls = classify_product(client, prod, conn)
+        cls = classify_product(client, prod, conn, classify_opts)
 
         if cls.get('error'):
             print(f"HATA: {cls['error'][:60]}")
