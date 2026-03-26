@@ -11,13 +11,13 @@ Temu ürün metni + Türkiye gümrük tarife cetveli (SQLite) ile **12 haneli GT
 
 ## Veritabanı (`data/gtip_2026.db`)
 
-`.gitignore` nedeniyle **SQLite dosyası repoda yok**; yerelde üretin:
+Repoda **hazır SQLite** bulunabilir (~13 MB). Sıfırdan veya güncellemek için:
 
 ```bash
 python scripts/build_db.py data/fasil_dosyalari/ --notlar data/fasil_notlari/ --db data/gtip_2026.db --force
 ```
 
-Repoda `data/fasil_dosyalari/` ve `data/fasil_notlari/` XLS kaynakları vardır.
+Kaynak XLS: `data/fasil_dosyalari/`, `data/fasil_notlari/`.
 
 ## GTİP matcher (Ana akış)
 
