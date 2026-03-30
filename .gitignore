@@ -1,9 +1,4 @@
-__pycache__/
-*.pyc
-*.pyo
 .env
-mappings/
-*.db-journal
-data/chrome_debug/
 data/browser_profile/
-scripts/_test_live.py
+data/chrome_debug/
+
