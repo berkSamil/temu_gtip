@@ -45,4 +45,4 @@ python scripts/temu_scraper.py data/input.xlsx --delay 12 --jitter 8 --warmup-ev
 
 ## Lisans / uyarı
 
-Tarife verileri resmi kaynaklardan türetilmelidir; GTİP önerileri **nihai gümrük kararı değildir**. API anahtarlarını ve kişisel link listelerini herkese açık repoda paylaşmayın.
+Tarife verileri resmi kaynaklardan türetilmelidir; GTİP önerileri **nihai gümrük kararı değildir**. 
