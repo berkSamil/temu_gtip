@@ -96,7 +96,7 @@ build_db.py sağlık durumu (son kontrol):
   ✅ 96 fasıl notu, bölüm/fasıl ayrımı doğru
   ✅ 3,986 pozisyon, hierarchy tracking doğru
   ✅ FTS5 indeksleri çalışıyor
-  ⚠️ .doc dosyalar libreoffice --headless --convert-to docx ile
+  ⚠️ .doc dosyalar soffice --headless --convert-to docx ile
      dönüştürülmeli (build_db.py bunu otomatik yapacak)
 
 ---
@@ -332,7 +332,7 @@ python scripts/build_db.py data/fasil_dosyalari/ \
 ANTHROPIC_API_KEY=sk-ant-...
 
 # İzahname parse için (build_db.py otomatik kullanacak)
-# libreoffice kurulu olmalı (.doc → .docx dönüşümü)
+# soffice kurulu olmalı (.doc → .docx dönüşümü)
 # pip install python-docx
 ```
 
@@ -341,7 +341,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 ## MÜHENDİSLİK HEDEFLERİ (Faz 2 — şu an)
 
 ### Adım 1 — İzahname + genel kurallar + içindekiler entegrasyonu
-- build_db.py'a parse_izahname_doc() ekle (libreoffice + python-docx)
+- build_db.py'a parse_izahname_doc() ekle (soffice + python-docx)
 - build_db.py'a parse_yorum_kurallari() ve parse_icindekiler() ekle
 - DB'ye izahname_notlari, yorum_kurallari, bolum_fasil tabloları
 - 97 izahname .doc'u data/izahname_notlari/ altına koy
