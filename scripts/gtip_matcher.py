@@ -46,24 +46,11 @@ _TEMU_STOP = frozenset({
 
 def get_candidate_fasils(conn, product_details, keywords, description, title, max_fasils=8):
     """
-    Aday fasillari belirle: urun metninden kelimeler -> FTS (gtip_fts) ile eslesen satirlarin
-    fasil numaralari + hafif malzeme ipucu (urun turu degil, sadece malzeme sozcukleri).
-    Urun-ozel anahtar kelime haritasi yok.
+    Aday fasillari belirle: urun metninden kelimeler -> FTS (gtip_fts + notlar_fts) ile
+    eslesen satirlarin fasil numaralari. Material hints kaldirildi — tarife mantığına aykırı.
     """
     text = f"{title} {description} {keywords} {product_details}".lower()
     scores = {}
-
-    material_hints = (
-        ('plastic', 39), ('rubber', 40), ('leather', 42), ('wood', 44), ('paper', 48),
-        ('cotton', 52), ('polyester', 54), ('wool', 51), ('nylon', 55), ('silk', 50),
-        ('linen', 53), ('ceramic', 69), ('porcelain', 69), ('glass', 70),
-        ('steel', 73), ('stainless', 73), ('iron', 73), ('copper', 74),
-        ('aluminum', 76), ('aluminium', 76), ('brass', 74), ('zinc', 79), ('metal', 73),
-        ('silicone', 39), ('pvc', 39), ('abs', 39), ('eva', 39), ('bamboo', 44),
-    )
-    for kw, fn in material_hints:
-        if kw in text:
-            scores[fn] = scores.get(fn, 0) + 2
 
     words = sorted(
         set(re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ]{4,}', text)),
@@ -120,6 +107,145 @@ def get_fasil_notu(conn, fasil_no):
         (fasil_no,)
     ).fetchone()
     return row[0] if row else ""
+
+
+def get_all_pozisyonlar(conn, fasil_no):
+    """
+    Fasılın tüm 4'lü pozisyonlarını döner.
+
+    Tarife cetveli yarı-düzenlidir: bazı pozisyonlar cetvelde 4'lü değil
+    doğrudan 6'lı seviyede başlar (örn. 9602.00, 9605.00). Bu durumda
+    pozisyon tablosunda seviye=4 kaydı olmaz ama gtip tablosunda ilgili
+    12'liler mevcuttur. Yalnızca pozisyon tablosuna bağlı kalmak bu
+    pozisyonları Step 1'den gizler ve Step 2'ye geçilmesini engeller.
+
+    Çözüm: gtip tablosundan substr(gtip_clean,1,4) ile sentetik 4'lü
+    gruplar türet, açıklama için pozisyon tablosuna bak, yoksa gtip
+    hiyerarşi metnini kullan.
+    """
+    c = conn.cursor()
+    # 1) Fasıldaki tüm benzersiz 4-hane öneklerini GTİP tablosundan çıkar
+    prefixes = [
+        row[0]
+        for row in c.execute("""
+            SELECT DISTINCT substr(gtip_clean, 1, 4) AS p
+            FROM gtip
+            WHERE fasil = ?
+            ORDER BY p
+        """, (fasil_no,)).fetchall()
+    ]
+    result = []
+    for pref in prefixes:
+        # 2a) pozisyon tablosunda bu önekle başlayan en kısa kaydı ara
+        row = c.execute("""
+            SELECT tanim FROM pozisyon
+            WHERE fasil = ? AND substr(kod_clean, 1, 4) = ?
+            ORDER BY seviye
+            LIMIT 1
+        """, (fasil_no, pref)).fetchone()
+        if row:
+            result.append((pref, row[0]))
+        else:
+            # gtip tablosundan tanim_hiyerarsi ile temsil et
+            g = c.execute("""
+                SELECT tanim_hiyerarsi FROM gtip
+                WHERE fasil = ? AND substr(gtip_clean, 1, 4) = ?
+                ORDER BY gtip_code
+                LIMIT 1
+            """, (fasil_no, pref)).fetchone()
+            if g:
+                result.append((pref, g[0] or pref))
+    return result
+
+
+def get_gtips_by_pozisyon(conn, pozisyon_kod):
+    """Seçilen 4'lü pozisyon altındaki tüm 12'li GTİP'leri döner."""
+    clean = re.sub(r'[^0-9]', '', str(pozisyon_kod))[:4]
+    c = conn.cursor()
+    return c.execute("""
+        SELECT gtip_code, tanim, tanim_hiyerarsi FROM gtip
+        WHERE gtip_clean LIKE ?
+        ORDER BY gtip_code
+    """, (clean + '%',)).fetchall()
+
+
+def get_izahname(conn, fasil_no, max_chars=3000):
+    """Fasıl izahname metnini döner (kırpılmış)."""
+    c = conn.cursor()
+    row = c.execute(
+        "SELECT metin FROM izahname_notlari WHERE fasil_no = ?",
+        (fasil_no,)
+    ).fetchone()
+    if not row or not row[0]:
+        return ""
+    return row[0][:max_chars]
+
+
+def get_yorum_kurallari(conn):
+    """Tüm yorum kurallarını tek metin olarak döner (özet)."""
+    c = conn.cursor()
+    rows = c.execute(
+        "SELECT kural_no, metin FROM yorum_kurallari ORDER BY kural_no"
+    ).fetchall()
+    parts = []
+    for kural_no, metin in rows:
+        parts.append(f"KURAL {kural_no}:\n{(metin or '')[:600]}")
+    return "\n\n".join(parts)
+
+
+_TAXONOMY_CACHE = {}
+_PROMPT_CACHE = {}
+
+def get_fasil_taxonomy(conn, note_chars=300):
+    """
+    bolum_fasil tablosundan tüm bölüm→fasıl hiyerarşisini döner.
+    Her fasıl için kısa fasıl notu özeti de eklenir. Sonuç cache'lenir.
+    """
+    cache_key = note_chars
+    if cache_key in _TAXONOMY_CACHE:
+        return _TAXONOMY_CACHE[cache_key]
+
+    c = conn.cursor()
+    rows = c.execute(
+        "SELECT bolum_no, bolum_adi, fasil_no, fasil_adi FROM bolum_fasil ORDER BY bolum_no, fasil_no"
+    ).fetchall()
+
+    parts = []
+    current_bolum = None
+    for bolum_no, bolum_adi, fasil_no, fasil_adi in rows:
+        if bolum_no != current_bolum:
+            parts.append(f"\nBÖLÜM {bolum_no}: {bolum_adi}")
+            current_bolum = bolum_no
+        if note_chars > 0:
+            note = get_fasil_notu(conn, fasil_no)
+            note_excerpt = f" | {note[:note_chars]}" if note else ""
+        else:
+            note_excerpt = ""
+        parts.append(f"  Fasıl {fasil_no:02d}: {fasil_adi}{note_excerpt}")
+
+    result = "\n".join(parts)
+    _TAXONOMY_CACHE[cache_key] = result
+    return result
+
+
+def build_fasil_prompt(conn):
+    if 'fasil' in _PROMPT_CACHE:
+        return _PROMPT_CACHE['fasil']
+    kurallar = get_yorum_kurallari(conn)
+    blok = f"TARIFEYE ILISKIN GENEL YORUMLAMA KURALLARI:\n{kurallar}" if kurallar else ""
+    result = _FASIL_PROMPT_BASE.format(kurallar_blok=blok)
+    _PROMPT_CACHE['fasil'] = result
+    return result
+
+
+def build_pozisyon_prompt(conn):
+    if 'pozisyon' in _PROMPT_CACHE:
+        return _PROMPT_CACHE['pozisyon']
+    kurallar = get_yorum_kurallari(conn)
+    blok = f"TARIFEYE ILISKIN GENEL YORUMLAMA KURALLARI:\n{kurallar}" if kurallar else ""
+    result = _POZISYON_PROMPT_BASE.format(kurallar_blok=blok)
+    _PROMPT_CACHE['pozisyon'] = result
+    return result
 
 
 def search_gtip_fts(conn, query, limit=20):
@@ -331,6 +457,35 @@ REFINE_SYSTEM_PROMPT = """Ayni gorev: Turk gumruk GTIP siniflandirmasi. Onceki J
 TARIFE metnini tekrar dikkatle uygula; gtip_code ve alternatifler SADECE mesajdaki listede var olan
 12 haneli kodlardan secilsin. Yanit SADECE gecerli JSON (gtip_code, fasil, gerekce, guven, alternatifler)."""
 
+_FASIL_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
+Gorev: Asagidaki tarife taksonomisini kullanarak urun icin 3-5 aday FASIL belirle.
+
+{kurallar_blok}
+
+Yanitini SADECE su JSON formatinda ver:
+{{
+  "aday_fasiller": [96, 33, 71],
+  "gerekce": "Kisa Turkce gerekce (2-3 cumle)"
+}}"""
+
+_POZISYON_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
+Gorev: Urun icin dogru FASIL ve 4 haneli POZİSYONU belirle.
+
+Verilen fasil notlari, izahname ve pozisyon listesine gore en uygun pozisyonu sec.
+
+{kurallar_blok}
+
+- Fasil notu ve izahname dahil/haric hukumlerini aynen uygula.
+- En ozel pozisyonu sec; "Digerleri"ni son care olarak kullan.
+- Listede olmayan pozisyon uydurma.
+
+Yanitini SADECE su JSON formatinda ver:
+{{
+  "fasil": 84,
+  "pozisyon_kod": "84.73",
+  "gerekce": "Kisa Turkce gerekce (2-3 cumle)"
+}}"""
+
 
 def _needs_refine(cls):
     if cls.get('error') or cls.get('parse_hatasi'):
@@ -383,6 +538,98 @@ def build_tarife_context(
     return "\n\n".join(parts), candidate_fasils
 
 
+def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
+                           product_details, note_max_chars, retrieval_top_n,
+                           izahname_max_chars=1500):
+    """Adım 1 context: fasıl notları + izahname özeti + tüm 4'lü pozisyonlar."""
+    ranked = retrieve_ranked_gtips(
+        conn, title, desc, keywords, product_details, top_n=min(retrieval_top_n, 20)
+    )
+    parts = []
+    if ranked:
+        rlines = "\n".join(f"  {g[0]}  {g[1]}" for g in ranked)
+        parts.append(f"=== METNE GORE FTS REFERANS ===\n{rlines}")
+
+    for fno in candidate_fasils[:5]:
+        pozlar = get_all_pozisyonlar(conn, fno)
+        if not pozlar:
+            continue
+        note = get_fasil_notu(conn, fno)
+        excerpt = (note[:note_max_chars] if note else "(not yok)")
+        izahname = get_izahname(conn, fno, izahname_max_chars)
+        poz_lines = "\n".join(f"  {p[0]}  {p[1]}" for p in pozlar)
+        block = (
+            f"=== FASIL {fno} ===\n"
+            f"FASIL NOTU:\n{excerpt}\n\n"
+        )
+        if izahname:
+            block += f"IZAHNAME (ozet):\n{izahname}\n\n"
+        block += f"4'LU POZISYONLAR:\n{poz_lines}"
+        parts.append(block)
+
+    return "\n\n".join(parts)
+
+
+def _get_ara_pozisyonlar(conn, fasil_no, poz4_clean):
+    """4'lü pozisyon altındaki ara seviye (6,8,10 hane) pozisyonları döner: {kod_clean: tanim}"""
+    c = conn.cursor()
+    rows = c.execute("""
+        SELECT kod_clean, tanim FROM pozisyon
+        WHERE fasil = ?
+          AND length(kod_clean) > 4
+          AND length(kod_clean) < 12
+          AND substr(kod_clean, 1, 4) = ?
+        ORDER BY length(kod_clean), kod_clean
+    """, (fasil_no, poz4_clean)).fetchall()
+    return {r[0]: r[1] for r in rows}
+
+
+def _format_gtip_grouped(gtips, ara_pozlar):
+    """12'li GTİP listesini ara pozisyon başlıklarıyla gruplu formatlar."""
+    if not ara_pozlar:
+        return "\n".join(f"  {g[0]}  {g[1]}" for g in gtips)
+
+    def best_header(gtip_clean):
+        best = None
+        for ara_clean in ara_pozlar:
+            if gtip_clean.startswith(ara_clean):
+                if best is None or len(ara_clean) > len(best):
+                    best = ara_clean
+        return best
+
+    lines = []
+    last_header = None
+    for g in gtips:
+        gtip_clean = re.sub(r'[^0-9]', '', g[0])
+        header = best_header(gtip_clean)
+        if header and header != last_header:
+            lines.append(f"\n  [{header}]  {ara_pozlar[header]}")
+            last_header = header
+        lines.append(f"    {g[0]}  {g[1]}")
+
+    return "\n".join(lines).lstrip("\n")
+
+
+def build_gtip_context(conn, fasil_no, pozisyon_kod, note_max_chars, izahname_max_chars):
+    """Adım 2 context: fasıl notu + seçilen pozisyonun tüm 12'lileri (ara seviye başlıklı)."""
+    poz4_clean = re.sub(r'[^0-9]', '', str(pozisyon_kod))[:4]
+    gtips = get_gtips_by_pozisyon(conn, pozisyon_kod)
+    note = get_fasil_notu(conn, fasil_no)
+    izahname = get_izahname(conn, fasil_no, izahname_max_chars)
+
+    parts = []
+    if note:
+        parts.append(f"=== FASIL {fasil_no} NOTU ===\n{note[:note_max_chars]}")
+    if izahname:
+        parts.append(f"=== FASIL {fasil_no} IZAHNAME (ozet) ===\n{izahname}")
+    if gtips:
+        ara_pozlar = _get_ara_pozisyonlar(conn, fasil_no, poz4_clean)
+        gtip_block = _format_gtip_grouped(gtips, ara_pozlar)
+        parts.append(f"=== POZISYON {pozisyon_kod} ALTINDAKI TUM GTIP'LER ===\n{gtip_block}")
+
+    return "\n\n".join(parts), gtips
+
+
 def _call_classify(client, model, max_tokens, system_prompt, user_msg):
     return client.messages.create(
         model=model,
@@ -392,65 +639,203 @@ def _call_classify(client, model, max_tokens, system_prompt, user_msg):
     )
 
 
+def _api_call_with_retry(client, model, max_tokens, system_prompt, user_msg):
+    """Rate limit retry mantığıyla API çağrısı yapar."""
+    try:
+        return _call_classify(client, model, max_tokens, system_prompt, user_msg)
+    except anthropic.RateLimitError:
+        for wait in [30, 60]:
+            print(f"\n    Rate limit, {wait}s bekleniyor...", end="", flush=True)
+            time.sleep(wait)
+            try:
+                return _call_classify(client, model, max_tokens, system_prompt, user_msg)
+            except anthropic.RateLimitError:
+                continue
+        raise
+
+
 def classify_product(client, product_info, conn, opts=None):
     """
-    opts: dict — model, max_tokens, note_max_chars, gtip_rows_per_fasil, retrieval_top_n,
-    refine, refine_model, refine_max_tokens
+    2-adımlı hiyerarşik sınıflandırma:
+      Adım 1: Aday fasıllar → 4'lü pozisyon seçimi
+      Adım 2: Seçilen pozisyon altındaki tüm 12'liler → GTİP seçimi
+
+    opts: model, max_tokens, note_max_chars, izahname_max_chars,
+          gtip_rows_per_fasil (fallback için), retrieval_top_n,
+          refine, refine_model, refine_max_tokens
     """
     opts = opts or {}
-    model = opts.get('model', 'claude-haiku-4-5-20251001')
-    max_tokens = int(opts.get('max_tokens', 1200))
-    note_max_chars = int(opts.get('note_max_chars', 8000))
+    model               = opts.get('model', 'claude-haiku-4-5-20251001')
+    max_tokens          = int(opts.get('max_tokens', 1200))
+    note_max_chars      = int(opts.get('note_max_chars', 8000))
+    izahname_max_chars  = int(opts.get('izahname_max_chars', 0))
     gtip_rows_per_fasil = int(opts.get('gtip_rows_per_fasil', 120))
-    retrieval_top_n = int(opts.get('retrieval_top_n', 50))
-    do_refine = bool(opts.get('refine'))
-    refine_model = opts.get('refine_model', 'claude-sonnet-4-20250514')
-    refine_max_tokens = int(opts.get('refine_max_tokens', 1200))
+    retrieval_top_n     = int(opts.get('retrieval_top_n', 50))
+    do_refine           = bool(opts.get('refine'))
+    refine_model        = opts.get('refine_model', 'claude-sonnet-4-20250514')
+    refine_max_tokens   = int(opts.get('refine_max_tokens', 1200))
 
-    title = product_info.get('title', '')
-    desc = product_info.get('description', '')
-    keywords = product_info.get('keywords', '')
+    title           = product_info.get('title', '')
+    desc            = product_info.get('description', '')
+    keywords        = product_info.get('keywords', '')
     product_details = product_info.get('product_details', '')
-    sku_variants = product_info.get('sku_variants', '')
+    sku_variants    = product_info.get('sku_variants', '')
 
-    tarife_context, _ = build_tarife_context(
-        conn,
-        title,
-        desc,
-        keywords,
-        product_details,
-        note_max_chars,
-        gtip_rows_per_fasil,
-        retrieval_top_n,
+    product_text = (
+        f"Baslik: {title}\n"
+        f"Aciklama: {desc}\n"
+        f"Urun Detaylari: {product_details or '(belirtilmemis)'}\n"
+        f"Varyantlar: {sku_variants or '(yok)'}"
     )
 
-    user_msg = f"""Asagidaki urun icin dogru 12 haneli GTIP kodunu belirle.
+    # ------------------------------------------------------------------
+    # ADIM 0 — Fasıl seçimi (taxonomy-driven, FTS yok)
+    # ------------------------------------------------------------------
+    taxonomy = get_fasil_taxonomy(conn, note_chars=0)
+    fasil_user_msg = (
+        f"Asagidaki urun icin dogru fasillari sec.\n\n"
+        f"URUN BILGILERI:\n{product_text}\n\n"
+        f"TURK GUMRUK TARIFE TAKSONOMISI:\n{taxonomy}\n\n"
+        f"Yanitini SADECE JSON olarak ver."
+    )
+    fasil_system_prompt   = build_fasil_prompt(conn)
+    pozisyon_system_prompt = build_pozisyon_prompt(conn)
 
-URUN BILGILERI:
-Baslik: {title}
-Aciklama: {desc}
-Urun Detaylari (Product Details): {product_details or '(belirtilmemis)'}
-Varyantlar: {sku_variants or '(yok)'}
+    candidate_fasils = []
+    try:
+        fasil_resp = _api_call_with_retry(client, model, 400, fasil_system_prompt, fasil_user_msg)
+        fasil_parsed = extract_first_json_object(fasil_resp.content[0].text)
+        if fasil_parsed and fasil_parsed.get('aday_fasiller'):
+            raw = fasil_parsed['aday_fasiller']
+            candidate_fasils = [int(x) for x in raw if str(x).isdigit()][:5]
+    except Exception:
+        pass
 
-Urun bilgisini ve asagidaki tarife metnini kullan. Gerekcede yalnizca yukarida gercekten gecen bilgiye dayan.
+    # Adım 0 başarısız olursa FTS fallback
+    if not candidate_fasils:
+        candidate_fasils = get_candidate_fasils(conn, product_details, keywords, desc, title)
 
-TARIFE CETVELI VERILERI:
-{tarife_context}
+    # ------------------------------------------------------------------
+    # ADIM 1 — Pozisyon seçimi
+    # ------------------------------------------------------------------
+    poz_context = build_pozisyon_context(
+        conn, candidate_fasils, title, desc, keywords,
+        product_details, note_max_chars, retrieval_top_n,
+        izahname_max_chars=izahname_max_chars
+    )
+    poz_user_msg = (
+        f"Asagidaki urun icin dogru FASIL ve 4 haneli POZISYONU sec.\n\n"
+        f"URUN BILGILERI:\n{product_text}\n\n"
+        f"TARIFE CETVELI:\n{poz_context}\n\n"
+        f"Yanitini SADECE JSON olarak ver."
+    )
 
-Yanitini SADECE JSON olarak ver."""
+    poz_result = None
+    try:
+        poz_resp = _api_call_with_retry(client, model, 600, pozisyon_system_prompt, poz_user_msg)
+        poz_parsed = extract_first_json_object(poz_resp.content[0].text)
+        if poz_parsed and poz_parsed.get('pozisyon_kod'):
+            poz_result = poz_parsed
+    except Exception:
+        pass
 
-    def run_once(sys_p, mdl, mtok):
-        response = _call_classify(client, mdl, mtok, sys_p, user_msg)
-        text = response.content[0].text.strip()
+    # Pozisyon seçimi başarısızsa eski flat yönteme düş
+    if not poz_result:
+        return _classify_flat(client, product_info, conn, opts,
+                              candidate_fasils, note_max_chars,
+                              gtip_rows_per_fasil, retrieval_top_n)
+
+    fasil_no     = poz_result.get('fasil')
+    pozisyon_kod = str(poz_result.get('pozisyon_kod', '')).strip()
+
+    gtips_check = get_gtips_by_pozisyon(conn, pozisyon_kod)
+    if not gtips_check:
+        return _classify_flat(client, product_info, conn, opts,
+                              candidate_fasils, note_max_chars,
+                              gtip_rows_per_fasil, retrieval_top_n)
+
+    # ------------------------------------------------------------------
+    # ADIM 2 — GTİP seçimi
+    # ------------------------------------------------------------------
+    gtip_context, _ = build_gtip_context(
+        conn, fasil_no, pozisyon_kod, note_max_chars, izahname_max_chars
+    )
+
+    # Yorum kurallarını system prompt'a ekle
+    kurallar = get_yorum_kurallari(conn)
+    system_step2 = (
+        f"TARIFEYE ILISKIN GENEL YORUMLAMA KURALLARI:\n{kurallar}\n\n---\n\n{SYSTEM_PROMPT}"
+        if kurallar else SYSTEM_PROMPT
+    )
+
+    gtip_user_msg = (
+        f"Asagidaki urun icin dogru 12 haneli GTIP kodunu belirle.\n\n"
+        f"URUN BILGILERI:\n{product_text}\n"
+        f"Secilen pozisyon: {pozisyon_kod} (Fasil {fasil_no})\n\n"
+        f"Urun bilgisini ve asagidaki tarife metnini kullan.\n\n"
+        f"TARIFE CETVELI VERILERI:\n{gtip_context}\n\n"
+        f"Yanitini SADECE JSON olarak ver."
+    )
+
+    def run_step2(sys_p, mdl, mtok):
+        resp = _api_call_with_retry(client, mdl, mtok, sys_p, gtip_user_msg)
+        text = resp.content[0].text.strip()
         parsed = extract_first_json_object(text)
         if parsed is None:
-            return {
-                "gtip_code": "",
-                "gerekce": text[:300],
-                "guven": "dusuk",
-                "error": "JSON parse edilemedi",
-                "parse_hatasi": True,
-            }
+            return {"gtip_code": "", "gerekce": text[:300], "guven": "dusuk",
+                    "error": "JSON parse edilemedi", "parse_hatasi": True}
+        return sanitize_classification(conn, parsed)
+
+    try:
+        out = run_step2(system_step2, model, max_tokens)
+        out.pop('parse_hatasi', None)
+        if do_refine and _needs_refine(out):
+            refined = run_step2(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)
+            refined.pop('parse_hatasi', None)
+            if (not refined.get('error') and refined.get('gtip_code')
+                    and gtip_exists(conn, refined['gtip_code'])):
+                refined['gerekce'] = ('[Ikinci gecis] ' + str(refined.get('gerekce', '')))[:2500]
+                return refined
+        return out
+    except Exception as e:
+        return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e)[:100]}
+
+
+def _classify_flat(client, product_info, conn, opts, candidate_fasils,
+                   note_max_chars, gtip_rows_per_fasil, retrieval_top_n):
+    """Eski tek-adımlı flat sınıflandırma (fallback)."""
+    model             = opts.get('model', 'claude-haiku-4-5-20251001')
+    max_tokens        = int(opts.get('max_tokens', 1200))
+    do_refine         = bool(opts.get('refine'))
+    refine_model      = opts.get('refine_model', 'claude-sonnet-4-20250514')
+    refine_max_tokens = int(opts.get('refine_max_tokens', 1200))
+
+    title           = product_info.get('title', '')
+    desc            = product_info.get('description', '')
+    keywords        = product_info.get('keywords', '')
+    product_details = product_info.get('product_details', '')
+    sku_variants    = product_info.get('sku_variants', '')
+
+    tarife_context, _ = build_tarife_context(
+        conn, title, desc, keywords, product_details,
+        note_max_chars, gtip_rows_per_fasil, retrieval_top_n
+    )
+    user_msg = (
+        f"Asagidaki urun icin dogru 12 haneli GTIP kodunu belirle.\n\n"
+        f"URUN BILGILERI:\nBaslik: {title}\nAciklama: {desc}\n"
+        f"Urun Detaylari: {product_details or '(belirtilmemis)'}\n"
+        f"Varyantlar: {sku_variants or '(yok)'}\n\n"
+        f"TARIFE CETVELI VERILERI:\n{tarife_context}\n\n"
+        f"Yanitini SADECE JSON olarak ver."
+    )
+
+    def run_once(sys_p, mdl, mtok):
+        resp = _api_call_with_retry(client, mdl, mtok, sys_p, user_msg)
+        text = resp.content[0].text.strip()
+        parsed = extract_first_json_object(text)
+        if parsed is None:
+            return {"gtip_code": "", "gerekce": text[:300], "guven": "dusuk",
+                    "error": "JSON parse edilemedi", "parse_hatasi": True}
         return sanitize_classification(conn, parsed)
 
     try:
@@ -459,42 +844,11 @@ Yanitini SADECE JSON olarak ver."""
         if do_refine and _needs_refine(out):
             refined = run_once(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)
             refined.pop('parse_hatasi', None)
-            if (
-                not refined.get('error')
-                and refined.get('gtip_code')
-                and gtip_exists(conn, refined['gtip_code'])
-            ):
-                refined['gerekce'] = (
-                    '[Ikinci gecis] ' + str(refined.get('gerekce', ''))
-                )[:2500]
+            if (not refined.get('error') and refined.get('gtip_code')
+                    and gtip_exists(conn, refined['gtip_code'])):
+                refined['gerekce'] = ('[Ikinci gecis] ' + str(refined.get('gerekce', '')))[:2500]
                 return refined
         return out
-
-    except anthropic.RateLimitError:
-        for wait in [30, 60]:
-            print(f"\n    Rate limit, {wait}s bekleniyor...", end="", flush=True)
-            time.sleep(wait)
-            try:
-                out = run_once(SYSTEM_PROMPT, model, max_tokens)
-                out.pop('parse_hatasi', None)
-                if do_refine and _needs_refine(out):
-                    refined = run_once(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)
-                    refined.pop('parse_hatasi', None)
-                    if (
-                        not refined.get('error')
-                        and refined.get('gtip_code')
-                        and gtip_exists(conn, refined['gtip_code'])
-                    ):
-                        refined['gerekce'] = (
-                            '[Ikinci gecis] ' + str(refined.get('gerekce', ''))
-                        )[:2500]
-                        return refined
-                return out
-            except anthropic.RateLimitError:
-                continue
-            except Exception as e2:
-                return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e2)[:100]}
-        return {"gtip_code": "", "gerekce": "", "guven": "", "error": "Rate limit asılamadı"}
     except Exception as e:
         return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e)[:100]}
 
@@ -508,6 +862,9 @@ def _slug_header(name):
     if name is None:
         return ''
     s = str(name).lower()
+    # Turkish character transliteration
+    tr_map = str.maketrans('üöşıığçÜÖŞIİĞÇ', 'uosiigcuosiigc')
+    s = s.translate(tr_map)
     s = re.sub(r'[^a-z0-9]+', '_', s)
     return s.strip('_')
 
@@ -531,17 +888,18 @@ def normalize_product_row(row):
         return ''
 
     url = pick('url', 'product_url', 'product_link', 'link')
-    title = pick('title', 'product_title')
-    description = pick('description', 'aciklama', 'desc')
-    keywords = pick('keywords', 'keyword', 'category_path', 'category')
-    product_details = pick('product_details')
+    title = pick('title', 'product_title', 'urun_basligi', 'urun_adi',
+                 'turkce_ticari_tanim', 'ticari_tanim', 'turkce_ticar_itanim', 'mal_tanimi')
+    description = pick('description', 'aciklama', 'desc', 'urun_aciklamasi')
+    keywords = pick('keywords', 'keyword', 'category_path', 'category', 'kategori')
+    product_details = pick('product_details', 'urun_detaylari')
     if not product_details:
         for sk, val in by_slug.items():
             if 'product' in sk and 'detail' in sk and str(val).strip():
                 product_details = str(val).strip()
                 break
 
-    image_url = pick('image_url', 'thumbnail_url', 'img_url')
+    image_url = pick('image_url', 'thumbnail_url', 'img_url', 'kucuk_resim_url', 'resim_url')
     if not image_url:
         for sk, val in by_slug.items():
             if 'thumbnail' in sk and str(val).strip():
@@ -776,7 +1134,14 @@ def main():
         type=int,
         default=120,
         metavar='N',
-        help='Her aday fasil icin GTIP satir sayisi',
+        help='Fallback modda her aday fasil icin GTIP satir sayisi',
+    )
+    parser.add_argument(
+        '--izahname-chars',
+        type=int,
+        default=3000,
+        metavar='N',
+        help='Izahname metninden modele giden max karakter (varsayilan: 3000)',
     )
     parser.add_argument(
         '--retrieval',
@@ -833,6 +1198,7 @@ def main():
         'model': args.model,
         'max_tokens': args.max_tokens,
         'note_max_chars': args.note_chars,
+        'izahname_max_chars': args.izahname_chars,
         'gtip_rows_per_fasil': args.gtip_rows,
         'retrieval_top_n': args.retrieval,
         'refine': args.refine,

@@ -1,0 +1,1490 @@
+{
+  "timestamp": "2026-04-02T17:02:18.760733",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 121,
+  "n_skipped": 104,
+  "metrics": {
+    "fasil": {
+      "hits": 12,
+      "total": 17,
+      "accuracy": 70.59
+    },
+    "pozisyon": {
+      "hits": 10,
+      "total": 17,
+      "accuracy": 58.82
+    },
+    "alt_poz": {
+      "hits": 8,
+      "total": 17,
+      "accuracy": 47.06
+    },
+    "exact": {
+      "hits": 8,
+      "total": 17,
+      "accuracy": 47.06
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Tek elle kullanılan bahçe budama makası",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Seyahat tipi dikiş seti (taşınabilir)",
+      "correct_gtip": "9605.00.00.90.00",
+      "predicted_gtip": "9601.90.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Manyetik şişe açacağı",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8308.90.00.90.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Yüz temizleme fırçası",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Parfüm için spreyli atomizer şişe (doldurulabilir)",
+      "correct_gtip": "9616.10.10.00.00",
+      "predicted_gtip": "9616.10.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Plastikten mamul, yapışkanlı duvar tipi tıraş bıçağı tutucu (banyo aksesuarı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "kıyafetleri sabitleyen, ayarlanabilir ve çıkarılabilir 6’lı pratik klips seti.",
+      "correct_gtip": "7117.90.00.50.00",
+      "predicted_gtip": "9606.10.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Plastikten mamul, yapışkanlı kablo tutucu klips",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Kozmetik uygulama süngeri (makyaj süngeri)",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "3304.99.00.90.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Isısız saç şekillendirme aparatı (saç sarma bandı)",
+      "correct_gtip": "9615.90.00.90.00",
+      "predicted_gtip": "9615.19.00.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Plastik tabanlı, metal askı aparatı (yapışkanlı duvar tipi)",
+      "correct_gtip": "8302.50.00.00.00",
+      "predicted_gtip": "8302.50.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Maskara uygulama fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Ahşaptan mamul, yapışkanlı dekoratif süs eşyası",
+      "correct_gtip": "4420.19.00.00.00",
+      "predicted_gtip": "4420.90.99.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Ahşaptan mamul hatıra saklama kutusu",
+      "correct_gtip": "4420.90.99.00.00",
+      "predicted_gtip": "4420.90.99.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Kozmetik amaçlı eyeliner / kaş fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "3304.20.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Tekstil kaplı saç bandı (taç tipi saç aksesuarı)",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "9615.19.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Istampa",
+      "correct_gtip": "9612.20.00.00.00",
+      "predicted_gtip": "4911.91.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Fondöten uygulama fırçası (kozmetik makyaj fırçası)",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Tekstil mamul saç tokası",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Balıkçılıkta kullanılan misina stoperi (kauçuk boncuk)",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı altı izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Sentetik monofilament balıkçılık misinası (fluorokarbon/naylon)",
+      "correct_gtip": "5404.19.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Nail art uygulama fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "kozmetik makyaj fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Resim yapmaya mahsus ince uçlu boya fırçası",
+      "correct_gtip": "9603.30.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Polietilenden mamul örgü balıkçılık misinası (PE braided line)",
+      "correct_gtip": "5607.49.90.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte banyo organizer raf (saç kurutma makinesi tutuculu",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte organizer kutu (çok bölmeli saklama kabı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kablo sabitleme klipsi",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Silikon saç derisi temizleme ve bakım aparatı",
+      "correct_gtip": "9603.29.30.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte tıraş bıçağı tutucu",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Renkli jel kalem refill seti",
+      "correct_gtip": "9608.60.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastik saç bigudisi seti",
+      "correct_gtip": "9615.90.00.10.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Saç şekillendirme aparatı (plastik)",
+      "correct_gtip": "9615.90.00.10.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastik spiral saç tokası",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastik gövdeli dekoratif desen çizim kalemi seti",
+      "correct_gtip": "9611.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Sentetik monofilament balıkçılık misinası (fluorokarbon leader line)",
+      "correct_gtip": "5404.19.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Yapay balık yemi (suni kurt formunda silikon balıkçılık yemi)",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Balıkçılık ekipmanı – kurşun sinker (ağırlık) seti",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Resim Fırçası",
+      "correct_gtip": "9603.30.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "vücut temizleme fırçası",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal pimli, yapışkanlı duvar askı aparatı",
+      "correct_gtip": "8302.50.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Mobil cihazlar için tripod stand (plastik/alüminyum)",
+      "correct_gtip": "9620.00.91.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Balıkçılıkta kullanılan hazır olta takımı (sabiki rig)",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Aritmetik işlem basan damga",
+      "correct_gtip": "9611.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Akrilik/suluboya boya fırça seti",
+      "correct_gtip": "9603.30.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Alüminyum araç lastik sibop kapağı",
+      "correct_gtip": "7616.99.90.90.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Balık yakalama kepçesi",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Alüminyum tığ seti",
+      "correct_gtip": "7616.99.90.90.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Balıkçılık bağlantı aparatı",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Alüminyum RFID korumalı kartlık",
+      "correct_gtip": "4202.39.00.10.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Alüminyum karabina (anahtarlık ve askı amaçlı kanca)",
+      "correct_gtip": "7616.99.90.90.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Telefon için alüminyum yüzük tutucu stand",
+      "correct_gtip": "7616.99.90.90.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Alüminyum laptop standı",
+      "correct_gtip": "7616.99.90.90.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Alüminyum telefon ve tablet tutucu stand",
+      "correct_gtip": "7616.99.90.90.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Katlanabilir alüminyum kamp ocağı rüzgarlığı",
+      "correct_gtip": "7616.99.90.90.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Yapay balık yemi",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Gece balıkçılığı için ışık çubuğu",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte tutucu aparat",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Kurşun başlıklı olta iğnesi (jig head)",
+      "correct_gtip": "9507.20.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "olta kamışı",
+      "correct_gtip": "9507.10.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte süpürge/mop tutucu",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Saç tacı",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Ev tipi temizlik süngeri",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Müzik portesi basan döner tip damga",
+      "correct_gtip": "9611.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastikten mamul, vakumlu duvar tipi banyo rafı (ev eşyası)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "boya fırçası",
+      "correct_gtip": "9603.40.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastik elastik saç tokası (saç lastiği)",
+      "correct_gtip": "9615.11.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Acrylic magnetic memo board",
+      "correct_gtip": "9610.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Olta iğneleri",
+      "correct_gtip": "9507.20.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastikten mamul diş macunu sıkacağı ve diş fırçası tutucu",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Boncuklu elastik plastik saç tokası",
+      "correct_gtip": "9615.11.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Dekoratif desen basan roller damga",
+      "correct_gtip": "9611.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Su hazneli suluboya fırçası",
+      "correct_gtip": "9603.30.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Unicorn figürlü, takma saçlı dekoratif saçtokası",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Silikon yüz temizleme fırçası",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastik saç tokası",
+      "correct_gtip": "9615.11.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Olta aksesuarı (stoper / şamandıra boncuğu",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastik saç şekillendirme aksesuar seti",
+      "correct_gtip": "9615.11.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte diş fırçası tutucu",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Elle kullanılan saat kadranı damgası",
+      "correct_gtip": "9611.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Elle kullanılan damga",
+      "correct_gtip": "9611.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Resim fırça seti",
+      "correct_gtip": "9603.30.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Şifreli asma kilit",
+      "correct_gtip": "8301.10.00.00.11",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Buharlı temizleyiciye ait fırça başlıkları",
+      "correct_gtip": "9603.50.00.10.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Kapı/pencere güvenlik kilidi",
+      "correct_gtip": "8301.40.90.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Şifreli kablolu bisiklet kilidi",
+      "correct_gtip": "8301.10.00.00.11",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Mobilya için şifreli dolap kilidi",
+      "correct_gtip": "8301.30.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Frenli döner mobilya tekerlek seti (caster)",
+      "correct_gtip": "8302.20.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Portatif kapı güvenlik aparatı",
+      "correct_gtip": "8302.41.10.00.19",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal ataç",
+      "correct_gtip": "8305.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal kitap ayracı",
+      "correct_gtip": "8305.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Kalem tutucu klips",
+      "correct_gtip": "8305.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal masa zili",
+      "correct_gtip": "8306.10.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal süs zilleri",
+      "correct_gtip": "8306.10.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Dekoratif masa zili",
+      "correct_gtip": "8306.10.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Boya fırça seti",
+      "correct_gtip": "9603.40.10.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal dekoratif tılsım figürü",
+      "correct_gtip": "8306.29.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal ve kristal araç içi dekoratif süs klipsi",
+      "correct_gtip": "8306.29.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Pirinç dekoratif burç figürü",
+      "correct_gtip": "8306.29.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal ve kristal rüzgar çanı (dekoratif)",
+      "correct_gtip": "8306.29.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Pirinç dekoratif kaplumbağa figürü",
+      "correct_gtip": "8306.29.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Balıkçılık bağlantı klipsi",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal Çin uğur parası asma dekoru",
+      "correct_gtip": "8306.29.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal ayakkabı aksesuarı (bağcık süsü)",
+      "correct_gtip": "8308.90.00.90.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Paslanmaz çelik evcil hayvan isim etiketi",
+      "correct_gtip": "8310.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Paslanmaz çelik posta kutusu isim levhası",
+      "correct_gtip": "8310.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Keçe uçlu kalem seti",
+      "correct_gtip": "9608.20.00.10.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal harf seti (araç yazı/işaret için)",
+      "correct_gtip": "8310.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal bagaj isim/adres etiketi",
+      "correct_gtip": "8310.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal araç telefon numarası plakası",
+      "correct_gtip": "8310.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal kapı numarası",
+      "correct_gtip": "8310.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Saç fırçası",
+      "correct_gtip": "9603.29.30.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Dokunmatik ekran kalemi yedek uçları",
+      "correct_gtip": "9608.99.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Plastik saç kıvırma aparatı (elektriksiz)",
+      "correct_gtip": "9615.90.00.10.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Cilt temizleme fırçası",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Olta iğneli balıkçılık takımı",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Sentetik filament iplik",
+      "correct_gtip": "5406.00.00.00.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Elle kullanılan dekoratif kağıt kesme aparatı",
+      "correct_gtip": "8472.90.80.90.12",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Metal hair pin",
+      "correct_gtip": "9615.90.00.90.00",
+      "predicted_gtip": "",
+      "guven": "",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    }
+  ]
+}

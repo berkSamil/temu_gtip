@@ -1,0 +1,398 @@
+{
+  "timestamp": "2026-04-01T18:12:07.290371",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 30,
+  "n_skipped": 3,
+  "metrics": {
+    "fasil": {
+      "hits": 13,
+      "total": 27,
+      "accuracy": 48.15
+    },
+    "pozisyon": {
+      "hits": 7,
+      "total": 27,
+      "accuracy": 25.93
+    },
+    "alt_poz": {
+      "hits": 6,
+      "total": 27,
+      "accuracy": 22.22
+    },
+    "exact": {
+      "hits": 6,
+      "total": 27,
+      "accuracy": 22.22
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "[8.5\" Titanium Pruning Shears] Super Sharp 8.5\" Professional Titanium Bypass Pru",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Includes 111pcs Multi-sewing Kit with Accessories - 24-color Thread, Needles, an",
+      "correct_gtip": "9605.00.00.90.00",
+      "predicted_gtip": "8214.20.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "A Multifunctional That Serves As a Magnetic Bottle Opener, Can Opener, And Lever",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8205.59.80.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "1-Pack Manual Lymphatic Cleansing Brush | Suitable for Sensitive Skin and Lymphe",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "1/2/3/5-Pack Wall-Mounted Shaving Razor Holder | Stylish Bathroom Storage Rack, ",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "3pcs Set, a Professional Titanium Alloy Gardening Pruning Shears 21.59 cm And a ",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "2/5/10pcs Women's Adjustable Clothes Clips with Butterfly and Heart-Shaped Decor",
+      "correct_gtip": "7117.90.00.50.00",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "100pcs Adhesive Cable Clips, Transparent Wire Holders for Power Line Management,",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "4pcs Light-Colored Soft Makeup Sponge Set - Multifunctional Wet and Dry Use, Per",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "20-Piece Modern Wall-Mounted Utility Hooks - Easy to Install, Strong Adhesive, N",
+      "correct_gtip": "8302.50.00.00.00",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "5-Pcs / 9-Pcs Thumb-Shaped Organizers, Random Colors, Lightweight Desktop Cable ",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Crystal Disposable Mascara Wand Eyelash Brush Solid Spiral Eyebrow Brush Lash Co",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9615.90.00.10.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Set of 13 Professional Makeup Brushes for Beauty, Including Soft Fur Eye Shadow,",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "30/50/100pcs Mini Wooden Ladybugs, Red, with Stickers, for DIY Handicraft, Card ",
+      "correct_gtip": "4420.19.00.00.00",
+      "predicted_gtip": "9505.90.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Lymphatic Drainage Facial Massager and Contour Brush- Portable Facial Lymphatic ",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9615.90.00.10.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Original Wood Fetal Hair Keepsake Box | Perfect Gift for New Parents, Portable H",
+      "correct_gtip": "4420.90.99.00.00",
+      "predicted_gtip": "4420.90.99.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "1pc Spring Floral 5ML Perfume Spray Bottle – Refillable & Travel-Friendly Cute P",
+      "correct_gtip": "9616.10.10.00.00",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "1/2/3pcs Porcelain White Precision Angle Eyeliner and Eyebrow Brush Set - Nylon ",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Wide-Brimmed Anti Slip Headband for Hair Styling, High Crown Headdress with Comb",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "6507.00.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Touchless Ink Pad for Safe Footprint, Handprint, and Pet Print Stamping, Black I",
+      "correct_gtip": "9612.20.00.00.00",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "MAANGE Professional Foundation Brush - Soft Nylon Bristles, Elegant Brown Handle",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "1/7pcs Lymphatic Contour Face Brush, Lymphatic Drainage Brush for Face, Chin & N",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9615.90.00.10.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "1pc New Shiny Rhinestone Twist Hair Clip, Fashionable and Versatile for All Hair",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "1pc/3pcs Triangle Powder Puff Setting Powder Makeup Sponge Fan Powder Finger Cus",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "12/14/15/16/18pcs Makeup Sponge Set | Multi-Color Beauty Sponges for Liquid, Cre",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Set of 300 Fishing Rubber Beads And Bobber Stoppers: Reliable Buoyancy Managemen",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "4016.99.97.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Bow Design Bun Maker, Bohemian Headband, French Curling Iron, Headband, Hairstyl",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Door Draft Stopper, Under Door Sweep for Exterior & Interior Doors, Weatherstrip",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3919.90.80.90.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "500M/546YD Invisible Nylon Fishing Line, Fluorocarbon Fishing Line, Durable And ",
+      "correct_gtip": "5404.19.00.00.00",
+      "predicted_gtip": "5509.41.00.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Ultra-Fine Detail Brush for Nail Art - a Golden Copper Wire Painting Pen Designe",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9615.19.00.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    }
+  ]
+}

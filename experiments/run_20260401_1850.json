@@ -1,0 +1,158 @@
+{
+  "timestamp": "2026-04-01T18:50:43.398750",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 10,
+  "n_skipped": 2,
+  "metrics": {
+    "fasil": {
+      "hits": 5,
+      "total": 8,
+      "accuracy": 62.5
+    },
+    "pozisyon": {
+      "hits": 3,
+      "total": 8,
+      "accuracy": 37.5
+    },
+    "alt_poz": {
+      "hits": 2,
+      "total": 8,
+      "accuracy": 25.0
+    },
+    "exact": {
+      "hits": 2,
+      "total": 8,
+      "accuracy": 25.0
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "[8.5\" Titanyum Budama Makası] Süper Keskin 8.5\" Profesyonel Titanyum Bypass Buda",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "111 Parçalı Aksesuar İçeren Çok Amaçlı Dikiş Seti - 24 Renk İplik, İğneler ve Kü",
+      "correct_gtip": "9605.00.00.90.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Manyetik Şişe Açacağı, Konserve Açacağı ve Bira Kutusu Kaldıracı Olarak Kullanıl",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "1 Adet Manuel Lenf Temizleme Fırçası | Hassas Cilt ve Lenfödem İçin Uygun, Oval ",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.90.99.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "1/2/3/5'li Paket Duvara Monte Tıraş Bıçağı Tutucu | Şık Banyo Düzenleyici Raf, D",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3925.90.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "3'lü Set, Profesyonel Titanyum Alaşımlı Bahçe Budama Makası 21.59 cm + 304 Pasla",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "2/5/10 Adet Kelebek ve Kalp Şekilli Dekorlu Kadın Kıyafet Klipsi - Kolları Anınd",
+      "correct_gtip": "7117.90.00.50.00",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "100 Adet Yapışkanlı Kablo Klipsi, Güç Hattı Yönetimi İçin Şeffaf Kablo Tutucular",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3925.90.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "4'lü Açık Renkli Yumuşak Makyaj Süngeri Seti - Çok Amaçlı Islak ve Kuru Kullanım",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "3304.99.00.90.00",
+      "guven": "",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "20 Parçalı Modern Duvara Monte Askı Kancası Seti - Kolay Montaj, Güçlü Yapıştırı",
+      "correct_gtip": "8302.50.00.00.00",
+      "predicted_gtip": "3925.90.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    }
+  ]
+}

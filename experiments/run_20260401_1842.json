@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-04-01T18:42:34.775929",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 0,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 0,
+      "total": 0,
+      "accuracy": 0.0
+    },
+    "pozisyon": {
+      "hits": 0,
+      "total": 0,
+      "accuracy": 0.0
+    },
+    "alt_poz": {
+      "hits": 0,
+      "total": 0,
+      "accuracy": 0.0
+    },
+    "exact": {
+      "hits": 0,
+      "total": 0,
+      "accuracy": 0.0
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": []
+}

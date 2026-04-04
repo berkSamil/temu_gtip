@@ -1,0 +1,398 @@
+{
+  "timestamp": "2026-04-02T11:42:37.112530",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 30,
+  "n_skipped": 3,
+  "metrics": {
+    "fasil": {
+      "hits": 21,
+      "total": 27,
+      "accuracy": 77.78
+    },
+    "pozisyon": {
+      "hits": 20,
+      "total": 27,
+      "accuracy": 74.07
+    },
+    "alt_poz": {
+      "hits": 16,
+      "total": 27,
+      "accuracy": 59.26
+    },
+    "exact": {
+      "hits": 14,
+      "total": 27,
+      "accuracy": 51.85
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "[8.5\" Titanyum Budama Makası] Süper Keskin 8.5\" Profesyonel Titanyum Bypass Buda",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "111 Parçalı Aksesuar İçeren Çok Amaçlı Dikiş Seti - 24 Renk İplik, İğneler ve Kü",
+      "correct_gtip": "9605.00.00.90.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Manyetik Şişe Açacağı, Konserve Açacağı ve Bira Kutusu Kaldıracı Olarak Kullanıl",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8205.40.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "1 Adet Manuel Lenf Temizleme Fırçası | Hassas Cilt ve Lenfödem İçin Uygun, Oval ",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.90.99.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "1/2/3/5'li Paket Duvara Monte Tıraş Bıçağı Tutucu | Şık Banyo Düzenleyici Raf, D",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3925.90.80.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "3'lü Set, Profesyonel Titanyum Alaşımlı Bahçe Budama Makası 21.59 cm + 304 Pasla",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "2/5/10 Adet Kelebek ve Kalp Şekilli Dekorlu Kadın Kıyafet Klipsi - Kolları Anınd",
+      "correct_gtip": "7117.90.00.50.00",
+      "predicted_gtip": "9615.90.00.10.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "100 Adet Yapışkanlı Kablo Klipsi, Güç Hattı Yönetimi İçin Şeffaf Kablo Tutucular",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "4'lü Açık Renkli Yumuşak Makyaj Süngeri Seti - Çok Amaçlı Islak ve Kuru Kullanım",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "9616.20.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "20 Parçalı Modern Duvara Monte Askı Kancası Seti - Kolay Montaj, Güçlü Yapıştırı",
+      "correct_gtip": "8302.50.00.00.00",
+      "predicted_gtip": "3925.90.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "5 / 9 Adet Parmak Şekilli Düzenleyici, Rastgele Renkler, Hafif Masa Üstü Kablo Y",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Kristal Tek Kullanımlık Maskara Fırçası Spiral Kaş Fırçası Kirpik Tarağı Makyaj ",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.10.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "13 Parçalı Profesyonel Makyaj Fırça Seti - Yumuşak Far, Fondöten ve Allık Fırçal",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "30/50/100 Adet Mini Ahşap Uğur Böceği, Kırmızı, Etiketli, DIY El Sanatları, Kart",
+      "correct_gtip": "4420.19.00.00.00",
+      "predicted_gtip": "9503.00.49.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Lenf Drenajı Yüz Masajı ve Kontur Fırçası - Yumuşak Naylon Kıllı Taşınabilir Yüz",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Orijinal Ahşap Bebek Saçı Hatıra Kutusu | Yeni Ebeveynler İçin Mükemmel Hediye, ",
+      "correct_gtip": "4420.90.99.00.00",
+      "predicted_gtip": "4420.90.99.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "1 Adet Bahar Çiçekli 5ML Parfüm Sprey Şişesi – Doldurulabilir ve Seyahate Uygun ",
+      "correct_gtip": "9616.10.10.00.00",
+      "predicted_gtip": "9616.10.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "1/2/3 Adet Porselen Beyaz Hassas Açılı Eyeliner ve Kaş Fırçası Seti - Naylon Fır",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "Saç Şekillendirme İçin Geniş Kenarlı Kaymaz Kafa Bandı, Yüksek Taçlı Toka ile Sa",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "9615.19.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Ayak İzi, El İzi ve Evcil Hayvan Pençe Izi İçin Güvenli Temassız Mürekkep Pedi, ",
+      "correct_gtip": "9612.20.00.00.00",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "MAANGE Profesyonel Fondöten Fırçası - Yumuşak Naylon Kıllar, Şık Kahverengi Sap ",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "1/7 Adet Lenf Kontur Yüz Fırçası, Yüz, Çene ve Boyun İçin Lenf Drenaj Fırçası - ",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "1 Adet Yeni Parlak Taşlı Bükümlü Saç Tokası, Tüm Saç Tiplerine Uygun Şık ve Çok ",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "9615.19.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "1 / 3 Adet Üçgen Pudra Puf Pudra Makyaj Süngeri Fan Parmak Yastık Pudra Puf",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "9616.20.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "12/14/15/16/18 Adet Makyaj Süngeri Seti | Sıvı Krem ve Pudra İçin Çok Renkli Güz",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      }
+    },
+    {
+      "title": "300 Adet Balıkçılık Kauçuk Boncuk ve Şamandıra Durdurucusu Seti: Sazan, Deniz ve",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "4016.99.97.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Fiyonk Tasarımlı Topuz Yapıcı, Bohem Kafa Bandı, Fransız Bukle Aleti, Tembel Saç",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "9615.11.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Kapı Hava Sızdırmaz Şerit, Dış ve İç Kapılar İçin Alt Kapı Süpürgesi, Hava Yalıt",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3925.90.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": false
+      }
+    },
+    {
+      "title": "500M/546YD Görünmez Naylon Olta Misinası, Florkarbon Olta Misinası, Dayanıklı ve",
+      "correct_gtip": "5404.19.00.00.00",
+      "predicted_gtip": "5608.19.19.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Tırnak Sanatı İçin Ultra İnce Detay Fırçası - Hassas Çizgiler, Çiçek Efektleri v",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": false
+      }
+    }
+  ]
+}

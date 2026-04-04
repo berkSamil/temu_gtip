@@ -1,0 +1,98 @@
+{
+  "timestamp": "2026-04-01T17:20:18.719254",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 5,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 4,
+      "total": 5,
+      "accuracy": 80.0
+    },
+    "pozisyon": {
+      "hits": 3,
+      "total": 5,
+      "accuracy": 60.0
+    },
+    "alt_poz": {
+      "hits": 2,
+      "total": 5,
+      "accuracy": 40.0
+    },
+    "exact": {
+      "hits": 2,
+      "total": 5,
+      "accuracy": 40.0
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "[8.5\" Titanium Pruning Shears] Super Sharp 8.5\" Professional Titanium Bypass Pru",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Includes 111pcs Multi-sewing Kit with Accessories - 24-color Thread, Needles, an",
+      "correct_gtip": "9605.00.00.90.00",
+      "predicted_gtip": "8214.20.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "A Multifunctional That Serves As a Magnetic Bottle Opener, Can Opener, And Lever",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8205.59.80.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "1-Pack Manual Lymphatic Cleansing Brush | Suitable for Sensitive Skin and Lymphe",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "1/2/3/5-Pack Wall-Mounted Shaving Razor Holder | Stylish Bathroom Storage Rack, ",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      }
+    }
+  ]
+}
