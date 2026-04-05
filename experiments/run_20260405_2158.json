@@ -1,0 +1,807 @@
+{
+  "timestamp": "2026-04-05T21:58:52.574280",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 30,
+  "n_skipped": 2,
+  "metrics": {
+    "fasil": {
+      "hits": 18,
+      "total": 28,
+      "accuracy": 64.29
+    },
+    "pozisyon": {
+      "hits": 14,
+      "total": 28,
+      "accuracy": 50.0
+    },
+    "alt_poz": {
+      "hits": 13,
+      "total": 28,
+      "accuracy": 46.43
+    },
+    "exact": {
+      "hits": 13,
+      "total": 28,
+      "accuracy": 46.43
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Tek elle kullanılan bahçe budama makası",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [],
+        "candidate_fasiller": [
+          8201,
+          709,
+          901,
+          510,
+          8204,
+          8211,
+          8515,
+          9603
+        ],
+        "secilen_pozisyon": "8201",
+        "secilen_fasil": 82
+      }
+    },
+    {
+      "title": "Manyetik şişe açacağı",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8302.49.00.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20
+        ],
+        "candidate_fasiller": [
+          83,
+          82,
+          73
+        ],
+        "secilen_pozisyon": "8302",
+        "secilen_fasil": 83
+      }
+    },
+    {
+      "title": "Yüz temizleme fırçası",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          6,
+          20
+        ],
+        "candidate_fasiller": [
+          96,
+          33,
+          34
+        ],
+        "secilen_pozisyon": "9603",
+        "secilen_fasil": 96
+      }
+    },
+    {
+      "title": "Parfüm için spreyli atomizer şişe (doldurulabilir)",
+      "correct_gtip": "9616.10.10.00.00",
+      "predicted_gtip": "9616.10.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          96,
+          70
+        ],
+        "secilen_pozisyon": "9616",
+        "secilen_fasil": 96
+      }
+    },
+    {
+      "title": "Plastikten mamul, yapışkanlı duvar tipi tıraş bıçağı tutucu (banyo aksesuarı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [],
+        "candidate_fasiller": [
+          6005,
+          3307,
+          4203,
+          2403,
+          3916,
+          3917,
+          3214,
+          3922
+        ],
+        "secilen_pozisyon": "3926",
+        "secilen_fasil": 39
+      }
+    },
+    {
+      "title": "kıyafetleri sabitleyen, ayarlanabilir ve çıkarılabilir 6’lı pratik klips seti.",
+      "correct_gtip": "7117.90.00.50.00",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          96,
+          95
+        ],
+        "secilen_pozisyon": "39.26",
+        "secilen_fasil": 39
+      }
+    },
+    {
+      "title": "Plastikten mamul, yapışkanlı kablo tutucu klips",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "secilen_pozisyon": "3926",
+        "secilen_fasil": 39
+      }
+    },
+    {
+      "title": "Kozmetik uygulama süngeri (makyaj süngeri)",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "3304.99.00.90.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          6,
+          7
+        ],
+        "candidate_fasiller": [
+          33,
+          34,
+          39
+        ],
+        "secilen_pozisyon": "3304.99",
+        "secilen_fasil": 33
+      }
+    },
+    {
+      "title": "Isısız saç şekillendirme aparatı (saç sarma bandı)",
+      "correct_gtip": "9615.90.00.90.00",
+      "predicted_gtip": "8516.32.00.00.11",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          16
+        ],
+        "candidate_fasiller": [
+          85,
+          96,
+          84
+        ],
+        "secilen_pozisyon": "8516",
+        "secilen_fasil": 85
+      }
+    },
+    {
+      "title": "Plastik tabanlı, metal askı aparatı (yapışkanlı duvar tipi)",
+      "correct_gtip": "8302.50.00.00.00",
+      "predicted_gtip": "8302.50.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          15
+        ],
+        "candidate_fasiller": [
+          39,
+          83,
+          73
+        ],
+        "secilen_pozisyon": "8302",
+        "secilen_fasil": 83
+      }
+    },
+    {
+      "title": "Maskara uygulama fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9616.20.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          6,
+          20
+        ],
+        "candidate_fasiller": [
+          33,
+          96,
+          95
+        ],
+        "secilen_pozisyon": "9616",
+        "secilen_fasil": 96
+      }
+    },
+    {
+      "title": "Ahşaptan mamul, yapışkanlı dekoratif süs eşyası",
+      "correct_gtip": "4420.19.00.00.00",
+      "predicted_gtip": "4420.90.99.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          9,
+          20
+        ],
+        "candidate_fasiller": [
+          44,
+          96,
+          95
+        ],
+        "secilen_pozisyon": "4420",
+        "secilen_fasil": 44
+      }
+    },
+    {
+      "title": "Ahşaptan mamul hatıra saklama kutusu",
+      "correct_gtip": "4420.90.99.00.00",
+      "predicted_gtip": "4420.90.99.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          9,
+          20
+        ],
+        "candidate_fasiller": [
+          44,
+          96,
+          95
+        ],
+        "secilen_pozisyon": "4420",
+        "secilen_fasil": 44
+      }
+    },
+    {
+      "title": "Kozmetik amaçlı eyeliner / kaş fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "3304.20.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [],
+        "candidate_fasiller": [
+          3307,
+          4706,
+          4707,
+          8418,
+          9616,
+          9603,
+          4011,
+          39
+        ],
+        "secilen_pozisyon": "3304",
+        "secilen_fasil": 33
+      }
+    },
+    {
+      "title": "Tekstil kaplı saç bandı (taç tipi saç aksesuarı)",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "6704.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          11,
+          12
+        ],
+        "candidate_fasiller": [
+          65,
+          63,
+          67
+        ],
+        "secilen_pozisyon": "6704",
+        "secilen_fasil": 67
+      }
+    },
+    {
+      "title": "Istampa",
+      "correct_gtip": "9612.20.00.00.00",
+      "predicted_gtip": "3212.10.00.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [],
+        "candidate_fasiller": [
+          39,
+          73,
+          82,
+          83,
+          84,
+          85,
+          90,
+          94
+        ],
+        "secilen_pozisyon": "3212",
+        "secilen_fasil": 32
+      }
+    },
+    {
+      "title": "Fondöten uygulama fırçası (kozmetik makyaj fırçası)",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [],
+        "candidate_fasiller": [
+          3307,
+          4202,
+          3304,
+          9616,
+          9603,
+          39,
+          73,
+          82
+        ],
+        "secilen_pozisyon": "9603",
+        "secilen_fasil": 96
+      }
+    },
+    {
+      "title": "Tekstil mamul saç tokası",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "6704.20.00.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          11,
+          12
+        ],
+        "candidate_fasiller": [
+          67,
+          65,
+          63
+        ],
+        "secilen_pozisyon": "6704",
+        "secilen_fasil": 67
+      }
+    },
+    {
+      "title": "Balıkçılıkta kullanılan misina stoperi (kauçuk boncuk)",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "4016.99.97.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          40,
+          39,
+          96
+        ],
+        "secilen_pozisyon": "4016",
+        "secilen_fasil": 40
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı altı izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3919.90.80.20.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "secilen_pozisyon": "3919",
+        "secilen_fasil": 39
+      }
+    },
+    {
+      "title": "Sentetik monofilament balıkçılık misinası (fluorokarbon/naylon)",
+      "correct_gtip": "5404.19.00.00.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          95,
+          96
+        ],
+        "secilen_pozisyon": "9507",
+        "secilen_fasil": 95
+      }
+    },
+    {
+      "title": "Nail art uygulama fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          15
+        ],
+        "candidate_fasiller": [
+          82,
+          96,
+          83
+        ],
+        "secilen_pozisyon": "96.03",
+        "secilen_fasil": 96
+      }
+    },
+    {
+      "title": "kozmetik makyaj fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [],
+        "candidate_fasiller": [
+          3307,
+          4202,
+          3304,
+          9616,
+          9603,
+          39,
+          73,
+          82
+        ],
+        "secilen_pozisyon": "9603",
+        "secilen_fasil": 96
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3919.10.80.90.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "secilen_pozisyon": "3919",
+        "secilen_fasil": 39
+      }
+    },
+    {
+      "title": "Resim yapmaya mahsus ince uçlu boya fırçası",
+      "correct_gtip": "9603.30.10.00.00",
+      "predicted_gtip": "",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": null,
+        "pozisyon": null,
+        "alt_poz": null,
+        "exact": null
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          6
+        ],
+        "candidate_fasiller": [
+          9608,
+          603,
+          604,
+          4802,
+          206,
+          3201,
+          3210,
+          3405
+        ],
+        "secilen_pozisyon": "9608",
+        "secilen_fasil": 96
+      }
+    },
+    {
+      "title": "Polietilenden mamul örgü balıkçılık misinası (PE braided line)",
+      "correct_gtip": "5607.49.90.00.00",
+      "predicted_gtip": "3916.10.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          95,
+          96
+        ],
+        "secilen_pozisyon": "3916",
+        "secilen_fasil": 39
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kablo sabitleme klipsi",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "secilen_pozisyon": "3926",
+        "secilen_fasil": 39
+      }
+    },
+    {
+      "title": "Yapay balık yemi (suni kurt formunda silikon balıkçılık yemi)",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "9507.90.00.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "candidate_fasiller": [
+          39,
+          95,
+          96
+        ],
+        "secilen_pozisyon": "9507",
+        "secilen_fasil": 95
+      }
+    },
+    {
+      "title": "Balıkçılık ekipmanı – kurşun sinker (ağırlık) seti",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "9507.90.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20
+        ],
+        "candidate_fasiller": [
+          78,
+          83,
+          95
+        ],
+        "secilen_pozisyon": "9507",
+        "secilen_fasil": 95
+      }
+    },
+    {
+      "title": "Resim Fırçası",
+      "correct_gtip": "9603.30.10.00.00",
+      "predicted_gtip": "9603.30.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [],
+        "candidate_fasiller": [
+          4802,
+          4414,
+          8306,
+          3213,
+          4903,
+          39,
+          73,
+          82
+        ],
+        "secilen_pozisyon": "9603",
+        "secilen_fasil": 96
+      }
+    }
+  ]
+}

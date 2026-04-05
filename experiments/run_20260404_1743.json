@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-04-04T17:43:55.999433",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 3,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 3,
+      "total": 3,
+      "accuracy": 100.0
+    },
+    "pozisyon": {
+      "hits": 3,
+      "total": 3,
+      "accuracy": 100.0
+    },
+    "alt_poz": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    },
+    "exact": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Tek elle kullanılan bahçe budama makası",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    },
+    {
+      "title": "Manyetik şişe açacağı",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8205.59.80.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      }
+    },
+    {
+      "title": "Yüz temizleme fırçası",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      }
+    }
+  ]
+}

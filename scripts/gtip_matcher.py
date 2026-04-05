@@ -66,7 +66,7 @@ def get_candidate_fasils(conn, product_details, keywords, description, title, ma
             parts = str(code).split('.')
             if not parts or not parts[0].isdigit():
                 continue
-            fn = int(parts[0])
+            fn = int(parts[0][:2])
             scores[fn] = scores.get(fn, 0) + 1
 
     ordered = sorted(scores.keys(), key=lambda x: (-scores[x], x))
@@ -195,6 +195,35 @@ def get_yorum_kurallari(conn):
 
 _TAXONOMY_CACHE = {}
 _PROMPT_CACHE = {}
+_BOLUM_CACHE = {}
+
+
+def get_bolum_listesi(conn):
+    """21 bölümü döner: [(bolum_no, bolum_adi), ...]. Sonuç cache'lenir."""
+    if 'bolumler' in _BOLUM_CACHE:
+        return _BOLUM_CACHE['bolumler']
+    c = conn.cursor()
+    rows = c.execute(
+        "SELECT DISTINCT bolum_no, bolum_adi FROM bolum_fasil ORDER BY bolum_no"
+    ).fetchall()
+    _BOLUM_CACHE['bolumler'] = rows
+    return rows
+
+
+def get_fasiller_by_bolumler(conn, bolum_nos):
+    """Verilen bölüm numaralarının fasıllarını döner: [(fasil_no, fasil_adi), ...]."""
+    if not bolum_nos:
+        return []
+    if 'fasil_map' not in _BOLUM_CACHE:
+        c = conn.cursor()
+        _BOLUM_CACHE['fasil_map'] = c.execute(
+            "SELECT bolum_no, fasil_no, fasil_adi FROM bolum_fasil ORDER BY bolum_no, fasil_no"
+        ).fetchall()
+    bolum_set = set(bolum_nos)
+    return [(fasil_no, fasil_adi)
+            for bolum_no, fasil_no, fasil_adi in _BOLUM_CACHE['fasil_map']
+            if bolum_no in bolum_set]
+
 
 def get_fasil_taxonomy(conn, note_chars=300):
     """
@@ -226,6 +255,13 @@ def get_fasil_taxonomy(conn, note_chars=300):
     result = "\n".join(parts)
     _TAXONOMY_CACHE[cache_key] = result
     return result
+
+
+def build_bolum_prompt():
+    if 'bolum' in _PROMPT_CACHE:
+        return _PROMPT_CACHE['bolum']
+    _PROMPT_CACHE['bolum'] = _BOLUM_PROMPT_BASE
+    return _BOLUM_PROMPT_BASE
 
 
 def build_fasil_prompt(conn):
@@ -457,8 +493,18 @@ REFINE_SYSTEM_PROMPT = """Ayni gorev: Turk gumruk GTIP siniflandirmasi. Onceki J
 TARIFE metnini tekrar dikkatle uygula; gtip_code ve alternatifler SADECE mesajdaki listede var olan
 12 haneli kodlardan secilsin. Yanit SADECE gecerli JSON (gtip_code, fasil, gerekce, guven, alternatifler)."""
 
+_BOLUM_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
+Gorev: Urun icin en uygun 2 aday BOLUMU belirle.
+Sadece bolum listesine bak; fasil detayina girme.
+
+Yanitini SADECE su JSON formatinda ver:
+{{
+  "aday_bolumler": [7, 20],
+  "gerekce": "Kisa Turkce gerekce (1-2 cumle)"
+}}"""
+
 _FASIL_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
-Gorev: Asagidaki tarife taksonomisini kullanarak urun icin 3-5 aday FASIL belirle.
+Gorev: Asagidaki fasil listesinden urun icin 3 aday FASIL belirle.
 
 {kurallar_blok}
 
@@ -689,27 +735,52 @@ def classify_product(client, product_info, conn, opts=None):
     )
 
     # ------------------------------------------------------------------
-    # ADIM 0 — Fasıl seçimi (taxonomy-driven, FTS yok)
+    # ADIM 0a — Bölüm seçimi (21 bölüm → 2 aday bölüm)
     # ------------------------------------------------------------------
-    taxonomy = get_fasil_taxonomy(conn, note_chars=0)
-    fasil_user_msg = (
-        f"Asagidaki urun icin dogru fasillari sec.\n\n"
-        f"URUN BILGILERI:\n{product_text}\n\n"
-        f"TURK GUMRUK TARIFE TAKSONOMISI:\n{taxonomy}\n\n"
-        f"Yanitini SADECE JSON olarak ver."
-    )
-    fasil_system_prompt   = build_fasil_prompt(conn)
+    bolum_system_prompt    = build_bolum_prompt()
+    fasil_system_prompt    = build_fasil_prompt(conn)
     pozisyon_system_prompt = build_pozisyon_prompt(conn)
 
-    candidate_fasils = []
+    bolum_listesi = get_bolum_listesi(conn)
+    bolum_text = "\n".join(f"  Bolum {b[0]:2d}: {b[1]}" for b in bolum_listesi)
+    bolum_user_msg = (
+        f"Asagidaki urun icin dogru bolumu sec.\n\n"
+        f"URUN BILGILERI:\n{product_text}\n\n"
+        f"TURK GUMRUK TARIFE BOLUMLERI:\n{bolum_text}\n\n"
+        f"Yanitini SADECE JSON olarak ver."
+    )
+
+    candidate_bolumler = []
     try:
-        fasil_resp = _api_call_with_retry(client, model, 400, fasil_system_prompt, fasil_user_msg)
-        fasil_parsed = extract_first_json_object(fasil_resp.content[0].text)
-        if fasil_parsed and fasil_parsed.get('aday_fasiller'):
-            raw = fasil_parsed['aday_fasiller']
-            candidate_fasils = [int(x) for x in raw if str(x).isdigit()][:5]
+        bolum_resp = _api_call_with_retry(client, model, 200, bolum_system_prompt, bolum_user_msg)
+        bolum_parsed = extract_first_json_object(bolum_resp.content[0].text)
+        if bolum_parsed and bolum_parsed.get('aday_bolumler'):
+            raw = bolum_parsed['aday_bolumler']
+            candidate_bolumler = [int(float(x)) for x in raw if isinstance(x, (int, float)) or str(x).isdigit()][:3]
     except Exception:
         pass
+
+    # ------------------------------------------------------------------
+    # ADIM 0b — Fasıl seçimi (seçilen bölümlerin fasılları → 3 aday fasıl)
+    # ------------------------------------------------------------------
+    candidate_fasils = []
+    if candidate_bolumler:
+        fasiller = get_fasiller_by_bolumler(conn, candidate_bolumler)
+        fasil_text = "\n".join(f"  Fasil {f[0]:02d}: {f[1]}" for f in fasiller)
+        fasil_user_msg = (
+            f"Asagidaki urun icin dogru fasillari sec.\n\n"
+            f"URUN BILGILERI:\n{product_text}\n\n"
+            f"FASIL LISTESI:\n{fasil_text}\n\n"
+            f"Yanitini SADECE JSON olarak ver."
+        )
+        try:
+            fasil_resp = _api_call_with_retry(client, model, 300, fasil_system_prompt, fasil_user_msg)
+            fasil_parsed = extract_first_json_object(fasil_resp.content[0].text)
+            if fasil_parsed and fasil_parsed.get('aday_fasiller'):
+                raw = fasil_parsed['aday_fasiller']
+                candidate_fasils = [int(float(x)) for x in raw if isinstance(x, (int, float)) or str(x).isdigit()][:3]
+        except Exception:
+            pass
 
     # Adım 0 başarısız olursa FTS fallback
     if not candidate_fasils:
@@ -741,18 +812,32 @@ def classify_product(client, product_info, conn, opts=None):
 
     # Pozisyon seçimi başarısızsa eski flat yönteme düş
     if not poz_result:
-        return _classify_flat(client, product_info, conn, opts,
-                              candidate_fasils, note_max_chars,
-                              gtip_rows_per_fasil, retrieval_top_n)
+        out = _classify_flat(client, product_info, conn, opts,
+                             candidate_fasils, note_max_chars,
+                             gtip_rows_per_fasil, retrieval_top_n)
+        out['debug'] = {
+            'candidate_bolumler': candidate_bolumler,
+            'candidate_fasiller': candidate_fasils,
+            'secilen_pozisyon': None,
+            'secilen_fasil': None,
+        }
+        return out
 
     fasil_no     = poz_result.get('fasil')
     pozisyon_kod = str(poz_result.get('pozisyon_kod', '')).strip()
 
     gtips_check = get_gtips_by_pozisyon(conn, pozisyon_kod)
     if not gtips_check:
-        return _classify_flat(client, product_info, conn, opts,
-                              candidate_fasils, note_max_chars,
-                              gtip_rows_per_fasil, retrieval_top_n)
+        out = _classify_flat(client, product_info, conn, opts,
+                             candidate_fasils, note_max_chars,
+                             gtip_rows_per_fasil, retrieval_top_n)
+        out['debug'] = {
+            'candidate_bolumler': candidate_bolumler,
+            'candidate_fasiller': candidate_fasils,
+            'secilen_pozisyon': pozisyon_kod,
+            'secilen_fasil': fasil_no,
+        }
+        return out
 
     # ------------------------------------------------------------------
     # ADIM 2 — GTİP seçimi
@@ -786,19 +871,28 @@ def classify_product(client, product_info, conn, opts=None):
                     "error": "JSON parse edilemedi", "parse_hatasi": True}
         return sanitize_classification(conn, parsed)
 
+    debug = {
+        'candidate_bolumler': candidate_bolumler,
+        'candidate_fasiller': candidate_fasils,
+        'secilen_pozisyon': pozisyon_kod,
+        'secilen_fasil': fasil_no,
+    }
+
     try:
         out = run_step2(system_step2, model, max_tokens)
         out.pop('parse_hatasi', None)
+        out['debug'] = debug
         if do_refine and _needs_refine(out):
             refined = run_step2(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)
             refined.pop('parse_hatasi', None)
             if (not refined.get('error') and refined.get('gtip_code')
                     and gtip_exists(conn, refined['gtip_code'])):
                 refined['gerekce'] = ('[Ikinci gecis] ' + str(refined.get('gerekce', '')))[:2500]
+                refined['debug'] = debug
                 return refined
         return out
     except Exception as e:
-        return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e)[:100]}
+        return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e)[:100], "debug": debug}
 
 
 def _classify_flat(client, product_info, conn, opts, candidate_fasils,

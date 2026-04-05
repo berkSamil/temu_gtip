@@ -234,7 +234,7 @@ def main():
     parser.add_argument('--note-chars',    type=int, default=8000)
     parser.add_argument('--gtip-rows',     type=int, default=120)
     parser.add_argument('--retrieval',     type=int, default=50)
-    parser.add_argument('--delay',         type=float, default=0.5)
+    parser.add_argument('--delay',         type=float, default=15)
     parser.add_argument('--refine',        action='store_true')
     parser.add_argument('--refine-model',  default='claude-sonnet-4-20250514')
     parser.add_argument('--refine-max-tokens', type=int, default=1200)
@@ -305,6 +305,15 @@ def main():
               f"Fasıl:{fasil_sym} Poz:{poz_sym} AltPoz:{alt_sym} Exact:{ex_sym}  "
               f"[{cls.get('guven', '?')}]")
 
+        dbg = cls.get('debug', {})
+        if dbg:
+            bolumler = dbg.get('candidate_bolumler') or []
+            fasiller = dbg.get('candidate_fasiller') or []
+            pozisyon = dbg.get('secilen_pozisyon') or '-'
+            gtip_out = predicted or '-'
+            print(f"         Bölümler: {bolumler} → Fasıllar: {fasiller} "
+                  f"→ Pozisyon: {pozisyon} → GTİP: {gtip_out}")
+
         results.append({
             'title':          row['title'],
             'correct_gtip':   correct,
@@ -314,6 +323,7 @@ def main():
             'alternatifler':  cls.get('alternatifler', []),
             'error':          cls.get('error', ''),
             'metrics':        metrics,
+            'debug':          dbg,
         })
 
         if i < len(gold_rows):
@@ -399,6 +409,7 @@ def main():
                 'predicted_gtip': r['predicted_gtip'],
                 'guven':          r['guven'],
                 'metrics':        r['metrics'],
+                'debug':          r.get('debug', {}),
             }
             for r in results
         ]
