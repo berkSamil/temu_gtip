@@ -1,0 +1,1868 @@
+{
+  "timestamp": "2026-04-06T17:39:32.248912",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 30,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 22,
+      "total": 30,
+      "accuracy": 73.33
+    },
+    "pozisyon": {
+      "hits": 18,
+      "total": 30,
+      "accuracy": 60.0
+    },
+    "alt_poz": {
+      "hits": 17,
+      "total": 30,
+      "accuracy": 56.67
+    },
+    "exact": {
+      "hits": 17,
+      "total": 30,
+      "accuracy": 56.67
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Tek elle kullanılan bahçe budama makası",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [15, 20],\n  \"gerekce\": \"Bahçe budama makası, metal gövde ve kesici bıçaklardan oluşan adi metal ürünü olup Bolum 15'e girmektedir. Alternatif olarak, mekanik işletimli bahçe aletleri Bolum 20'de de sınıflandırılabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          82,
+          73,
+          83
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [82, 73, 83],\n  \"gerekce\": \"Tek elle kullanılan bahçe budama makası, adi metalden yapılmış bir kesme aletdir. Fasil 82, adi metallerden aletler ve bıçakcı eşyasını kapsamakta olup en uygun sınıflandırmadır. Fasil 73 ve 83 ise demir/çelik malzeme ve çeşitli metal eşyalar için ikincil seçeneklerdir.\"\n}\n```",
+        "secilen_pozisyon": "8201.50",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 82,\n  \"pozisyon_kod\": \"8201.50\",\n  \"gerekce\": \"Tek elle kullanılan bahçe budama makası, Fasıl 82 pozisyon 8201 kapsamında 'Bağ ve bahçıvan makasları' olarak sınıflandırılır. Ürün ziraatte ve bahçıvanlıkta kullanılan kesici el aleti olup, bahçe budama amacına yönelik özel tasarlanmış makastır.\"\n}\n```",
+        "secilen_fasil": 82,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1966,
+            "out": 121,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 685,
+            "out": 155,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 119,
+            "out": 152,
+            "cache_write": 0,
+            "cache_read": 8352
+          },
+          "adim_2": {
+            "in": 4081,
+            "out": 322,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6851,
+            "out": 750,
+            "cache_write": 0,
+            "cache_read": 8352
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Seyahat tipi dikiş seti (taşınabilir)",
+      "correct_gtip": "9605.00.00.90.00",
+      "predicted_gtip": "9605.00.00.90.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          11,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"anad_bolumler\": [11, 20],\n  \"gerekce\": \"Seyahat tipi dikiş seti taşınabilir bir eşyadır. İğne, iplik gibi dokumaya elverişli maddeleri içerebileceğinden Bölüm 11, veya çeşitli malzemelerden oluşan nihai mamul eşya olarak Bölüm 20 uygun adaylardır.\"\n}\n```",
+        "candidate_fasiller": [
+          63,
+          96,
+          62
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [63, 96, 62],\n  \"gerekce\": \"Seyahat tipi dikiş seti taşınabilir hazır eşya olup, dokumaya elverişli maddelerden yapılmış bir set ürünüdür. Fasil 63 dokumaya elverişli maddelerden hazır eşya takımlarını, Fasil 96 çeşitli mamul eşyaları, Fasil 62 ise giyim aksesuarlarını kapsamaktadır. Ürünün nihai malzeme bileşimi bilinmediğinde en uygun sınıflandırmalar bunlardır.\"\n}\n```",
+        "secilen_pozisyon": "9605",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9605\",\n  \"gerekce\": \"Seyahat tipi dikiş seti, 9605 pozisyonunda tanımlanan 'İnsanların tuvalet malzemesi olarak veya dikiş dikmekte veya elbise ve ayakkabılarını temizlemekte kullandıkları seyahat takımları' kapsamına doğrudan girmektedir. Ürün taşınabilir ve dikiş yapılması amacına mahsus bir seyahat takımıdır.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1971,
+            "out": 131,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 926,
+            "out": 192,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 125,
+            "out": 163,
+            "cache_write": 6823,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3715,
+            "out": 277,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6737,
+            "out": 763,
+            "cache_write": 6823,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Manyetik şişe açacağı",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8214.90.00.90.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [15, 20],\n  \"gerekce\": \"Manyetik şişe açacağı, metal malzemeden yapılmış basit bir el aracı olup, adı metallerden eşya (Bölüm 15) veya muhtelf mamul eşya (Bölüm 20) kategorisine girmektedir.\"\n}\n```",
+        "candidate_fasiller": [
+          82,
+          83,
+          73
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [82, 83, 73],\n  \"gerekce\": \"Manyetik şişe açacağı adi metallerden (demir/çelik) yapılmış bir alet olup, Fasil 82 (adi metallerden aletler) birincil sınıflandırmadır. Fasil 83 (çeşitli eşya) ve Fasil 73 (demir/çelikten eşya) alternatif seçeneklerdir.\"\n}\n```",
+        "secilen_pozisyon": "8214",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 82,\n  \"pozisyon_kod\": \"8214\",\n  \"gerekce\": \"Manyetik şişe açacağı, bıçakçı eşyası kategorisine girer. Fasil 82 pozisyon 8214, şişe açacakları dahil olmak üzere 'diğer bıçakçı eşyası' olarak tanımlanır. Manyetik özellik montaj yöntemidir ve ürünün temel fonksiyonunu değiştirmez.\"\n}\n```",
+        "secilen_fasil": 82,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1964,
+            "out": 110,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 683,
+            "out": 146,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 117,
+            "out": 153,
+            "cache_write": 8573,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3965,
+            "out": 318,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6729,
+            "out": 727,
+            "cache_write": 8573,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Yüz temizleme fırçası",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          6,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [6, 20],\n  \"gerekce\": \"Yüz temizleme fırçası, kozmetik veya kişisel bakım ürünü olarak Bolum 6 (kimya sanayı ürünleri) altında sınıflandırılabilir. Alternatif olarak Bolum 20 (muhtelf mamul eşya) da uygun bir seçenektir.\"\n}\n```",
+        "candidate_fasiller": [
+          96,
+          33,
+          34
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [96, 33, 34],\n  \"gerekce\": \"Yüz temizleme fırçası bir tuvalet/bakım aksesuarı olup, Fasil 96 (Çeşitli mamul eşya) altında sınıflandırılır. Fasil 33 ve 34, kozmetik/temizleme ürünleriyle ilişkili olsa da, fırça gibi mekanik alet bu fasillere değil Fasil 96'ya daha uygun düşmektedir.\"\n}\n```",
+        "secilen_pozisyon": "9603",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9603\",\n  \"gerekce\": \"Yüz temizleme fırçası, Fasil 96, Pozisyon 9603 kapsamında siniflandirilir. Bu pozisyon 'Süpürgeler ve fırçalar (makina, cihaz veya taşıtların aksamı olan fırçalar dahil), elle kullanılmaya mahsus mekanik süpürgeler (motorlular hariç), paspaslar ve tüyden toz süpürgeleri; süpürge veya fırça yapımına mahsus hazırlanmış fırça başları' içerir. Yüz temizleme fırçası, elle kullanılan bir fırça olarak bu pozisyonun kapsamı içindedir.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1964,
+            "out": 128,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 911,
+            "out": 160,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 117,
+            "out": 229,
+            "cache_write": 6752,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 133,
+            "out": 273,
+            "cache_write": 4306,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 3125,
+            "out": 790,
+            "cache_write": 11058,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Parfüm için spreyli atomizer şişe (doldurulabilir)",
+      "correct_gtip": "9616.10.10.00.00",
+      "predicted_gtip": "9616.10.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Spreyli atomizer şişe plastikten yapılmış bir mamuller olup Bölüm 7 (Plastikler ve Mamuller)'e dahildir. Alternatif olarak, doldurulabilir parfüm şişeleri Bölüm 20 (Muhtelf Mamul Eşya) altında da sınıflandırılabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 40],\n  \"gerekce\": \"Spreyli atomizer şişe plastik malzemeden üretilen bir doldurulabilir konteynerdir. Fasil 39 (Plastikler ve mamulleri) birincil aday olup, plastik şişe ve spreyer mekanizmasını kapsamaktadır. Fasil 96 (Çeşitli mamul eşya) ikincil aday olarak değerlendirilebilir. Fasil 40, kauçuk kullanılması durumunda alternatif olarak düşünülebilir.\"\n}\n```",
+        "secilen_pozisyon": "9616",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9616\",\n  \"gerekce\": \"Parfüm spreyleri ve benzeri tuvalet spreyleri, bunların püskürtme mekanizmaları ve püskürtücü başları 9616 pozisyonunda tanımlanmıştır. Doldurulabilir spreyli atomizer şişe, parfüm uygulamaya mahsus bir tuvalet spreyi olup bu pozisyona girmelidir.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1972,
+            "out": 134,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 434,
+            "out": 172,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 126,
+            "out": 140,
+            "cache_write": 7888,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3754,
+            "out": 291,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6286,
+            "out": 737,
+            "cache_write": 7888,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastikten mamul, yapışkanlı duvar tipi tıraş bıçağı tutucu (banyo aksesuarı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Ürün plastikten yapılmış banyo aksesuarı olduğundan Bölüm 7 (Plastikler ve Mamuller) birinci adaydır. Belirli bir kategoriye tam olarak uymuyorsa Bölüm 20 (Muhtelf Mamul Eşya) ikinci adaydır.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Ürün plastikten yapılmış banyo aksesuarı olup, Fasil 39 (Plastikler ve mamulleri) birincil sınıflandırmadır. Fasil 96 (Çeşitli mamul eşya) ve Fasil 94 (Banyo aksesuarları dahil mobilya ve aksesuarlar) da uygun alternatifler olabilir.\"\n}\n```",
+        "secilen_pozisyon": "3924",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3924\",\n  \"gerekce\": \"Ürün plastikten mamul banyo aksesuarı olup, Fasil 39 Pozisyon 3924 'Plastikten sofra eşyası, mutfak eşyası, diğer ev eşyası ve sağlık veya tuvalet eşyası' kapsamına girmektedir. Yapışkanlı duvar titutucu fonksiyonundan ziyade, tuvalet/banyo eşyası niteliği ön plandadır.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1989,
+            "out": 127,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 451,
+            "out": 145,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 142,
+            "out": 168,
+            "cache_write": 0,
+            "cache_read": 7226
+          },
+          "adim_2": {
+            "in": 3840,
+            "out": 384,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6422,
+            "out": 824,
+            "cache_write": 0,
+            "cache_read": 7226
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "kıyafetleri sabitleyen, ayarlanabilir ve çıkarılabilir 6’lı pratik klips seti.",
+      "correct_gtip": "7117.90.00.50.00",
+      "predicted_gtip": "9606.29.00.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Klips seti plastik/metal malzemeden yapılmış pratik aksesuar olup, Bolum 7 (Plastikler ve Mamuller) veya Bolum 20 (Muhtelf Mamul Eşya) altında sınıflandırılabilir. Kesin malzeme bileşimi belirtilmediğinden her iki bolum da muhtemeldir.\"\n}\n```",
+        "candidate_fasiller": [
+          96,
+          39,
+          95
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [96, 39, 95],\n  \"gerekce\": \"Kıyafet sabitleme klipsleri çeşitli mamul eşya kategorisinde değerlendirilir. Plastik malzeme içerebileceği için Fasil 39 ve giyim aksesuar olarak Fasil 95 de düşünülebilir.\"\n}\n```",
+        "secilen_pozisyon": "9606",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9606\",\n  \"gerekce\": \"Kıyafetleri sabitleyen klipsler, düğme, çıtçıt ve benzeri tekstil aksesuarları kategorisinde sınıflandırılır. Fasil 96, pozisyon 9606 'Düğmeler, çıtçıtlar, düğme formları ve bunların diğer aksamı' kapsamında pratik klips setleri bu pozisyona girmektedir. Montaj yöntemi (yapışkan vb.) sınıf belirlemez; asıl fonksiyon kıyafet sabitleme amacıdır.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1987,
+            "out": 137,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 449,
+            "out": 113,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 140,
+            "out": 195,
+            "cache_write": 7165,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3785,
+            "out": 302,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6361,
+            "out": 747,
+            "cache_write": 7165,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastikten mamul, yapışkanlı kablo tutucu klips",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\"aday_bolumler\": [7, 20], \"gerekce\": \"Plastikten yapılmış kablo tutucu klips, öncelikle Bolum 7 (Plastikler ve Mamuller) altında sınıflandırılır. Alternatif olarak Bolum 20 (Muhtelif Mamul Eşya) da muhasebeleştirilebilir çünkü ürün basit bir aksesuar niteliğindedir.\"}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 40],\n  \"gerekce\": \"Plastikten yapılmış kablo tutucu klips öncelikle Fasil 39 (Plastikler ve mamulleri) kapsamına girmektedir. Fasil 96 (Çeşitli mamul eşya) ve Fasil 40 (Kauçuk ve mamulleri) ise yapışkanlı bileşenlerin içeriğine bağlı olarak ikincil seçeneklerdir.\"\n}\n```",
+        "secilen_pozisyon": "3926",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3926\",\n  \"gerekce\": \"Yapışkanlı kablo tutucu klips, belirli bir işlev için tasarlanmış mamul bir plastik ürünüdür. Kendinden yapışkanlı levha/bant ham malzemesi değil, kablo tutacağı amacıyla üretilmiş hazır bir aksesuar olduğundan 3919 pozisyonuna girmez. Fasil 39'da daha spesifik pozisyon bulunamadığından, tarifenin başka yerinde belirtilmeyen plastik eşya olarak 3926 pozisyonunda sınıflandırılır.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1971,
+            "out": 132,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 433,
+            "out": 149,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 125,
+            "out": 200,
+            "cache_write": 7787,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 142,
+            "out": 342,
+            "cache_write": 0,
+            "cache_read": 4146
+          },
+          "toplam": {
+            "in": 2671,
+            "out": 823,
+            "cache_write": 7787,
+            "cache_read": 4146
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kozmetik uygulama süngeri (makyaj süngeri)",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "9616.20.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          6,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [6, 20],\n  \"gerekce\": \"Kozmetik uygulama süngeri, kimyasal ürünlerin aplikasyonu için kullanılan yardımcı malzeme olarak Bölüm 6 (Kimya Sanayii Ürünleri) veya bu kategoriye girmeyen çeşitli mamul eşya olarak Bölüm 20 (Muhtelf Mamul Eşya) kapsamında sınıflandırılabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          33,
+          96,
+          34
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [33, 96, 34],\n  \"gerekce\": \"Kozmetik uygulama süngeri, makyaj süngerinin birincil kullanım amacına göre Fasil 33 (kozmetik müstahzarları) altında sınıflandırılır. Alternatif olarak, sünger materyalinin yapısına vurgu yapılırsa Fasil 96 (çeşitli mamul eşya) veya temizlik amaçlı kullanımı göz önüne alınırsa Fasil 34 değerlendirilebilir.\"\n}\n```",
+        "secilen_pozisyon": "9616",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9616\",\n  \"gerekce\": \"Kozmetik uygulama süngeri (makyaj süngeri), 9616 pozisyonundaki 'pudra ve diğer kozmetik veya tuvalet ürünlerinin kullanılmasına mahsus büyük ve küçük ponponlar' kapsamında siniflandirilir. Makyaj uygulamasinda kullanilan süngerler, kozmetik ürünlerin uygulanmasina mahsus aksesuarlardir.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1971,
+            "out": 151,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 918,
+            "out": 174,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 124,
+            "out": 162,
+            "cache_write": 6974,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3753,
+            "out": 341,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6766,
+            "out": 828,
+            "cache_write": 6974,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Isısız saç şekillendirme aparatı (saç sarma bandı)",
+      "correct_gtip": "9615.90.00.90.00",
+      "predicted_gtip": "9615.90.00.90.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Isısız saç şekillendirme aparatı plastik ve/veya kauçuk malzemelerden yapılmış bir ev eşyasıdır. Bolum 7 (Plastikler ve Mamulleri; Kauçuk ve Mamulleri) veya Bolum 20 (Muhtelf Mamul Eşya) altında sınıflandırılabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          95
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 95],\n  \"gerekce\": \"Isısız saç şekillendirme aparatı plastik veya elastik malzemeden üretilmiş bir saç bakım aksesuarıdır. Fasil 39 (Plastikler) veya Fasil 96 (Çeşitli mamul eşya) birincil adaylardır. Fasil 95, spor/kişisel bakım kategorisinde değerlendirilirse ikincil adaydır.\"\n}\n```",
+        "secilen_pozisyon": "9615",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9615\",\n  \"gerekce\": \"Isısız saç şekillendirme aparatı (saç sarma bandı), saç tokaları, kıvırma pensleri, bigudiler ve benzeri saç bakım aksesuarları kategorisine girmektedir. Fasil 96, Pozisyon 9615 'Saç tarakları, süs tarakları ve benzerleri; saç tokaları, kıvırma pensleri, saç firketeleri, bigudiler ve benzerleri' başlığı altında bu ürünü kapsamaktadır.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1975,
+            "out": 139,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 437,
+            "out": 152,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 128,
+            "out": 181,
+            "cache_write": 7181,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3736,
+            "out": 336,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6276,
+            "out": 808,
+            "cache_write": 7181,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastik tabanlı, metal askı aparatı (yapışkanlı duvar tipi)",
+      "correct_gtip": "8302.50.00.00.00",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          15
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 15],\n  \"gerekce\": \"Ürün plastik tabanlı metal askı aparatı olup, Bölüm 7 (Plastikler ve Mamuller) veya Bölüm 15 (Adî Metaller ve Mamuller) altında sınıflandırılabilir. Bileşik malzeme yapısından dolayı baskın malzemeye göre kesin sınıflandırma yapılması gerekmektedir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          83,
+          73
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 83, 73],\n  \"gerekce\": \"Ürün plastik tabanlı ve metal askı aparatı olduğundan, plastik komponent nedeniyle Fasil 39 birincil seçenektir. Metal askı kısmı Fasil 73 (demir/çelik eşya) veya Fasil 83 (adi metallerden çeşitli eşya) kapsamındadır. Bileşik ürünlerde hammaddesi itibariyle asıl öğenin malzemesi belirleyici olacaktır.\"\n}\n```",
+        "secilen_pozisyon": "3924",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3924\",\n  \"gerekce\": \"Plastik tabanlı metal askı aparatı, ev eşyası olarak sınıflandırılır. Pozisyon 3924, plastikten sofra eşyası, mutfak eşyası, diğer ev eşyası ve sağlık/tuvalet eşyasını kapsar. Yapışkanlı duvar montajlı askı, ev düzenlemesinde kullanılan ev aksessuarıdır ve bu pozisyona uygun düşer.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1976,
+            "out": 148,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 559,
+            "out": 170,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 129,
+            "out": 167,
+            "cache_write": 8743,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3827,
+            "out": 378,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6491,
+            "out": 863,
+            "cache_write": 8743,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Maskara uygulama fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          6
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [20, 6],\n  \"gerekce\": \"Maskara fırçası, muhtelf mamul eşya kategorisinde yer alan kozmetik aplikatör aracıdır. Alternatif olarak kimyasal/kozmetik ürünlere bağlantılı olabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          33,
+          96,
+          34
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [33, 96, 34],\n  \"gerekce\": \"Maskara uygulama fırçası kozmetik uygulamada kullanılan bir araç olup, Fasil 33'e (parfümeri, kozmetik müstahzarları) veya Fasil 96'ya (çeşitli mamul eşya) girmektedir. Fırçanın yapısı ve kullanım amacı göz önüne alındığında, Fasil 33 birincil, Fasil 96 ikincil seçenektir.\"\n}\n```",
+        "secilen_pozisyon": "9603",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9603\",\n  \"gerekce\": \"Maskara uygulama fırçası, 96.03 pozisyonunda tanımlanan 'süpürgeler ve fırçalar' kapsamına girer. Bu pozisyon 'boya pedleri ve ruloları' gibi kozmetik uygulama araçlarını da içerir. Ürün elle kullanılan bir fırça olup kozmetik uygulaması için tasarlanmıştır.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1963,
+            "out": 98,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 910,
+            "out": 165,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 116,
+            "out": 152,
+            "cache_write": 6311,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 132,
+            "out": 294,
+            "cache_write": 0,
+            "cache_read": 4306
+          },
+          "toplam": {
+            "in": 3121,
+            "out": 709,
+            "cache_write": 6311,
+            "cache_read": 4306
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Ahşaptan mamul, yapışkanlı dekoratif süs eşyası",
+      "correct_gtip": "4420.19.00.00.00",
+      "predicted_gtip": "4420.90.99.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          9,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [9, 20],\n  \"gerekce\": \"Ahşaptan mamul dekoratif süs eşyası Bölüm 9'da (Ağaç ve ahşap eşya) sınıflandırılabilir. Alternatif olarak, yapışkanlı özellik ve dekoratif fonksiyonu ön plana çıkarsa Bölüm 20 (Muhtelf mamul eşya) da değerlendirilebilir.\"\n}\n```",
+        "candidate_fasiller": [
+          44,
+          96,
+          95
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [44, 96, 95],\n  \"gerekce\": \"Ahşaptan yapılan dekoratif süs eşyası öncelikle Fasil 44 (Ağaç ve ahşap eşya) altında sınıflandırılır. Yapışkanlı özelliği ve dekoratif niteliği nedeniyle Fasil 96 (Çeşitli mamul eşya) da uygun bir alternatiftir. Oyuncak veya spor malzemesi olmadığı takdirde Fasil 95 üçüncü seçenek olabilir.\"\n}\n```",
+        "secilen_pozisyon": "4420",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 44,\n  \"pozisyon_kod\": \"4420\",\n  \"gerekce\": \"Ürün ahşaptan mamul süs eşyası olup, Fasil 44 Pozisyon 4420 'Üzerine kakma yapılmış ağaç; mücevherat ve çatal, bıçak takımı için ahşap kutu ve mahfazalar ve benzeri eşya; ahşap küçük heykelcikler ve diğer süs eşyası' kapsamına girmektedir. Yapışkanlı olması montaj yöntemidir ve ürünün asıl fonksiyonunu (dekoratif süs eşyası) değiştirmez.\"\n}\n```",
+        "secilen_fasil": 44,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1975,
+            "out": 145,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 499,
+            "out": 179,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 128,
+            "out": 201,
+            "cache_write": 7819,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3817,
+            "out": 280,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6419,
+            "out": 805,
+            "cache_write": 7819,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Ahşaptan mamul hatıra saklama kutusu",
+      "correct_gtip": "4420.90.99.00.00",
+      "predicted_gtip": "4420.90.99.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          9,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"adar_bolumler\": [9, 20],\n  \"gerekce\": \"Ahşaptan mamul hatıra saklama kutusu, öncelikle Bolum 9 (Ağaç ve Ahşap Eşya) altında sınıflandırılabilir. İkinci aday olarak Bolum 20 (Muhtelif Mamul Eşya) düşünülebilir; çünkü hatıra/dekoratif saklama kutusu işlevsel olmayan mamul eşya kategorisine de girebilir.\"\n}\n```",
+        "candidate_fasiller": [
+          44,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [44, 96, 94],\n  \"gerekce\": \"Ahşaptan mamul hatıra saklama kutusu öncelikle Fasil 44 (Ağaç ve ahşap eşya) kapsamına girmektedir. Fasil 96 (Çeşitli mamul eşya) ve Fasil 94 (Mobilyalar ve benzeri eşya), dekoratif/fonksiyonel saklama kutusu olarak değerlendirilmesi durumunda alternatif sınıflandırma seçenekleridir.\"\n}\n```",
+        "secilen_pozisyon": "4420",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 44,\n  \"pozisyon_kod\": \"4420\",\n  \"gerekce\": \"Ahşaptan mamul hatıra saklama kutusu, Fasil 44'ün 4420 pozisyonuna girmektedir. Bu pozisyon 'Üzerine kakma yapılmış ağaç; mücevherat ve çatal, bıçak takımı için ahşap kutu ve mahfazalar ve benzeri eşya; ahşap küçük heykelcikler ve diğer süs eşyası' olarak tanımlanmıştır. Hatıra saklama kutusu, belirli eşyaları saklamak için tasarlanmış ahşap mahfaza olup bu kapsamda değerlendirilir.\"\n}\n```",
+        "secilen_fasil": 44,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1968,
+            "out": 161,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 492,
+            "out": 168,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 121,
+            "out": 215,
+            "cache_write": 7540,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3810,
+            "out": 281,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6391,
+            "out": 825,
+            "cache_write": 7540,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kozmetik amaçlı eyeliner / kaş fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "3305.90.00.90.00",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          6,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\"adag_bolumler\": [6, 20], \"gerekce\": \"Kozmetik ürünler Bölüm 6 (Kimya Sanayii) altında sınıflanır. Fırça gibi kozmetik aplikatörleri ise Bölüm 20 (Muhtelif Mamul Eşya) kapsamına girer.\"}\n```",
+        "candidate_fasiller": [
+          33,
+          96,
+          34
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [33, 96, 34],\n  \"gerekce\": \"Eyeliner ve kaş fırçası kozmetik ürünüdür. Fasil 33 parfümeri ve kozmetik müstahzarlarını kapsar ve birincil seçimdir. Fasil 96 çeşitli mamul eşyaları, Fasil 34 ise kozmetik amaçlı yardımcı ürünleri içerebilir.\"\n}\n```",
+        "secilen_pozisyon": "3305",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 33,\n  \"pozisyon_kod\": \"3305\",\n  \"gerekce\": \"Eyeliner/kaş fırçası, saç ve vücut bakımı müstahzarlarının uygulanmasında kullanılan kozmetik aracıdır. Fasil 33 pozisyon 3305 'Saç müstahzarları' başlığı altında, saç bakımı ve stilizasyonuna mahsus araçları kapsamaktadır. Kozmetik uygulamada kullanılan fırçalar bu kategoriye girmektedir.\"\n}\n```",
+        "secilen_fasil": 33,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1971,
+            "out": 106,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 918,
+            "out": 140,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 124,
+            "out": 167,
+            "cache_write": 7083,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3711,
+            "out": 520,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6724,
+            "out": 933,
+            "cache_write": 7083,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Tekstil kaplı saç bandı (taç tipi saç aksesuarı)",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "6505.00.90.40.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          11,
+          12
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [11, 12],\n  \"gerekce\": \"Tekstil kaplı saç bandı, dokumaya elverişli maddelerden mamul eşya (Bölüm 11) veya saç aksesuarı olarak başlıklar ve bunlara ilişkin eşya kategorisinde (Bölüm 12) sınıflandırılabilir. Tekstil bileşeni nedeniyle Bölüm 11 birincil aday, saç aksesuarı işlevi nedeniyle Bölüm 12 ikincil adaydır.\"\n}\n```",
+        "candidate_fasiller": [
+          65,
+          67,
+          63
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [65, 67, 63],\n  \"gerekce\": \"Saç bandı başlık aksesuarı olarak Fasil 65'e girmektedir. Yapma saç aksesuarları Fasil 67'de yer alabilir. Tekstil kaplı saç aksesuarları hazır tekstil eşyası olarak Fasil 63'e de dahil olabilir.\"\n}\n```",
+        "secilen_pozisyon": "6505",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 65,\n  \"pozisyon_kod\": \"6505\",\n  \"gerekce\": \"Tekstil kaplı saç bandı (taç tipi saç aksesuarı), dokumaya elverişli maddelerden yapılmış başlık aksesuarıdır. Fasıl 65 pozisyon 6505, dantel, keçe veya diğer dokumaya elverişli maddelerden yapılmış şapkalar ve başlıkları, ayrıca saç fileleri gibi başlığa mahsus aksesuarları kapsar. Tekstil malzemenin kullanılması ve başa takılan aksesuar niteliği bu pozisyona girmeyi gerektirir.\"\n}\n```",
+        "secilen_fasil": 65,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1975,
+            "out": 172,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 915,
+            "out": 124,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 129,
+            "out": 204,
+            "cache_write": 5243,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3863,
+            "out": 363,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6882,
+            "out": 863,
+            "cache_write": 5243,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Istampa",
+      "correct_gtip": "9612.20.00.00.00",
+      "predicted_gtip": "9612.20.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          13
+        ],
+        "bolum_raw_response": "```json\n{\"anad_bolumler\": [20, 13], \"gerekce\": \"İstampa, basılı sanat eseri veya dekoratif baskı ürünü olarak Bolum 20'de sınıflandırılır. Eğer seramik, cam veya taş üzerine uygulanmış istampa ise Bolum 13'te yer alabilir.\"}\n```",
+        "candidate_fasiller": [
+          69,
+          68,
+          96
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [69, 68, 96],\n  \"gerekce\": \"İstampa (baskı sanatı ürünü) en çok seramik mamulleri (Fasil 69) kategorisinde yer alabilir. Alternatif olarak taş veya cam üzerine yapılan istampalar Fasil 68 veya 70'de, diğer malzemelerden yapılanlar ise Fasil 96'da sınıflandırılabilir.\"\n}\n```",
+        "secilen_pozisyon": "9612",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9612\",\n  \"gerekce\": \"Istampa, 9612 pozisyonunda tanımlanan 'ıstampalar (mürekkep emdirilmiş olsun olmasın, kutulu veya kutusuz)' kapsamına girmektedir. Bu pozisyon mürekkepli veya mürekkepsiz tüm istampaları içerir.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1956,
+            "out": 112,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 451,
+            "out": 141,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 109,
+            "out": 127,
+            "cache_write": 6882,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3848,
+            "out": 246,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6364,
+            "out": 626,
+            "cache_write": 6882,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Fondöten uygulama fırçası (kozmetik makyaj fırçası)",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          6,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [6, 20],\n  \"gerekce\": \"Fondöten fırçası, kozmetik makyaj uygulaması için tasarlanmış bir araçtır. Bolum 6 (kimya sanayii ürünleri) veya Bolum 20 (muhtelf mamul eşya) kapsamına girmesi muhtemeldir. Fırçanın yapısı ve kullanım amacı detaylandırılmadan, en uygun bölümler bu ikisidir.\"\n}\n```",
+        "candidate_fasiller": [
+          33,
+          96,
+          34
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [33, 96, 34],\n  \"gerekce\": \"Fondöten uygulama fırçası bir kozmetik makyaj aracı olup, Fasil 33'te yer alan kozmetik müstahzarları kategorisine en uygun gelmektedir. Fasil 96 (çeşitli mamul eşya) ve Fasil 34 (kozmetik ürünleri ile ilgili) de ikincil tercihler olarak değerlendirilebilir.\"\n}\n```",
+        "secilen_pozisyon": "9603",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9603\",\n  \"gerekce\": \"Fondöten uygulama fırçası, kozmetik makyaj için kullanılan elle tutulabilir bir fırçadır. Fasil 96 Pozisyon 9603, 'Süpürgeler ve fırçalar...paspaslar ve tüyden toz süpürgeleri; süpürge veya fırça yapımına mahsus hazırlanmış fırça başları; boya pedleri ve ruloları' tanımını içermektedir. Makyaj fırçaları, boya pedleri ve ruloları ile aynı kategoride yer alan kozmetik uygulama araçlarıdır.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1976,
+            "out": 151,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 923,
+            "out": 149,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 129,
+            "out": 208,
+            "cache_write": 0,
+            "cache_read": 6974
+          },
+          "adim_2": {
+            "in": 145,
+            "out": 307,
+            "cache_write": 0,
+            "cache_read": 4306
+          },
+          "toplam": {
+            "in": 3173,
+            "out": 815,
+            "cache_write": 0,
+            "cache_read": 11280
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Tekstil mamul saç tokası",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "6704.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          11,
+          12
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [11, 12],\n  \"gerekce\": \"Saç tokası tekstil mamulü olup, dokumaya elverişli maddelerden mamul eşya (Bölüm 11) veya başlık aksesuarı olarak başlık ve bunların aksamilarını içeren Bölüm 12 altında sınıflandırılabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          67,
+          65,
+          63
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [67, 65, 63],\n  \"gerekce\": \"Saç tokası insan saçından yapılan bir aksesuary olarak Fasil 67'ye uygundur. Alternatif olarak başlık aksesuarı olarak Fasil 65 veya genel tekstil aksesuarı olarak Fasil 63 değerlendirilebilir.\"\n}\n```",
+        "secilen_pozisyon": "6704",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 67,\n  \"pozisyon_kod\": \"6704\",\n  \"gerekce\": \"Tekstil mamul saç tokası, insan saçından veya dokumaya elverişli diğer maddelerden yapılmış saç aksesuarıdır. Fasil 67, pozisyon 6704, tarifenin başka yerinde belirtilmeyen insan saçından diğer eşyayı kapsar ve saç tokası bu tanıma uymaktadır.\"\n}\n```",
+        "secilen_fasil": 67,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1961,
+            "out": 117,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 901,
+            "out": 117,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 115,
+            "out": 142,
+            "cache_write": 5207,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3721,
+            "out": 264,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6698,
+            "out": 640,
+            "cache_write": 5207,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Balıkçılıkta kullanılan misina stoperi (kauçuk boncuk)",
+      "correct_gtip": "9507.90.00.00.00",
+      "predicted_gtip": "4016.99.97.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Misina stoperi kauçuk boncuk olduğundan Bölüm 7 (Kauçuk ve Mamuller) birincil adaydır. Balıkçılık aksesuarı olarak Bölüm 20 (Muhtelf Mamul Eşya) ikincil aday olabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          40,
+          39,
+          96
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [40, 39, 96],\n  \"gerekce\": \"Misina stoperi kauçuktan üretilmiş bir ürün olduğu için Fasil 40 birincil seçimdir. Alternatif olarak plastik malzemeden yapılmış olması durumunda Fasil 39, veya balıkçılık spor malzemesi olarak değerlendirilirse Fasil 96 düşünülebilir.\"\n}\n```",
+        "secilen_pozisyon": "4016",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 40,\n  \"pozisyon_kod\": \"4016\",\n  \"gerekce\": \"Balıkçılıkta kullanılan misina stoperi (kauçuk boncuk), vulkanize edilmiş kauçuktan yapılmış spesifik bir eşyadır. Fasil 40 pozisyon 4016 'Sertleştirilmemiş vulkanize kauçuktan diğer eşya' başlığı altında sınıflandırılır çünkü ürün ne hijyen eşyası (4014), ne giyim aksesuarı (4015), ne de diğer spesifik pozisyonlara girmektedir.\"\n}\n```",
+        "secilen_fasil": 40,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1978,
+            "out": 124,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 440,
+            "out": 136,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 131,
+            "out": 196,
+            "cache_write": 7646,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 147,
+            "out": 296,
+            "cache_write": 4098,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 2696,
+            "out": 752,
+            "cache_write": 11744,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı altı izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3925.90.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı altı izolasyon fitili, plastikten yapılmış bir mamul olduğu için Bölüm 7'de sınıflandırılabilir. Alternatif olarak, kapı yerleştirme aksesuarı niteliğinde Bölüm 20'de de değerlendirilebilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 40],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı altı izolasyon fitili, birinci sırada plastik malzemeden üretilmiş bir mamul olduğu için Fasil 39'a girmektedir. Teknik özellikleri belirtilmediği ve çeşitli uygulamalara sahip olabileceği için Fasil 96 da ikinci seçenek olabilir. Kauçuk bileşen içermesi durumunda Fasil 40 üçüncü alternatif olarak değerlendirilmiştir.\"\n}\n```",
+        "secilen_pozisyon": "3925",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3925\",\n  \"gerekce\": \"Ürün, plastikten yapılmış kapı altı izolasyon fitili olup inşaat malzemesidir. Fasil 39 Pozisyon 3925 'tarifenin başka yerinde belirtilmeyen veya yer almayan plastiklerden inşaat malzemeleri' kapsamına girmektedir. Kendinden yapışkanlı özellik ek bir niteliktir ve malzemenin asıl işlevini (kapı/pencere sizdırmazlığı) değiştirmez.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1972,
+            "out": 132,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 434,
+            "out": 183,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 126,
+            "out": 176,
+            "cache_write": 7884,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3911,
+            "out": 310,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6443,
+            "out": 801,
+            "cache_write": 7884,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Sentetik monofilament balıkçılık misinası (fluorokarbon/naylon)",
+      "correct_gtip": "5404.19.00.00.00",
+      "predicted_gtip": "9507.90.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"adar_bolumler\": [7, 20],\n  \"gerekce\": \"Sentetik monofilament balıkçılık misinası fluorokarbon/naylon malzemeden yapılmış plastik mamuldür. Bolum 7 (Plastikler ve Mamuller) birincil sınıflandırma olup, Bolum 20 (Muhtelf Mamul Eşya) alternatif olarak değerlendirilmelidir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          95,
+          96
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 95, 96],\n  \"gerekce\": \"Balıkçılık misinası sentetik malzeme (fluorokarbon/naylon) ile üretilmiş bir ürün olup, Fasil 39 plastik mamulleri kapsamına girmektedir. Fasil 95 spor malzemeleri içerdiği için balıkçılık ekipmanları için alternatif bir seçenektir. Fasil 96 çeşitli mamul eşyaları kapsamına da dahil olabilmektedir.\"\n}\n```",
+        "secilen_pozisyon": "9507",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 95,\n  \"pozisyon_kod\": \"9507\",\n  \"gerekce\": \"Sentetik monofilament balıkçılık misinası, balık avlamaya mahsus olta takımları kapsamındadır. Fasil 95 Pozisyon 9507 'Oltayla balık avlamaya mahsus olta kamışları, olta iğneleri ve diğer balık takımları' doğrudan bu ürünü kapsamaktadır.\"\n}\n```",
+        "secilen_fasil": 95,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1978,
+            "out": 135,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 440,
+            "out": 162,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 131,
+            "out": 143,
+            "cache_write": 7395,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3739,
+            "out": 245,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6288,
+            "out": 685,
+            "cache_write": 7395,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Nail art uygulama fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          6
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [20, 6],\n  \"gerekce\": \"Nail art fırçası, saç ve kozmetik aplikatör fırçaları gibi tuvalet ve kişisel bakım araçları olarak Bolum 20'de sınıflandırılır. Alternatif olarak, sentetik kıllardan yapılmışsa Bolum 6 (kimya sanayı ürünleri) de değerlendirilebilir.\"\n}\n```",
+        "candidate_fasiller": [
+          96,
+          33,
+          95
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [96, 33, 95],\n  \"gerekce\": \"Nail art fırçası, kozmetik uygulama aracı olarak Fasil 33 (kozmetik müstahzarları) kapsamında değerlendirilebilir. Alternatif olarak Fasil 96 (çeşitli mamul eşya) veya Fasil 95 (spor/sanat malzemeleri) uygun kategorilerdir.\"\n}\n```",
+        "secilen_pozisyon": "9603",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9603\",\n  \"gerekce\": \"Nail art uygulama fırçası, 9603 pozisyonunda tanımlanan 'Süpürgeler ve fırçalar' kapsamına girmektedir. Ürün, elle kullanılmaya mahsus bir fırça olup, kozmetik ve tuvalet amaçlı kullanılan fırça türlerine dâhildir. Fasil 33'deki kozmetik pozisyonları ham malzeme veya bitmiş kozmetik ürünleri için olup, fırça gibi uygulama aracı için değildir.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1963,
+            "out": 136,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 910,
+            "out": 135,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 116,
+            "out": 191,
+            "cache_write": 5945,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 132,
+            "out": 319,
+            "cache_write": 0,
+            "cache_read": 4306
+          },
+          "toplam": {
+            "in": 3121,
+            "out": 781,
+            "cache_write": 5945,
+            "cache_read": 4306
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "kozmetik makyaj fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "9603.30.90.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          6
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [20, 6],\n  \"gerekce\": \"Kozmetik makyaj fırçası, plastik veya metal sap ve sentetik kıl/tüy/hayvan kılı kombinasyonundan oluşan bir tuvalet aksesuarıdır. Bolum 20 (Muhtelf Mamul Eşya) tuvalet ve kozmetik alet ve cihazlarını içerirken, Bolum 6 (Kimya Sanayii) kozmetik araçlarının bazen bu kategoride sınıflandırıldığı alternatifdir.\"\n}\n```",
+        "candidate_fasiller": [
+          33,
+          96,
+          34
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [33, 96, 34],\n  \"gerekce\": \"Kozmetik makyaj fırçası, Fasil 33 (parfümeri, kozmetik veya tuvalet müstahzarları) altında sınıflandırılabilir. Fırçanın kendisi ise Fasil 96 (çeşitli mamul eşya) veya Fasil 34 (kozmetik uygulaması ile ilişkili ürünler) kapsamında değerlendirilebilir.\"\n}\n```",
+        "secilen_pozisyon": "9603",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9603\",\n  \"gerekce\": \"Kozmetik makyaj fırçası, 9603 pozisyonunda yer alan 'süpürgeler ve fırçalar' tanımına girmektedir. Elle kullanılan bu makyaj fırçası, boya pedleri ve ruloları ile aynı kategoride değerlendirilir. Fasil 33'deki kozmetik müstahzarları pozisyonları ürünün kullanım amacını değil, hazır formunu tanımladığından burada uygulanmaz.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1962,
+            "out": 173,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 909,
+            "out": 153,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 115,
+            "out": 175,
+            "cache_write": 0,
+            "cache_read": 6974
+          },
+          "adim_2": {
+            "in": 131,
+            "out": 336,
+            "cache_write": 0,
+            "cache_read": 4306
+          },
+          "toplam": {
+            "in": 3117,
+            "out": 837,
+            "cache_write": 0,
+            "cache_read": 11280
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3919.90.80.90.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili, plastikten yapılmış bir mamul ürün olduğu için öncelikle Bolum 7 (Plastikler ve Mamuller) kapsamına girmektedir. Ancak spesifik bina aksessuarı ve izolasyon ürünü karakteristiği sebebiyle Bolum 20 (Muhtelf Mamul Eşya) da değerlendirilmelidir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili, esasen plastik malzeme ile üretilmiş bir mamuldür. Fasil 39 birincil seçimdir çünkü plastik mamullerini kapsamaktadır. Fasil 96 (Çeşitli mamul eşya), plastik mamullerden yapılmış mühendislik ve inşaat ürünleri için alternatif olabilir. Fasil 94 ise bina donanımı bağlamında seçilmiştir ancak daha az olasıdır.\"\n}\n```",
+        "secilen_pozisyon": "3919",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3919\",\n  \"gerekce\": \"Ürün, kendinden yapışkanlı plastik malzemeden yapılmış bir fitil/şerit olup, Fasil 39 Pozisyon 3919 'Plastiklerden kendinden yapışkan levhalar, plakalar, bantlar, şeritler, filmler, folyolar ve diğer yassı şekiller' kapsamına girmektedir. Kapı/pencere kenar izolasyonu amacı, ürünün formu ve kendinden yapışkanlı özelliği bu pozisyonu belirlemektedir.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1975,
+            "out": 166,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 437,
+            "out": 195,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 128,
+            "out": 182,
+            "cache_write": 7330,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 4113,
+            "out": 336,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6653,
+            "out": 879,
+            "cache_write": 7330,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Resim yapmaya mahsus ince uçlu boya fırçası",
+      "correct_gtip": "9603.30.10.00.00",
+      "predicted_gtip": "9603.30.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          6
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [20, 6],\n  \"gerekce\": \"Resim yapımına mahsus boya fırçası, genel olarak muhtelf mamul eşya (Bölüm 20) kategorisinde değerlendirilir. Alternatif olarak, fırçanın sentetik malzemeden imal edilmesi durumunda plastik mamulleri (Bölüm 7) de uygun bir kategoridir.\"\n}\n```",
+        "candidate_fasiller": [
+          96,
+          32,
+          95
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [96, 32, 95],\n  \"gerekce\": \"Resim yapmaya mahsus ince uçlu boya fırçası, sanat malzemesi olarak Fasil 96 (Çeşitli mamul eşya) altında sınıflandırılır. Fasil 32 boya ve boyayıcı maddelerle ilgili olmasına rağmen fırça için geçerli değildir. Fasil 95 oyuncak ve spor malzemeleri için uygun olmakla birlikte, profesyonel sanat aletleri Fasil 96'da yer alır.\"\n}\n```",
+        "secilen_pozisyon": "9603",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9603\",\n  \"gerekce\": \"Resim yapmaya mahsus ince uçlu boya fırçası, 9603 pozisyonunda tanımlanan 'süpürgeler ve fırçalar' kapsamında yer almaktadır. Boya fırçaları, elle kullanılmaya mahsus fırçalar olup bu pozisyon kapsamında sınıflandırılır.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1972,
+            "out": 131,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 919,
+            "out": 183,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 125,
+            "out": 138,
+            "cache_write": 7219,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 141,
+            "out": 354,
+            "cache_write": 0,
+            "cache_read": 4306
+          },
+          "toplam": {
+            "in": 3157,
+            "out": 806,
+            "cache_write": 7219,
+            "cache_read": 4306
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Polietilenden mamul örgü balıkçılık misinası (PE braided line)",
+      "correct_gtip": "5607.49.90.00.00",
+      "predicted_gtip": "3916.10.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Polietilenden (PE) mamul balıkçılık misinası birincil olarak Bolum 7 (Plastikler ve Mamuller) kapsamında değerlendirilir. Alternatif olarak işlevsel özelliği nedeniyle Bolum 20 (Muhtelf Mamul Eşya) da uygun bir seçenektir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          95,
+          96
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 95, 96],\n  \"gerekce\": \"Polietilenden mamul örgü balıkçılık misinası öncelikle Fasil 39 (Plastikler ve mamulleri) altında sınıflandırılır çünkü ana hammaddesi plastiktir. Fasil 95 (Spor malzemeleri) balıkçılık ekipmanı olarak da değerlendirilebilir. Fasil 96, önceki fasyetlerin herhangi birine tam olarak uymayan çeşitli mamul eşya için alternatif olabilir.\"\n}\n```",
+        "secilen_pozisyon": "3916",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3916\",\n  \"gerekce\": \"Polietilenden mamul örgü balıkçılık misinası, plastikten mamul monofil/çubuk şeklindeki bir ürün olup, enine kesitinin en geniş yeri 1 mm'yi aşmaktadır. Fasil 39 pozisyon 3916 'Plastikten mamul, enine kesitinin en geniş yeri 1 mm'yi geçen monofiller, ince ve kalın çubuklar ve profiller' tanımına uyumludur.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1977,
+            "out": 132,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 439,
+            "out": 177,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 130,
+            "out": 175,
+            "cache_write": 7312,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3905,
+            "out": 312,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6451,
+            "out": 796,
+            "cache_write": 7312,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte banyo organizer raf (saç kurutma makinesi tutuculu",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3925.90.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Plastikten yapılmış banyo organizer raf, Bolum 7 (Plastikler ve Mamulleri) altında sınıflandırılabilir. Alternatif olarak, saç kurutma makinesi tutucu gibi çok amaçlı banyo aksesuar özelliği nedeniyle Bolum 20 (Muhtelf Mamul Eşya) de değerlendirilebilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          94,
+          96
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 94, 96],\n  \"gerekce\": \"Banyo organizer raf plastikten yapılmış bir ürün olup, Fasil 39 (Plastikler ve mamulleri) başlığı altında sınıflandırılabilir. Fasil 94 mobilyalar kategorisine de dahil olabilir. Fasil 96 çeşitli mamul eşya olarak tali seçenek olarak değerlendirilmiştir.\"\n}\n```",
+        "secilen_pozisyon": "3925",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3925\",\n  \"gerekce\": \"Plastikten mamul duvara monte banyo organizer raf, binaların duvarlarına kalıcı olarak monte edilmesi amaçlanan inşaat malzemesi niteliğindedir. Fasıl 39 Pozisyon 3925 'Tarifenin başka yerinde belirtilmeyen veya yer almayan plastiklerden inşaat malzemeleri' kapsamına girmektedir.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1981,
+            "out": 146,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 443,
+            "out": 144,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 134,
+            "out": 149,
+            "cache_write": 7178,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3920,
+            "out": 392,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6478,
+            "out": 831,
+            "cache_write": 7178,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte organizer kutu (çok bölmeli saklama kabı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Plastikten yapılmış duvara monte organizer kutu, birincil olarak Bolum 7 (Plastikler ve Mamuller) altında sınıflandırılır. Bolum 20 (Muhtelf Mamul Eşya) ise saklama amaçlı ev eşyası olarak alternatif bolum olarak değerlendirilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Plastikten yapılmış duvara monte organizer kutu, birincil olarak Fasil 39 (Plastikler ve mamulleri) altında sınıflandırılır. Fasil 96 (Çeşitli mamul eşya) ve Fasil 94 (Mobilyalar ve aksesuarılar) ise mobilya aksesuarı niteliği taşıması nedeniyle alternatif seçeneklerdir.\"\n}\n```",
+        "secilen_pozisyon": "3926",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3926\",\n  \"gerekce\": \"Plastikten mamul duvara monte organizer kutu, belirli bir ev düzenleme/saklama amacı taşıyan mamul bir üründür. Pozisyon 3924 (sofra, mutfak, ev eşyası ve tuvalet eşyası) dar kapsamlı olup, pozisyon 3926 'Plastikten diğer eşya' bu tür ev içi depolama ve organizasyon ürünlerini kapsayan genel pozisyondur.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1979,
+            "out": 135,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 441,
+            "out": 155,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 132,
+            "out": 169,
+            "cache_write": 7220,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 150,
+            "out": 336,
+            "cache_write": 4146,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 2702,
+            "out": 795,
+            "cache_write": 11366,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kablo sabitleme klipsi",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"adag_bolumler\": [7, 20],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kablo sabitleme klipsi, plastik malzemeden yapılmış bir aksesuar olduğu için Bölüm 7 (Plastikler ve Mamuller) birincil seçimdir. Bölüm 20 (Muhtelif Mamul Eşya) ise alternatif seçimdir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 40],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kablo sabitleme klipsi öncelikle Fasil 39 (Plastikler ve mamulleri) altında sınıflandırılır çünkü ürünün ana materyali plastiktir. Fasil 96 (Çeşitli mamul eşya) ikincil aday olarak değerlendirilir. Fasil 40 ise kauçuk esaslı alternatif bir sınıflandırma olabilir.\"\n}\n```",
+        "secilen_pozisyon": "3926",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3926\",\n  \"gerekce\": \"Kendinden yapışkanlı plastik kablo sabitleme klipsi, belirli bir işlev için tasarlanmış mamul bir plastik ürünüdür. Pozisyon 3919 (kendinden yapışkanlı levhalar, bantlar, filmler) ham malzeme formlarına özgü olup, bu ürün için geçerli değildir. Pozisyon 3926 'Plastikten diğer eşya' başlığı altında, tarifenin başka yerinde belirtilmeyen inşaat ve elektrik tesisatı aksesuarlarını kapsar.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1970,
+            "out": 130,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 432,
+            "out": 165,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 124,
+            "out": 196,
+            "cache_write": 7717,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 141,
+            "out": 270,
+            "cache_write": 0,
+            "cache_read": 4146
+          },
+          "toplam": {
+            "in": 2667,
+            "out": 761,
+            "cache_write": 7717,
+            "cache_read": 4146
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}

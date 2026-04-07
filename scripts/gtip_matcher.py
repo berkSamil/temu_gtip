@@ -267,9 +267,7 @@ def build_bolum_prompt():
 def build_fasil_prompt(conn):
     if 'fasil' in _PROMPT_CACHE:
         return _PROMPT_CACHE['fasil']
-    kurallar = get_yorum_kurallari(conn)
-    blok = f"TARIFEYE ILISKIN GENEL YORUMLAMA KURALLARI:\n{kurallar}" if kurallar else ""
-    result = _FASIL_PROMPT_BASE.format(kurallar_blok=blok)
+    result = _FASIL_PROMPT_BASE.format(kurallar_blok="")
     _PROMPT_CACHE['fasil'] = result
     return result
 
@@ -369,6 +367,42 @@ def _json_from_balanced_braces(s):
                 except json.JSONDecodeError:
                     return None
     return None
+
+
+def _count_tok(client, model, text):
+    """Tek bir string için token sayısı. count_tokens API kullanır."""
+    if not text:
+        return 0
+    try:
+        r = client.beta.messages.count_tokens(
+            model=model,
+            messages=[{"role": "user", "content": text}],
+            betas=["token-counting-2024-11-01", "prompt-caching-2024-07-31"],
+        )
+        return r.input_tokens
+    except Exception:
+        return None
+
+
+def _fuzzy_get_list(parsed, canonical_key, aliases=()):
+    """
+    JSON dict'te canonical_key veya alias'lardan birini ara.
+    Hiçbiri yoksa herhangi bir integer listesi döner.
+    """
+    for key in (canonical_key,) + aliases:
+        if key in parsed:
+            return parsed[key]
+    # Fuzzy: key içinde canonical'ın ilk 4 harfi geçiyorsa kabul et
+    prefix = canonical_key[:4].lower()
+    for k, v in parsed.items():
+        if prefix in k.lower() and isinstance(v, list):
+            return v
+    # Son çare: JSON'daki ilk integer listesi
+    return next(
+        (v for v in parsed.values() if isinstance(v, list)
+         and v and all(isinstance(x, (int, float)) for x in v)),
+        None
+    )
 
 
 def extract_first_json_object(text):
@@ -497,11 +531,9 @@ _BOLUM_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzman
 Gorev: Urun icin en uygun 2 aday BOLUMU belirle.
 Sadece bolum listesine bak; fasil detayina girme.
 
-Yanitini SADECE su JSON formatinda ver:
-{{
-  "aday_bolumler": [7, 20],
-  "gerekce": "Kisa Turkce gerekce (1-2 cumle)"
-}}"""
+KRITIK: JSON key tam olarak "aday_bolumler" olmali, baska hicbir yazim kabul edilmez.
+Yanitini SADECE asagidaki JSON formatinda ver:
+{"aday_bolumler": [7, 20], "gerekce": "Kisa Turkce gerekce (1-2 cumle)"}"""
 
 _FASIL_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
 Gorev: Asagidaki fasil listesinden urun icin 3 aday FASIL belirle.
@@ -524,6 +556,27 @@ Verilen fasil notlari, izahname ve pozisyon listesine gore en uygun pozisyonu se
 - Fasil notu ve izahname dahil/haric hukumlerini aynen uygula.
 - En ozel pozisyonu sec; "Digerleri"ni son care olarak kullan.
 - Listede olmayan pozisyon uydurma.
+
+POZISYON SECIMI KURALLARI:
+1. MONTAJ YONTEMI SINIF DEGILDIR: Urunun montaj bicimi (kendinden yapiskanlı, vidalı,
+   manyetik, kelepce) o urunun pozisyonunu belirlemez. Urunu asil fonksiyonu ve kullanim
+   amaci belirler. Yapiskanlı plastik klips bir "klips"tir, yapiskanlı film/bant degildir.
+
+2. HAM MALZEME FORMU vs MAMUL URUN: "Kendinden yapiskanlı levhalar, plakalar, bantlar,
+   seritler, filmler, folyolar" gibi ifadeler, o formda HAM MALZEME olarak satilan urunler
+   icin gecerlidir (orn. yapiskanlı rulo film, ambalaj banti). Belirli bir is icin tasarlanmis
+   mamul plastik urunler (klips, tutucu, fitil, aksesuar, yapi elemani) bu pozisyona girmez;
+   kendi amac/fonksiyon pozisyonlarinda siniflandirilir.
+
+3. "DIGERLERI" MUTLAK SON CAREDIR: "Diger esya" veya "digerleri" iceren pozisyon YALNIZCA
+   hicbir spesifik pozisyon uymadığinda kullanilir. Bir spesifik pozisyon ürünün amacini
+   veya fonksiyonunu kapsiyorsa (orn. "tuvalet esyasi" = banyo aksesuari, "insaat
+   malzemeleri" = kapi/pencere sizdirmazlik fitili), o spesifik pozisyona git. Spesifik
+   pozisyon "dar kapsami" gerekcesiyle reddedilip "digerleri"ne kacilmaz.
+
+4. VE ILE BAGLANAN KAPSAMLAR: "sofra, mutfak, diger ev esyasi VE saglik/tuvalet esyasi"
+   gibi birden fazla kategori iceren tanim, bunlardan HERHANGI birini kapsayan urunlere
+   uygulanir. Banyo aksesuari = tuvalet esyasi kapsamindadir.
 
 Yanitini SADECE su JSON formatinda ver:
 {{
@@ -586,34 +639,43 @@ def build_tarife_context(
 
 def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
                            product_details, note_max_chars, retrieval_top_n,
-                           izahname_max_chars=1500):
+                           izahname_max_chars=1500, return_atoms=False):
     """Adım 1 context: fasıl notları + izahname özeti + tüm 4'lü pozisyonlar."""
     ranked = retrieve_ranked_gtips(
         conn, title, desc, keywords, product_details, top_n=min(retrieval_top_n, 20)
     )
     parts = []
+    atoms = {}
+
     if ranked:
         rlines = "\n".join(f"  {g[0]}  {g[1]}" for g in ranked)
-        parts.append(f"=== METNE GORE FTS REFERANS ===\n{rlines}")
+        fts_blok = f"=== METNE GORE FTS REFERANS ===\n{rlines}"
+        parts.append(fts_blok)
+        atoms['fts_bloku'] = fts_blok
 
     for fno in candidate_fasils[:5]:
         pozlar = get_all_pozisyonlar(conn, fno)
         if not pozlar:
             continue
         note = get_fasil_notu(conn, fno)
-        excerpt = (note[:note_max_chars] if note else "(not yok)")
+        excerpt = note[:note_max_chars] if (note and note_max_chars > 0) else ""
         izahname = get_izahname(conn, fno, izahname_max_chars)
         poz_lines = "\n".join(f"  {p[0]}  {p[1]}" for p in pozlar)
-        block = (
-            f"=== FASIL {fno} ===\n"
-            f"FASIL NOTU:\n{excerpt}\n\n"
-        )
+        if excerpt:
+            atoms[f'fasil_{fno}_notu'] = excerpt
+        atoms[f'fasil_{fno}_pozisyonlar'] = poz_lines
+        if izahname:
+            atoms[f'fasil_{fno}_izahname'] = izahname
+        block = f"=== FASIL {fno} ===\n"
+        if excerpt:
+            block += f"FASIL NOTU:\n{excerpt}\n\n"
         if izahname:
             block += f"IZAHNAME (ozet):\n{izahname}\n\n"
         block += f"4'LU POZISYONLAR:\n{poz_lines}"
         parts.append(block)
 
-    return "\n\n".join(parts)
+    context = "\n\n".join(parts)
+    return (context, atoms) if return_atoms else context
 
 
 def _get_ara_pozisyonlar(conn, fasil_no, poz4_clean):
@@ -656,27 +718,89 @@ def _format_gtip_grouped(gtips, ara_pozlar):
     return "\n".join(lines).lstrip("\n")
 
 
-def build_gtip_context(conn, fasil_no, pozisyon_kod, note_max_chars, izahname_max_chars):
+def _get_pozisyon_tanim(conn, fasil_no, poz4_clean):
+    row = conn.execute("""
+        SELECT tanim FROM pozisyon
+        WHERE fasil = ? AND substr(kod_clean, 1, 4) = ?
+        ORDER BY seviye LIMIT 1
+    """, (fasil_no, poz4_clean)).fetchone()
+    return row[0] if row else ""
+
+
+def build_gtip_context(conn, fasil_no, pozisyon_kod, note_max_chars, izahname_max_chars,
+                       return_atoms=False):
     """Adım 2 context: fasıl notu + seçilen pozisyonun tüm 12'lileri (ara seviye başlıklı)."""
     poz4_clean = re.sub(r'[^0-9]', '', str(pozisyon_kod))[:4]
     gtips = get_gtips_by_pozisyon(conn, pozisyon_kod)
     note = get_fasil_notu(conn, fasil_no)
     izahname = get_izahname(conn, fasil_no, izahname_max_chars)
+    poz_tanim = _get_pozisyon_tanim(conn, fasil_no, poz4_clean)
 
     parts = []
-    if note:
-        parts.append(f"=== FASIL {fasil_no} NOTU ===\n{note[:note_max_chars]}")
+    atoms = {}
+    note_excerpt = (note[:note_max_chars] if note else None)
+    if note_excerpt:
+        atoms['fasil_notu'] = note_excerpt
+        parts.append(f"=== FASIL {fasil_no} NOTU ===\n{note_excerpt}")
     if izahname:
+        atoms['izahname'] = izahname
         parts.append(f"=== FASIL {fasil_no} IZAHNAME (ozet) ===\n{izahname}")
     if gtips:
         ara_pozlar = _get_ara_pozisyonlar(conn, fasil_no, poz4_clean)
         gtip_block = _format_gtip_grouped(gtips, ara_pozlar)
-        parts.append(f"=== POZISYON {pozisyon_kod} ALTINDAKI TUM GTIP'LER ===\n{gtip_block}")
+        atoms['gtip_listesi'] = gtip_block
+        header = f"POZISYON {pozisyon_kod}"
+        if poz_tanim:
+            header += f" — {poz_tanim}"
+        parts.append(f"=== {header} ALTINDAKI TUM GTIP'LER ===\n{gtip_block}")
 
-    return "\n\n".join(parts), gtips
+    context = "\n\n".join(parts)
+    if return_atoms:
+        return context, gtips, atoms
+    return context, gtips
+
+
+def build_gtip_context_multi(conn, aday_pozisyonlar, note_max_chars, izahname_max_chars):
+    """
+    2 aday pozisyon için birleşik context:
+      Her pozisyon için: tanımı başlıkta göster + tüm 12'li GTİP'ler
+    Adım 2'ye hem tanım hem tam liste gider; model pozisyon seçimini + GTİP seçimini birlikte yapar.
+    """
+    parts = []
+    all_gtips = []
+    primary_fasil = None
+
+    for poz_kod in aday_pozisyonlar:
+        poz4_clean = re.sub(r'[^0-9]', '', str(poz_kod))[:4]
+        fasil_no = int(poz4_clean[:2]) if poz4_clean.isdigit() else None
+        if primary_fasil is None:
+            primary_fasil = fasil_no
+
+        gtips = get_gtips_by_pozisyon(conn, poz_kod)
+        if not gtips:
+            continue
+        all_gtips.extend(gtips)
+
+        poz_tanim = _get_pozisyon_tanim(conn, fasil_no, poz4_clean) if fasil_no else ""
+        ara_pozlar = _get_ara_pozisyonlar(conn, fasil_no, poz4_clean) if fasil_no else {}
+        gtip_block = _format_gtip_grouped(gtips, ara_pozlar)
+
+        header = f"ADAY POZISYON {poz_kod}"
+        if poz_tanim:
+            header += f" — {poz_tanim}"
+        parts.append(f"=== {header} ===\n{gtip_block}")
+
+    # Fasıl notu sadece primary fasıl için, max_chars > 0 ise
+    if primary_fasil and note_max_chars > 0:
+        note = get_fasil_notu(conn, primary_fasil)
+        if note:
+            parts.insert(0, f"=== FASIL {primary_fasil} NOTU ===\n{note[:note_max_chars]}")
+
+    return "\n\n".join(parts), all_gtips
 
 
 def _call_classify(client, model, max_tokens, system_prompt, user_msg):
+    """Prompt caching olmadan basit API çağrısı (kısa system prompt'lar için)."""
     return client.messages.create(
         model=model,
         max_tokens=max_tokens,
@@ -685,8 +809,31 @@ def _call_classify(client, model, max_tokens, system_prompt, user_msg):
     )
 
 
+def _call_classify_ctx(client, model, max_tokens, system_prompt, context_text, query_text):
+    """
+    Prompt caching ile API çağrısı: context_text ayrı bir content block olarak
+    cache_control ile işaretlenir. Aynı context (aynı pozisyon/fasıl) ile yapılan
+    sonraki çağrılarda cache_read_input_tokens artar.
+    Minimum 2048 token altındaysa API cache_control'ü sessizce görmezden gelir.
+    """
+    return client.messages.create(
+        model=model,
+        max_tokens=max_tokens,
+        system=system_prompt,
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": context_text,
+                 "cache_control": {"type": "ephemeral"}},
+                {"type": "text", "text": query_text},
+            ]
+        }],
+        extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"},
+    )
+
+
 def _api_call_with_retry(client, model, max_tokens, system_prompt, user_msg):
-    """Rate limit retry mantığıyla API çağrısı yapar."""
+    """Rate limit retry mantığıyla API çağrısı yapar (kısa mesajlar için)."""
     try:
         return _call_classify(client, model, max_tokens, system_prompt, user_msg)
     except anthropic.RateLimitError:
@@ -695,6 +842,21 @@ def _api_call_with_retry(client, model, max_tokens, system_prompt, user_msg):
             time.sleep(wait)
             try:
                 return _call_classify(client, model, max_tokens, system_prompt, user_msg)
+            except anthropic.RateLimitError:
+                continue
+        raise
+
+
+def _api_call_ctx_with_retry(client, model, max_tokens, system_prompt, context_text, query_text):
+    """Rate limit retry mantığıyla context-cached API çağrısı."""
+    try:
+        return _call_classify_ctx(client, model, max_tokens, system_prompt, context_text, query_text)
+    except anthropic.RateLimitError:
+        for wait in [30, 60]:
+            print(f"\n    Rate limit, {wait}s bekleniyor...", end="", flush=True)
+            time.sleep(wait)
+            try:
+                return _call_classify_ctx(client, model, max_tokens, system_prompt, context_text, query_text)
             except anthropic.RateLimitError:
                 continue
         raise
@@ -713,13 +875,14 @@ def classify_product(client, product_info, conn, opts=None):
     opts = opts or {}
     model               = opts.get('model', 'claude-haiku-4-5-20251001')
     max_tokens          = int(opts.get('max_tokens', 1200))
-    note_max_chars      = int(opts.get('note_max_chars', 8000))
+    note_max_chars      = int(opts.get('note_max_chars', 0))
     izahname_max_chars  = int(opts.get('izahname_max_chars', 0))
     gtip_rows_per_fasil = int(opts.get('gtip_rows_per_fasil', 120))
     retrieval_top_n     = int(opts.get('retrieval_top_n', 50))
     do_refine           = bool(opts.get('refine'))
     refine_model        = opts.get('refine_model', 'claude-sonnet-4-20250514')
     refine_max_tokens   = int(opts.get('refine_max_tokens', 1200))
+    do_token_breakdown  = bool(opts.get('token_breakdown'))
 
     title           = product_info.get('title', '')
     desc            = product_info.get('description', '')
@@ -750,13 +913,37 @@ def classify_product(client, product_info, conn, opts=None):
         f"Yanitini SADECE JSON olarak ver."
     )
 
+    # Token breakdown sözlüğü — adım adım atomlar
+    tbd = {}  # token_breakdown dict
+
+    if do_token_breakdown:
+        ct = lambda text: _count_tok(client, model, text)
+        tbd['adim_0a'] = {
+            'system_prompt':    ct(bolum_system_prompt),
+            'urun_baslik':      ct(f"Baslik: {title}"),
+            'urun_aciklama':    ct(f"Aciklama: {desc}"),
+            'urun_detaylar':    ct(f"Urun Detaylari: {product_details or '(belirtilmemis)'}"),
+            'urun_variantlar':  ct(f"Varyantlar: {sku_variants or '(yok)'}"),
+            'bolum_listesi':    ct(bolum_text),
+        }
+
     candidate_bolumler = []
+    bolum_raw_response = None
+    usage_0a = None
     try:
         bolum_resp = _api_call_with_retry(client, model, 200, bolum_system_prompt, bolum_user_msg)
-        bolum_parsed = extract_first_json_object(bolum_resp.content[0].text)
-        if bolum_parsed and bolum_parsed.get('aday_bolumler'):
-            raw = bolum_parsed['aday_bolumler']
-            candidate_bolumler = [int(float(x)) for x in raw if isinstance(x, (int, float)) or str(x).isdigit()][:3]
+        bolum_raw_response = bolum_resp.content[0].text
+        usage_0a = {'in': bolum_resp.usage.input_tokens, 'out': bolum_resp.usage.output_tokens,
+                    'cache_write': getattr(bolum_resp.usage, 'cache_creation_input_tokens', 0) or 0,
+                    'cache_read':  getattr(bolum_resp.usage, 'cache_read_input_tokens', 0) or 0}
+        bolum_parsed = extract_first_json_object(bolum_raw_response)
+        if bolum_parsed:
+            raw = _fuzzy_get_list(bolum_parsed, 'aday_bolumler',
+                                  aliases=('anad_bolumler', 'adat_bolumler',
+                                           'candidate_bolumler', 'aday_bolum'))
+            if raw:
+                candidate_bolumler = [int(float(x)) for x in raw
+                                      if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 21][:3]
     except Exception:
         pass
 
@@ -764,9 +951,17 @@ def classify_product(client, product_info, conn, opts=None):
     # ADIM 0b — Fasıl seçimi (seçilen bölümlerin fasılları → 3 aday fasıl)
     # ------------------------------------------------------------------
     candidate_fasils = []
+    fasil_raw_response = None
+    usage_0b = None
     if candidate_bolumler:
         fasiller = get_fasiller_by_bolumler(conn, candidate_bolumler)
         fasil_text = "\n".join(f"  Fasil {f[0]:02d}: {f[1]}" for f in fasiller)
+        if do_token_breakdown:
+            tbd['adim_0b'] = {
+                'system_prompt': ct(fasil_system_prompt),
+                'urun_metni':    ct(product_text),
+                'fasil_listesi': ct(fasil_text),
+            }
         fasil_user_msg = (
             f"Asagidaki urun icin dogru fasillari sec.\n\n"
             f"URUN BILGILERI:\n{product_text}\n\n"
@@ -775,10 +970,18 @@ def classify_product(client, product_info, conn, opts=None):
         )
         try:
             fasil_resp = _api_call_with_retry(client, model, 300, fasil_system_prompt, fasil_user_msg)
-            fasil_parsed = extract_first_json_object(fasil_resp.content[0].text)
-            if fasil_parsed and fasil_parsed.get('aday_fasiller'):
-                raw = fasil_parsed['aday_fasiller']
-                candidate_fasils = [int(float(x)) for x in raw if isinstance(x, (int, float)) or str(x).isdigit()][:3]
+            fasil_raw_response = fasil_resp.content[0].text
+            usage_0b = {'in': fasil_resp.usage.input_tokens, 'out': fasil_resp.usage.output_tokens,
+                        'cache_write': getattr(fasil_resp.usage, 'cache_creation_input_tokens', 0) or 0,
+                        'cache_read':  getattr(fasil_resp.usage, 'cache_read_input_tokens', 0) or 0}
+            fasil_parsed = extract_first_json_object(fasil_raw_response)
+            if fasil_parsed:
+                raw = _fuzzy_get_list(fasil_parsed, 'aday_fasiller',
+                                      aliases=('aday_fasil', 'candidate_fasiller',
+                                               'anad_fasiller', 'adat_fasiller'))
+                if raw:
+                    candidate_fasils = [int(float(x)) for x in raw
+                                        if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 97][:3]
         except Exception:
             pass
 
@@ -789,38 +992,75 @@ def classify_product(client, product_info, conn, opts=None):
     # ------------------------------------------------------------------
     # ADIM 1 — Pozisyon seçimi
     # ------------------------------------------------------------------
-    poz_context = build_pozisyon_context(
-        conn, candidate_fasils, title, desc, keywords,
-        product_details, note_max_chars, retrieval_top_n,
-        izahname_max_chars=izahname_max_chars
-    )
-    poz_user_msg = (
+    if do_token_breakdown:
+        poz_context, poz_atoms = build_pozisyon_context(
+            conn, candidate_fasils, title, desc, keywords,
+            product_details, note_max_chars, retrieval_top_n,
+            izahname_max_chars=izahname_max_chars, return_atoms=True,
+        )
+        tbd['adim_1'] = {'system_prompt': ct(pozisyon_system_prompt), 'urun_metni': ct(product_text)}
+        tbd['adim_1'].update({k: ct(v) for k, v in poz_atoms.items()})
+    else:
+        poz_context = build_pozisyon_context(
+            conn, candidate_fasils, title, desc, keywords,
+            product_details, note_max_chars, retrieval_top_n,
+            izahname_max_chars=izahname_max_chars,
+        )
+    poz_context_block = f"TARIFE CETVELI:\n{poz_context}"
+    poz_query = (
         f"Asagidaki urun icin dogru FASIL ve 4 haneli POZISYONU sec.\n\n"
         f"URUN BILGILERI:\n{product_text}\n\n"
-        f"TARIFE CETVELI:\n{poz_context}\n\n"
+        f"Yukaridaki tarife cetvelini kullan.\n\n"
         f"Yanitini SADECE JSON olarak ver."
     )
 
     poz_result = None
+    pozisyon_raw_response = None
+    usage_1 = None
     try:
-        poz_resp = _api_call_with_retry(client, model, 600, pozisyon_system_prompt, poz_user_msg)
-        poz_parsed = extract_first_json_object(poz_resp.content[0].text)
+        poz_resp = _api_call_ctx_with_retry(client, model, 600, pozisyon_system_prompt,
+                                            poz_context_block, poz_query)
+        pozisyon_raw_response = poz_resp.content[0].text
+        usage_1 = {'in': poz_resp.usage.input_tokens, 'out': poz_resp.usage.output_tokens,
+                   'cache_write': getattr(poz_resp.usage, 'cache_creation_input_tokens', 0) or 0,
+                   'cache_read':  getattr(poz_resp.usage, 'cache_read_input_tokens', 0) or 0}
+        poz_parsed = extract_first_json_object(pozisyon_raw_response)
         if poz_parsed and poz_parsed.get('pozisyon_kod'):
             poz_result = poz_parsed
     except Exception:
         pass
+
+    def _make_debug(pozisyon_kod=None, fasil_no=None, usage_2=None, tbd=tbd):
+        token_log = {
+            'adim_0a': usage_0a,
+            'adim_0b': usage_0b,
+            'adim_1':  usage_1,
+            'adim_2':  usage_2,
+        }
+        total_in    = sum(u['in']          for u in token_log.values() if u)
+        total_out   = sum(u['out']         for u in token_log.values() if u)
+        total_cw    = sum(u.get('cache_write', 0) for u in token_log.values() if u)
+        total_cr    = sum(u.get('cache_read',  0) for u in token_log.values() if u)
+        token_log['toplam'] = {'in': total_in, 'out': total_out,
+                               'cache_write': total_cw, 'cache_read': total_cr}
+        return {
+            'candidate_bolumler':    candidate_bolumler,
+            'bolum_raw_response':    bolum_raw_response,
+            'candidate_fasiller':    candidate_fasils,
+            'fasil_raw_response':    fasil_raw_response,
+            'secilen_pozisyon':      pozisyon_kod,
+            'pozisyon_raw_response': pozisyon_raw_response,
+            'secilen_fasil':         fasil_no,
+            'token_usage':           token_log,
+            'token_breakdown':       tbd if tbd else None,
+        }
 
     # Pozisyon seçimi başarısızsa eski flat yönteme düş
     if not poz_result:
         out = _classify_flat(client, product_info, conn, opts,
                              candidate_fasils, note_max_chars,
                              gtip_rows_per_fasil, retrieval_top_n)
-        out['debug'] = {
-            'candidate_bolumler': candidate_bolumler,
-            'candidate_fasiller': candidate_fasils,
-            'secilen_pozisyon': None,
-            'secilen_fasil': None,
-        }
+        out['debug'] = _make_debug()
         return out
 
     fasil_no     = poz_result.get('fasil')
@@ -831,56 +1071,59 @@ def classify_product(client, product_info, conn, opts=None):
         out = _classify_flat(client, product_info, conn, opts,
                              candidate_fasils, note_max_chars,
                              gtip_rows_per_fasil, retrieval_top_n)
-        out['debug'] = {
-            'candidate_bolumler': candidate_bolumler,
-            'candidate_fasiller': candidate_fasils,
-            'secilen_pozisyon': pozisyon_kod,
-            'secilen_fasil': fasil_no,
-        }
+        out['debug'] = _make_debug(pozisyon_kod, fasil_no)
         return out
 
     # ------------------------------------------------------------------
     # ADIM 2 — GTİP seçimi
     # ------------------------------------------------------------------
-    gtip_context, _ = build_gtip_context(
-        conn, fasil_no, pozisyon_kod, note_max_chars, izahname_max_chars
-    )
-
-    # Yorum kurallarını system prompt'a ekle
     kurallar = get_yorum_kurallari(conn)
     system_step2 = (
         f"TARIFEYE ILISKIN GENEL YORUMLAMA KURALLARI:\n{kurallar}\n\n---\n\n{SYSTEM_PROMPT}"
         if kurallar else SYSTEM_PROMPT
     )
 
-    gtip_user_msg = (
+    if do_token_breakdown:
+        gtip_context, _, gtip_atoms = build_gtip_context(
+            conn, fasil_no, pozisyon_kod, note_max_chars, izahname_max_chars,
+            return_atoms=True,
+        )
+        tbd['adim_2'] = {'system_prompt': ct(system_step2), 'urun_metni': ct(product_text)}
+        tbd['adim_2'].update({k: ct(v) for k, v in gtip_atoms.items()})
+    else:
+        gtip_context, _ = build_gtip_context(
+            conn, fasil_no, pozisyon_kod, note_max_chars, izahname_max_chars,
+        )
+
+    gtip_context_block = f"TARIFE CETVELI VERILERI:\n{gtip_context}"
+    gtip_query = (
         f"Asagidaki urun icin dogru 12 haneli GTIP kodunu belirle.\n\n"
         f"URUN BILGILERI:\n{product_text}\n"
         f"Secilen pozisyon: {pozisyon_kod} (Fasil {fasil_no})\n\n"
-        f"Urun bilgisini ve asagidaki tarife metnini kullan.\n\n"
-        f"TARIFE CETVELI VERILERI:\n{gtip_context}\n\n"
+        f"Yukaridaki tarife cetvelini kullan.\n\n"
         f"Yanitini SADECE JSON olarak ver."
     )
 
     def run_step2(sys_p, mdl, mtok):
-        resp = _api_call_with_retry(client, mdl, mtok, sys_p, gtip_user_msg)
+        resp = _api_call_ctx_with_retry(client, mdl, mtok, sys_p, gtip_context_block, gtip_query)
+        usage = {'in': resp.usage.input_tokens, 'out': resp.usage.output_tokens,
+                 'cache_write': getattr(resp.usage, 'cache_creation_input_tokens', 0) or 0,
+                 'cache_read':  getattr(resp.usage, 'cache_read_input_tokens', 0) or 0}
         text = resp.content[0].text.strip()
         parsed = extract_first_json_object(text)
         if parsed is None:
-            return {"gtip_code": "", "gerekce": text[:300], "guven": "dusuk",
-                    "error": "JSON parse edilemedi", "parse_hatasi": True}
-        return sanitize_classification(conn, parsed)
-
-    debug = {
-        'candidate_bolumler': candidate_bolumler,
-        'candidate_fasiller': candidate_fasils,
-        'secilen_pozisyon': pozisyon_kod,
-        'secilen_fasil': fasil_no,
-    }
+            result = {"gtip_code": "", "gerekce": text[:300], "guven": "dusuk",
+                      "error": "JSON parse edilemedi", "parse_hatasi": True}
+        else:
+            result = sanitize_classification(conn, parsed)
+        result['_usage'] = usage
+        return result
 
     try:
         out = run_step2(system_step2, model, max_tokens)
+        usage_2 = out.pop('_usage', None)
         out.pop('parse_hatasi', None)
+        debug = _make_debug(pozisyon_kod, fasil_no, usage_2)
         out['debug'] = debug
         if do_refine and _needs_refine(out):
             refined = run_step2(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)

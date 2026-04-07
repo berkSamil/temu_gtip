@@ -1,0 +1,288 @@
+{
+  "timestamp": "2026-04-06T13:40:11.459098",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 5,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 5,
+      "total": 5,
+      "accuracy": 100.0
+    },
+    "pozisyon": {
+      "hits": 4,
+      "total": 5,
+      "accuracy": 80.0
+    },
+    "alt_poz": {
+      "hits": 3,
+      "total": 5,
+      "accuracy": 60.0
+    },
+    "exact": {
+      "hits": 3,
+      "total": 5,
+      "accuracy": 60.0
+    }
+  },
+  "params": {
+    "note_chars": 8000,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Tek elle kullanılan bahçe budama makası",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [15, 20],\n  \"gerekce\": \"Bahçe budama makası metal (demir/çelik) yapılı bir el aracı olup Bolum 15 (Adi Metaller ve Mamulleri) veya Bolum 20 (Muhtelf Mamul Eşya) altında sınıflandırılabilir. Metal kesme aletleri tipik olarak Bolum 15'te yer alır.\"\n}\n```",
+        "candidate_fasiller": [
+          82,
+          73,
+          83
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [82, 73, 83],\n  \"gerekce\": \"Tek elle kullanılan bahçe budama makası, adi metallerden yapılmış bir aletle/bıçak türü aracıdır. Fasil 82 en uygun sınıflandırmadır çünkü bıçakcı eşyası ve bahçe aletlerini kapsar. Fasil 73 demir/çelikten yapılmışsa alternatif olabilir. Fasil 83 diğer metal eşyalar için yedek seçenektir.\"\n}\n```",
+        "secilen_pozisyon": "8201",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 82,\n  \"pozisyon_kod\": \"8201\",\n  \"gerekce\": \"Tek elle kullanılan bahçe budama makası, Fasil 82 Notu 1 kapsamında adi metallerden yapılmış kesici el aleti olup, 8201 pozisyonunda 'bağ ve bahçıvan makasları' olarak tanımlanmaktadır. Fasil 82 pozisyonu 8201, bahçıvanlıkta kullanılan el aletlerini kapsarken, 8201.60 pozisyonu iki elle kullanılan budama makaslarını ayrıca belirttiğinden, tek elle kullanılan ürün 8201.50 'Bağ ve bahçıvan makasları' altında sınıflandırılır.\"\n}\n```",
+        "secilen_fasil": 82,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1966,
+            "out": 137
+          },
+          "adim_0b": {
+            "in": 3017,
+            "out": 169
+          },
+          "adim_1": {
+            "in": 9103,
+            "out": 230
+          },
+          "adim_2": {
+            "in": 4795,
+            "out": 264
+          },
+          "toplam": {
+            "in": 18881,
+            "out": 800
+          }
+        }
+      }
+    },
+    {
+      "title": "Manyetik şişe açacağı",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8205.59.80.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [15, 20],\n  \"gerekce\": \"Manyetik şişe açacağı, metal malzemeden yapılmış basit bir el aletdir. Bolum 15 (Adi Metaller ve Mamulleri) birincil aday, Bolum 20 (Muhtelif Mamul Eşya) ise alternatif sınıflandırmadır.\"\n}\n```",
+        "candidate_fasiller": [
+          73,
+          83,
+          82
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [73, 83, 82],\n  \"gerekce\": \"Manyetik şişe açacağı, esas olarak demir veya çelikten üretilen bir el aracıdır. Fasil 73 (demir veya çelikten eşya) birincil aday olup, Fasil 83 (adi metallerden çeşitli eşya) ve Fasil 82 (adi metallerden aletler) de ikincil adaylar olarak değerlendirilmektedir.\"\n}\n```",
+        "secilen_pozisyon": "8205",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 82,\n  \"pozisyon_kod\": \"8205\",\n  \"gerekce\": \"Manyetik şişe açacağı, tarifenin başka pozisyonlarında yer almayan bir el aletidir. 82.05 pozisyonu, 8202-8204 pozisyonlarında yer almayan el aletlerini (kaynak lambaları, mengeneler ve benzerleri de dahil) kapsamaktadır. Manyetik mekanizmalı şişe açacağı, bu tanımın kapsamına girmektedir.\"\n}\n```",
+        "secilen_fasil": 82,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1964,
+            "out": 123
+          },
+          "adim_0b": {
+            "in": 3015,
+            "out": 156
+          },
+          "adim_1": {
+            "in": 9322,
+            "out": 162
+          },
+          "adim_2": {
+            "in": 4917,
+            "out": 347
+          },
+          "toplam": {
+            "in": 19218,
+            "out": 788
+          }
+        }
+      }
+    },
+    {
+      "title": "Yüz temizleme fırçası",
+      "correct_gtip": "9603.29.80.00.00",
+      "predicted_gtip": "9603.29.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          6,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\"aday_bolumler\": [6, 20], \"gerekce\": \"Yüz temizleme fırçası kozmetik aksessuarı olup, genellikle temizleme amaçlı kimyasal madde içeren ürünlerle (Bolum 6) veya saf mekanik temizleme aletleri olarak muhtelf mamul eşya (Bolum 20) kapsamındadır.\"}\n```",
+        "candidate_fasiller": [
+          96,
+          34,
+          33
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [96, 34, 33],\n  \"gerekce\": \"Yüz temizleme fırçası, kullanım amacı itibariyle kişisel bakım ve temizlik aracıdır. Fasil 96 (Çeşitli mamul eşya) birincil tercihtir. Fasil 34 temizleme müstahzarları içerdiği için, Fasil 33 kozmetik ürünlerle ilişkili olduğu için değerlendirilmiştir.\"\n}\n```",
+        "secilen_pozisyon": "9603",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9603\",\n  \"gerekce\": \"Yüz temizleme fırçası, Fasil 96 pozisyon 9603 kapsamına girmektedir. Fasil 96 notu (f) bendine göre tıbbi/veteriner kullanıma mahsus özel fırçalar Fasil 90.18'e girse de, kozmetik amaçlı yüz temizleme fırçaları genel tuvalet fırçası olarak 9603'te sınıflandırılır. Fasil 33 ve 34 notlarına göre makyaj/temizleme müstahzarları değil fırça ürünüdür.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1964,
+            "out": 123
+          },
+          "adim_0b": {
+            "in": 3243,
+            "out": 157
+          },
+          "adim_1": {
+            "in": 9842,
+            "out": 208
+          },
+          "adim_2": {
+            "in": 5984,
+            "out": 395
+          },
+          "toplam": {
+            "in": 21033,
+            "out": 883
+          }
+        }
+      }
+    },
+    {
+      "title": "Parfüm için spreyli atomizer şişe (doldurulabilir)",
+      "correct_gtip": "9616.10.10.00.00",
+      "predicted_gtip": "9616.10.10.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Spreyli atomizer şişe plastik malzemeden mamul bir konteyner olup Bölüm 7'ye girmektedir. Alternatif olarak, doldurulabilir disperser şişeleri genel mamul eşya kategorisinde Bölüm 20'ye de sınıflandırılabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          70
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 70],\n  \"gerekce\": \"Spreyli atomizer şişe plastik malzemeden yapılmış bir kap olup, Fasil 39 (Plastikler ve mamulleri) kapsamındadır. Fasil 96 (Çeşitli mamul eşya) ve Fasil 70 (Cam ve cam mamulleri) de alternatif olarak değerlendirilebilir ancak plastik şişe olması nedeniyle Fasil 39 birincil sınıflandırmadır.\"\n}\n```",
+        "secilen_pozisyon": "9616",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9616\",\n  \"gerekce\": \"Parfüm için spreyli atomizer şişe, Fasil 96 Pozisyon 9616'da tanımlanan 'Parfüm spreyleri ve benzeri tuvalet spreyleri, bunların püskürtme mekanizmaları ve püskürtücü başları' kapsamına girmektedir. Ürün doldurulabilir spreyli atomizer olup tuvalet spreyi amaçlı kullanılan bir kapta bulunmaktadır.\"\n}\n```",
+        "secilen_fasil": 96,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1972,
+            "out": 119
+          },
+          "adim_0b": {
+            "in": 2766,
+            "out": 161
+          },
+          "adim_1": {
+            "in": 14080,
+            "out": 162
+          },
+          "adim_2": {
+            "in": 5298,
+            "out": 353
+          },
+          "toplam": {
+            "in": 24116,
+            "out": 795
+          }
+        }
+      }
+    },
+    {
+      "title": "Plastikten mamul, yapışkanlı duvar tipi tıraş bıçağı tutucu (banyo aksesuarı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\"aday_bolumler\": [7, 20], \"gerekce\": \"Plastikten yapılmış banyo aksesuarı olduğu için öncelikle Bölüm 7 (Plastikler ve Mamuller) uygun adaydır. Bölüm 20 (Muhtelf Mamul Eşya), eğer özelleştirilmiş banyo aksesuar kategorisine tam olarak oturmazsa alternatif seçenektir.\"}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Ürün plastikten yapılmış banyo aksesuarı olup, Fasil 39 (Plastikler ve mamulleri) birincil seçimdir. Fasil 96 (Çeşitli mamul eşya) ve Fasil 94 (Banyo mobilyaları ve aksesuarları) ikincil seçeneklerdir.\"\n}\n```",
+        "secilen_pozisyon": "3926",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3926\",\n  \"gerekce\": \"Plastikten mamul banyo aksesuarı olan duvar tipi tıraş bıçağı tutucu, Fasil 39 Notunun 11(ij) maddesinde belirtilen 'kapılara, pencerelere, merdiven, duvar veya binanın diğer bölümlerine tespit veya monte edilmek üzere hazırlanmış bağlantı ve montaj parçaları (saplar, tutaçlar, kancalar)' kapsamında değildir. Pozisyon 3926 'Plastikten diğer eşya' olarak bu ürünü kapsar.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1989,
+            "out": 136
+          },
+          "adim_0b": {
+            "in": 2783,
+            "out": 133
+          },
+          "adim_1": {
+            "in": 13575,
+            "out": 203
+          },
+          "adim_2": {
+            "in": 7879,
+            "out": 368
+          },
+          "toplam": {
+            "in": 26226,
+            "out": 840
+          }
+        }
+      }
+    }
+  ]
+}

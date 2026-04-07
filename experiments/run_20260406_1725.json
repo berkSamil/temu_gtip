@@ -1,0 +1,343 @@
+{
+  "timestamp": "2026-04-06T17:25:47.377377",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 5,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 5,
+      "total": 5,
+      "accuracy": 100.0
+    },
+    "pozisyon": {
+      "hits": 4,
+      "total": 5,
+      "accuracy": 80.0
+    },
+    "alt_poz": {
+      "hits": 4,
+      "total": 5,
+      "accuracy": 80.0
+    },
+    "exact": {
+      "hits": 4,
+      "total": 5,
+      "accuracy": 80.0
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Plastikten mamul, yapışkanlı duvar tipi tıraş bıçağı tutucu (banyo aksesuarı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Ürün plastikten yapılmış banyo aksesuarı olduğu için Bölüm 7 (Plastikler ve Mamuller) birincil adaydır. Bölüm 20 (Muhtelf Mamul Eşya) ise banyo aksesuarları için alternatif sınıflandırma bölümüdür.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Ürün plastikten mamul olduğu için Fasil 39 birincil adaydır. Banyo aksesuarı olarak Fasil 96 (Çeşitli mamul eşya) da uygun bir seçenektir. Fasil 94 mobilya ve banyo donanımı içerebileceği için üçüncü aday olarak değerlendirilmiştir.\"\n}\n```",
+        "secilen_pozisyon": "3924",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3924\",\n  \"gerekce\": \"Ürün plastikten mamul banyo aksesuarı olup, Fasil 39 Pozisyon 3924 'Plastikten sofra eşyası, mutfak eşyası, diğer ev eşyası ve sağlık veya tuvalet eşyası' kapsamına girmektedir. Tıraş bıçağı tutucu, banyo/tuvalet alanında kullanılan sağlık/tuvalet eşyasıdır.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1989,
+            "out": 133,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 451,
+            "out": 145,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 142,
+            "out": 168,
+            "cache_write": 7226,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3840,
+            "out": 280,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6422,
+            "out": 726,
+            "cache_write": 7226,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı altı izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3925.90.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı altı izolasyon fitili, plastik malzemeden yapılmış bir mamuldür ve öncelikli olarak Bölüm 7 (Plastikler ve Mamuller) altında sınıflandırılmalıdır. İkincil aday olarak Bölüm 20 (Muhtelif Mamul Eşya) yapı malzemeleri ve izolasyon ürünleri içeriğine göre değerlendirilebilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 40],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı altı izolasyon fitili, temelde plastik malzemeden üretilen bir mamuldür. Fasil 39, plastik mamulleri kapsar ve birincil seçimdir. Fasil 96, çeşitli mamul eşya kategorisinde yer alabilir. Fasil 40, kauçuk bileşen içermesi ihtimaline karşın yedek seçenektir.\"\n}\n```",
+        "secilen_pozisyon": "3925",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3925\",\n  \"gerekce\": \"Ürün, plastikten inşaat malzemesi olup kapı altı izolasyon fitili olarak işlev görmektedir. Fasıl 39, Pozisyon 3925 'Tarifenin başka yerinde belirtilmeyen veya yer almayan plastiklerden inşaat malzemeleri' tanımını karşılamaktadır. Kapı eşiği/altı izolasyonu inşaat malzemesi kategorisine girmektedir.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1972,
+            "out": 168,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 434,
+            "out": 153,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 126,
+            "out": 164,
+            "cache_write": 7884,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3911,
+            "out": 284,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6443,
+            "out": 769,
+            "cache_write": 7884,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3925.90.80.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili, birincil olarak Bolum 7 (Plastikler ve Mamuller) altında sınıflandırılır. İkincil aday olarak Bolum 20 (Muhtelf Mamul Eşya) değerlendirilir; çünkü yapı malzemeleri karakteri gösteren bu tür inşaat aksesuarları bazen bu bölüm altında da yer alabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          40
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 40],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kenar izolasyon fitili, plastik malzemeden üretildiği için Fasil 39'a girmektedir. Yapı malzemeleri olarak Fasil 96'da da sınıflandırılabilir. Kauçuk esaslı yapışkan içerebileceği için Fasil 40 da alternatif olabilir.\"\n}\n```",
+        "secilen_pozisyon": "3925.20",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3925.20\",\n  \"gerekce\": \"Ürün, plastikten inşaat malzemesi olup kapı/pencere kenar izolasyonu için tasarlanmıştır. FASIL 39 POZISYON 3925, tarifenin başka yerinde belirtilmeyen plastiklerden inşaat malzemelerini (kapılar, pencereler, çerçeveleri, pervazları ve kapı eşikleri) kapsar. Kendinden yapışkanlı özelliği, montaj yöntemi olup ürünün temel işlevini değiştirmez; asıl fonksiyonu kapı/pencere izolasyonudur.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1975,
+            "out": 168,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 437,
+            "out": 139,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 129,
+            "out": 201,
+            "cache_write": 7876,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3918,
+            "out": 357,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6459,
+            "out": 865,
+            "cache_write": 7876,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte organizer kutu (çok bölmeli saklama kabı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"anad_bolumler\": [7, 20],\n  \"gerekce\": \"Plastikten yapılmış duvara monte organizer kutu, plastik mamul olarak Bölüm 7'de sınıflandırılır. Alternatif olarak, çok fonksiyonlu saklama amaçlı muhteleif mamul eşya Bölüm 20'de de değerlendirilebilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Plastikten mamul duvara monte organizer kutu, birincil olarak Fasil 39 (Plastikler ve mamulleri) altında sınıflandırılır. Fasil 96 (Çeşitli mamul eşya) ve Fasil 94 (Mobilyalar ve benzeri) de mobilya/depolama işlevi nedeniyle düşünülebilecek alternatif fasiller olmakla birlikte, malzeme ana sınıflayıcı faktördür.\"\n}\n```",
+        "secilen_pozisyon": "3926",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3926\",\n  \"gerekce\": \"Plastikten mamul duvara monte organizer kutu, tarifenin başka yerinde belirtilmeyen plastik eşya olarak 3926 pozisyonuna girmektedir. 3924 (sofra, mutfak, ev eşyası) ve 3925 (inşaat malzemeleri) pozisyonları daha dar kapsamlı olup, bu ürün genel amaçlı saklama/organizer kutu olarak 3926 'Diğer eşya' pozisyonunda sınıflandırılır.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1979,
+            "out": 125,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 441,
+            "out": 168,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 132,
+            "out": 185,
+            "cache_write": 7220,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 150,
+            "out": 338,
+            "cache_write": 4146,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 2702,
+            "out": 816,
+            "cache_write": 11366,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kablo sabitleme klipsi",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"adag_bolumler\": [7, 20],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kablo sabitleme klipsi, Bolum 7 (Plastikler ve Mamuller) altında sınıflandırılmalıdır. Eğer spesifik plastik klipsi tanımı Bolum 7'de yer almayacaksa, Bolum 20 (Muhtelf Mamul Eşya) genel kategorisi ikinci adaydır.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Kendinden yapışkanlı plastik kablo sabitleme klipsi öncelikle Fasil 39 (Plastikler ve mamulleri) altında sınıflandırılabilir. Fasil 96 (Çeşitli mamul eşya) ve Fasil 94 (Mobilyalar ve benzeri) ise kullanım alanı ve montaj bağlamında alternatif seçeneklerdir.\"\n}\n```",
+        "secilen_pozisyon": "3926",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3926\",\n  \"gerekce\": \"Ürün, kendinden yapışkanlı plastikten mamul bir kablo sabitleme klipsidir. Montaj yöntemi (yapışkan) değil, asıl fonksiyonu (kablo sabitlemek) sınıflandırmayı belirler. 3919 (kendinden yapışkan levha, plaka, bant vb. ham malzeme) değil, belirli bir amaç için tasarlanmış mamul üründür. 3925 (inşaat malzemeleri) ise kablo sabitleme klipsi için dar kapsamlıdır. Kural 4 uyarınca, hiçbir spesifik pozisyon uygulanamadığında ürün 3926 'Plastikten diğer eşya'ya siniflandirilir.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1970,
+            "out": 146,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 432,
+            "out": 147,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 123,
+            "out": 251,
+            "cache_write": 7171,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 141,
+            "out": 351,
+            "cache_write": 0,
+            "cache_read": 4146
+          },
+          "toplam": {
+            "in": 2666,
+            "out": 895,
+            "cache_write": 7171,
+            "cache_read": 4146
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}

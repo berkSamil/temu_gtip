@@ -231,7 +231,7 @@ def main():
     parser.add_argument('--out',           default=None, help='Çıktı Excel yolu (varsayılan: output/eval_YYYYMMDD.xlsx)')
     parser.add_argument('--model',         default='claude-haiku-4-5-20251001')
     parser.add_argument('--max-tokens',    type=int, default=1200)
-    parser.add_argument('--note-chars',    type=int, default=8000)
+    parser.add_argument('--note-chars',    type=int, default=0)
     parser.add_argument('--gtip-rows',     type=int, default=120)
     parser.add_argument('--retrieval',     type=int, default=50)
     parser.add_argument('--delay',         type=float, default=15)
@@ -240,7 +240,9 @@ def main():
     parser.add_argument('--refine-max-tokens', type=int, default=1200)
     parser.add_argument('--experiments',   default='experiments', help='Experiment JSON klasörü')
     parser.add_argument('--limit',          type=int, default=None, help='İlk N ürünü çalıştır (test için)')
+    parser.add_argument('--items',          default=None, help='Virgülle ayrılmış 1-tabanlı indeksler (orn. 6,21,25)')
     parser.add_argument('--izahname-chars', type=int, default=0, help='İzahname max karakter (0=kapalı)')
+    parser.add_argument('--token-breakdown', action='store_true', help='Her atomun token sayısını JSON\'a yaz')
     args = parser.parse_args()
 
     # .env yükle
@@ -265,7 +267,10 @@ def main():
     # Gold set oku
     print(f"Gold set yükleniyor: {args.gold}")
     gold_rows = read_gold_set(args.gold)
-    if args.limit:
+    if args.items:
+        indices = [int(x.strip()) - 1 for x in args.items.split(',')]
+        gold_rows = [gold_rows[i] for i in indices if 0 <= i < len(gold_rows)]
+    elif args.limit:
         gold_rows = gold_rows[:args.limit]
     print(f"  {len(gold_rows)} ürün çalıştırılacak")
     print()
@@ -278,6 +283,7 @@ def main():
         'max_tokens':        args.max_tokens,
         'note_max_chars':    args.note_chars,
         'izahname_max_chars': args.izahname_chars,
+        'token_breakdown':   args.token_breakdown,
         'gtip_rows_per_fasil': args.gtip_rows,
         'retrieval_top_n':   args.retrieval,
         'refine':            args.refine,
@@ -313,6 +319,18 @@ def main():
             gtip_out = predicted or '-'
             print(f"         Bölümler: {bolumler} → Fasıllar: {fasiller} "
                   f"→ Pozisyon: {pozisyon} → GTİP: {gtip_out}")
+            tok = dbg.get('token_usage', {})
+            if tok:
+                def _fmt(u): return f"{u['in']}+{u['out']}" if u else '-'
+                toplam = tok.get('toplam', {})
+                cw = toplam.get('cache_write', 0)
+                cr = toplam.get('cache_read', 0)
+                cache_str = f"  cw:{cw} cr:{cr}" if (cw or cr) else ""
+                print(f"         Token  0a:{_fmt(tok.get('adim_0a'))}  "
+                      f"0b:{_fmt(tok.get('adim_0b'))}  "
+                      f"1:{_fmt(tok.get('adim_1'))}  "
+                      f"2:{_fmt(tok.get('adim_2'))}  "
+                      f"| toplam {toplam.get('in',0)}in + {toplam.get('out',0)}out{cache_str}")
 
         results.append({
             'title':          row['title'],

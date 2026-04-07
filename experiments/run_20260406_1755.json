@@ -1,0 +1,221 @@
+{
+  "timestamp": "2026-04-06T17:55:34.723279",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 3,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 3,
+      "total": 3,
+      "accuracy": 100.0
+    },
+    "pozisyon": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    },
+    "alt_poz": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    },
+    "exact": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Plastikten mamul, yapışkanlı duvar tipi tıraş bıçağı tutucu (banyo aksesuarı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Ürün plastikten yapılmış bir banyo aksesuarı olup, Bölüm 7 (Plastikler ve Mamuller) birincil kategoridir. Bölüm 20 (Muhtelf Mamul Eşya) ise banyo aksesuarları için alternatif olarak değerlendirilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Ürün birincil olarak plastikten yapılmış bir banyoaksesuarı olup Fasil 39'un kapsamına girmektedir. Fasil 96, banyoaksesuarları gibi çeşitli mamul eşyaları da kapsayabilir. Fasil 94 ise mobilya ve banyoaksesuarları içerebilmektedir.\"\n}\n```",
+        "secilen_pozisyon": "3924",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3924\",\n  \"gerekce\": \"Ürün plastikten mamul banyo aksesuarı olup, Fasil 39 Pozisyon 3924 'Plastikten sofra eşyası, mutfak eşyası, diğer ev eşyası ve sağlık veya tuvalet eşyası' kapsamındadır. Tıraş bıçağı tutucu, banyo ortamında kullanılan tuvalet eşyası fonksiyonuna sahiptir.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1989,
+            "out": 126,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 451,
+            "out": 141,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 142,
+            "out": 162,
+            "cache_write": 7226,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3882,
+            "out": 306,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6464,
+            "out": 735,
+            "cache_write": 7226,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte banyo organizer raf (saç kurutma makinesi tutuculu",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3924.90.00.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Ürün plastikten mamul bir banyo organizer raf olduğu için Bolum 7 (Plastikler ve Mamuller) birincil seçenektir. Saç kurutma makinesi tutucu gibi aksesuarlarla birlikte gelen ev dekorasyonu/banyo eşyası olması nedeniyle Bolum 20 (Muhtelf Mamul Eşya) da uygun bir alternatiftir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Ürün plastikten yapılmış banyo organizer raf olduğu için birincil olarak Fasil 39 (Plastikler ve mamulleri) uygulanır. Fasil 96 (Çeşitli mamul eşya) banyo aksesuarları için alternatif seçenektir. Fasil 94 mobilya ve banyo aksesuar kombinasyonları için değerlendirilir.\"\n}\n```",
+        "secilen_pozisyon": "3924",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3924\",\n  \"gerekce\": \"Plastikten mamul duvara monte banyo organizer raf, sağlık ve tuvalet eşyası olarak kullanılan ev eşyası kategorisine girer. Fasıl 39 Pozisyon 3924, plastikten sofra eşyası, mutfak eşyası, diğer ev eşyası ve sağlık veya tuvalet eşyasını kapsamaktadır. Banyo organizer raf tuvalet/banyo ortamında kullanılan ev eşyasıdır.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1981,
+            "out": 153,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 443,
+            "out": 148,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 134,
+            "out": 178,
+            "cache_write": 7178,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3874,
+            "out": 305,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 6432,
+            "out": 784,
+            "cache_write": 7178,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastikten mamul duvara monte organizer kutu (çok bölmeli saklama kabı)",
+      "correct_gtip": "3924.90.00.00.19",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20
+        ],
+        "bolum_raw_response": "```json\n{\n  \"aday_bolumler\": [7, 20],\n  \"gerekce\": \"Plastikten yapılmış duvara monte organizer kutu, birincil olarak Bolum 7 (Plastikler ve Mamulleri) altında sınıflandırılır. Bolum 20 (Muhtelif Mamul Eşya) ikinci aday olarak değerlendirilir çünkü depolama ve organizasyon amaçlı eşyalar bazı durumlarda bu bölüm altında yer alabilir.\"\n}\n```",
+        "candidate_fasiller": [
+          39,
+          96,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"aday_fasiller\": [39, 96, 94],\n  \"gerekce\": \"Plastikten yapılmış duvara monte organizer kutu öncelikle Fasil 39 (Plastikler ve mamulleri) altında sınıflandırılır. Fasil 96 (Çeşitli mamul eşya) ve Fasil 94 (Mobilyalar ve benzeri) de saklama/organizasyon işlevi nedeniyle ikinci ve üçüncü tercih olabilir.\"\n}\n```",
+        "secilen_pozisyon": "3926",
+        "pozisyon_raw_response": "```json\n{\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3926\",\n  \"gerekce\": \"Plastikten mamul duvara monte organizer kutu, tarifenin başka yerinde belirtilmeyen plastik eşya olup 3926 pozisyonuna girmektedir. 3924 (sofra, mutfak, ev eşyası) ve 3925 (inşaat malzemeleri) daha dar kapsamlı olduğundan, genel plastik eşya pozisyonu olan 3926 uygulanır.\"\n}\n```",
+        "secilen_fasil": 39,
+        "token_usage": {
+          "adim_0a": {
+            "in": 1979,
+            "out": 155,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 441,
+            "out": 147,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 132,
+            "out": 157,
+            "cache_write": 7220,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 150,
+            "out": 348,
+            "cache_write": 4189,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 2702,
+            "out": 807,
+            "cache_write": 11409,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}
