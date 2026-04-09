@@ -514,13 +514,13 @@ GENEL MUHAKEME (urun adi ezberleme yok; her kalemi basligin yasal tanimina gore 
    siralanmistir; tek basina yeterli degildir. Nihai kod mutlaka fasil notu ve satir tanimiyla
    uyumlu olmali; celisirse cetvel metnini esas al.
 
-Yanitini SADECE su JSON formatinda ver:
+Yanitini SADECE su JSON formatinda ver (gerekce ONCE, kod EN SONA):
 {
-  "gtip_code": "XXXX.XX.XX.XX.XX",
-  "fasil": 39,
-  "gerekce": "Turkce muhakeme metni",
+  "gerekce": "Turkce muhakeme metni — once fonksiyon, sonra spesifiklik, sonra eleme",
   "guven": "yuksek|orta|dusuk",
-  "alternatifler": ["YYYY.YY.YY.YY.YY"]
+  "alternatifler": ["YYYY.YY.YY.YY.YY"],
+  "fasil": 39,
+  "gtip_code": "XXXX.XX.XX.XX.XX"
 }"""
 
 REFINE_SYSTEM_PROMPT = """Ayni gorev: Turk gumruk GTIP siniflandirmasi. Onceki JSON cevabi zayif veya eksik olabilir.
@@ -528,22 +528,46 @@ TARIFE metnini tekrar dikkatle uygula; gtip_code ve alternatifler SADECE mesajda
 12 haneli kodlardan secilsin. Yanit SADECE gecerli JSON (gtip_code, fasil, gerekce, guven, alternatifler)."""
 
 _BOLUM_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
-Gorev: Urun icin en uygun 2 aday BOLUMU belirle.
+Gorev: Urun icin en uygun 3 aday BOLUMU belirle.
 Sadece bolum listesine bak; fasil detayina girme.
 
+KRITIK KURAL — FONKSIYON MATERYALI EZER:
+Urunun KULLANIM AMACI ve FONKSIYONU her zaman yapildigi malzemenin onune gecer.
+- "Tekstil kapli sac bandi" → sac aksesuari (Bolum 20), tekstil urunu degil (Bolum 11)
+- "Kaucuk balik avlama boncugu" → balikcilik ekipmani (Bolum 20), kaucuk esyasi degil (Bolum 7)
+- "Plastik tabanli metal aski" → metal esya (Bolum 15), plastik degil (Bolum 7)
+Malzeme adi urun adinda gecse bile, urunun ne ISE YARADIGINA bak.
+
+ONCELIK SIRASI: 1) Urun ne ise yarar? (fonksiyon)  2) Hangi sektorde kullanilir?  3) Malzeme
+
+ISTISNA — TEKSTIL FORMU: Monofilament, elyaf, ip, halat/sicim/kordon formundaki urunler
+kullanim amacinden bagimsiz olarak Bolum 11 (Dokumaya Elverişli Maddeler)'e girebilir.
+Orn: balikcilik misinasi (monofilament → Bolum 11, Fasil 54), PE orgu ip (halat → Bolum 11, Fasil 56).
+
 KRITIK: JSON key tam olarak "aday_bolumler" olmali, baska hicbir yazim kabul edilmez.
-Yanitini SADECE asagidaki JSON formatinda ver:
-{"aday_bolumler": [7, 20], "gerekce": "Kisa Turkce gerekce (1-2 cumle)"}"""
+Yanitini SADECE asagidaki JSON formatinda ver (gerekce ONCE, sonra bolumler):
+{"gerekce": "Once fonksiyon: urun ne ise yarar? Sonra bolum secimi (1-2 cumle)", "aday_bolumler": [20, 7, 11]}"""
 
 _FASIL_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
 Gorev: Asagidaki fasil listesinden urun icin 3 aday FASIL belirle.
 
 {kurallar_blok}
 
-Yanitini SADECE su JSON formatinda ver:
+FASIL SECIMI KURALLARI:
+
+1. SPESIFIK FASIL "CESITLI MAMUL" FASILINI EZER:
+   Fasil 96 "Cesitli mamul esya" son caredir; hicbir baska fasila girmeyen urunler icin.
+   - Urun oyuncak / oyun / spor / balikcilik ekipmani → Fasil 95 sec, 96 degil.
+   - Muhakemende "spor", "oyun", "balikcilik" veya "egzersiz" gectiyse → Fasil 95.
+
+2. SPESIFIK FASIL ONCELIKLIDIR: Fasil listesinde urunun fonksiyonuyla dogrudan eslesen
+   bir fasil varsa onu sec. "Cesitli" veya "diger mamul" iceren fasillara ancak
+   spesifik fasil yoksa git.
+
+Yanitini SADECE su JSON formatinda ver (gerekce ONCE, sonra fasiller):
 {{
-  "aday_fasiller": [96, 33, 71],
-  "gerekce": "Kisa Turkce gerekce (2-3 cumle)"
+  "gerekce": "Once fonksiyon: urun ne ise yarar? Sonra fasil secimi (2-3 cumle)",
+  "aday_fasiller": [96, 33, 71]
 }}"""
 
 _POZISYON_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
@@ -570,19 +594,21 @@ POZISYON SECIMI KURALLARI:
 
 3. "DIGERLERI" MUTLAK SON CAREDIR: "Diger esya" veya "digerleri" iceren pozisyon YALNIZCA
    hicbir spesifik pozisyon uymadığinda kullanilir. Bir spesifik pozisyon ürünün amacini
-   veya fonksiyonunu kapsiyorsa (orn. "tuvalet esyasi" = banyo aksesuari, "insaat
-   malzemeleri" = kapi/pencere sizdirmazlik fitili), o spesifik pozisyona git. Spesifik
-   pozisyon "dar kapsami" gerekcesiyle reddedilip "digerleri"ne kacilmaz.
+   veya fonksiyonunu kapsiyorsa, o spesifik pozisyona git.
+   - Orn: "insaat ve insaat urunleri" (3925) = kapi/pencere/raf/dolap/sızdırmazlık
+     plastik aksesuarlari, duvara monte parcalar → 3926 degil.
+   - Model "inşaat malzemesi" diye muhakeme yapmissa 3925'e git, 3926'ya kacma.
+   Spesifik pozisyon "dar kapsami" gerekcesiyle reddedilip "digerleri"ne kacilmaz.
 
 4. VE ILE BAGLANAN KAPSAMLAR: "sofra, mutfak, diger ev esyasi VE saglik/tuvalet esyasi"
    gibi birden fazla kategori iceren tanim, bunlardan HERHANGI birini kapsayan urunlere
    uygulanir. Banyo aksesuari = tuvalet esyasi kapsamindadir.
 
-Yanitini SADECE su JSON formatinda ver:
+Yanitini SADECE su JSON formatinda ver (gerekce ONCE, karar SONRA):
 {{
+  "gerekce": "Once fonksiyon analizi: urun ne ise yarar, hangi pozisyon tanimiyla ortuser? (2-3 cumle)",
   "fasil": 84,
-  "pozisyon_kod": "84.73",
-  "gerekce": "Kisa Turkce gerekce (2-3 cumle)"
+  "pozisyon_kod": "84.73"
 }}"""
 
 
@@ -931,7 +957,7 @@ def classify_product(client, product_info, conn, opts=None):
     bolum_raw_response = None
     usage_0a = None
     try:
-        bolum_resp = _api_call_with_retry(client, model, 200, bolum_system_prompt, bolum_user_msg)
+        bolum_resp = _api_call_with_retry(client, model, 300, bolum_system_prompt, bolum_user_msg)
         bolum_raw_response = bolum_resp.content[0].text
         usage_0a = {'in': bolum_resp.usage.input_tokens, 'out': bolum_resp.usage.output_tokens,
                     'cache_write': getattr(bolum_resp.usage, 'cache_creation_input_tokens', 0) or 0,
@@ -952,7 +978,11 @@ def classify_product(client, product_info, conn, opts=None):
     # ------------------------------------------------------------------
     candidate_fasils = []
     fasil_raw_response = None
+    fasil_user_msg = None
     usage_0b = None
+    gtip_context_block = None
+    gtip_query = None
+    gtip_raw_response = None
     if candidate_bolumler:
         fasiller = get_fasiller_by_bolumler(conn, candidate_bolumler)
         fasil_text = "\n".join(f"  Fasil {f[0]:02d}: {f[1]}" for f in fasiller)
@@ -1045,12 +1075,22 @@ def classify_product(client, product_info, conn, opts=None):
                                'cache_write': total_cw, 'cache_read': total_cr}
         return {
             'candidate_bolumler':    candidate_bolumler,
+            'bolum_system_prompt':   bolum_system_prompt,
+            'bolum_user_msg':        bolum_user_msg,
             'bolum_raw_response':    bolum_raw_response,
             'candidate_fasiller':    candidate_fasils,
+            'fasil_system_prompt':   fasil_system_prompt,
+            'fasil_user_msg':        fasil_user_msg if candidate_bolumler else None,
             'fasil_raw_response':    fasil_raw_response,
             'secilen_pozisyon':      pozisyon_kod,
+            'pozisyon_system_prompt': pozisyon_system_prompt,
+            'pozisyon_context_block': poz_context_block,
+            'pozisyon_query':        poz_query,
             'pozisyon_raw_response': pozisyon_raw_response,
             'secilen_fasil':         fasil_no,
+            'gtip_context_block':    gtip_context_block if pozisyon_kod else None,
+            'gtip_query':            gtip_query if pozisyon_kod else None,
+            'gtip_raw_response':     gtip_raw_response if pozisyon_kod else None,
             'token_usage':           token_log,
             'token_breakdown':       tbd if tbd else None,
         }
@@ -1117,11 +1157,13 @@ def classify_product(client, product_info, conn, opts=None):
         else:
             result = sanitize_classification(conn, parsed)
         result['_usage'] = usage
+        result['_raw'] = text
         return result
 
     try:
         out = run_step2(system_step2, model, max_tokens)
         usage_2 = out.pop('_usage', None)
+        gtip_raw_response = out.pop('_raw', None)
         out.pop('parse_hatasi', None)
         debug = _make_debug(pozisyon_kod, fasil_no, usage_2)
         out['debug'] = debug
@@ -1462,9 +1504,9 @@ def main():
     parser.add_argument(
         '--note-chars',
         type=int,
-        default=8000,
+        default=0,
         metavar='N',
-        help='Fasil notundan modele giden max karakter (once 2500; artirdi)',
+        help='Fasil notundan modele giden max karakter (0=kapali)',
     )
     parser.add_argument(
         '--gtip-rows',
@@ -1476,9 +1518,9 @@ def main():
     parser.add_argument(
         '--izahname-chars',
         type=int,
-        default=3000,
+        default=0,
         metavar='N',
-        help='Izahname metninden modele giden max karakter (varsayilan: 3000)',
+        help='Izahname metninden modele giden max karakter (0=kapali)',
     )
     parser.add_argument(
         '--retrieval',

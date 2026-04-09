@@ -208,6 +208,27 @@ def write_eval_excel(path, results):
 # JSON experiment kaydı
 # ---------------------------------------------------------------------------
 
+_PROMPT_KEYS = {
+    'bolum_system_prompt', 'bolum_user_msg',
+    'fasil_system_prompt', 'fasil_user_msg',
+    'pozisyon_system_prompt', 'pozisyon_context_block', 'pozisyon_query',
+    'gtip_context_block', 'gtip_query',
+}
+
+def _build_result_entry(r, log_prompts=False):
+    dbg = r.get('debug', {}) or {}
+    if not log_prompts:
+        dbg = {k: v for k, v in dbg.items() if k not in _PROMPT_KEYS}
+    return {
+        'title':          r['title'][:80],
+        'correct_gtip':   r['correct_gtip'],
+        'predicted_gtip': r['predicted_gtip'],
+        'guven':          r['guven'],
+        'metrics':        r['metrics'],
+        'debug':          dbg,
+    }
+
+
 def save_experiment(exp_dir, run_data):
     os.makedirs(exp_dir, exist_ok=True)
     ts = datetime.now().strftime('%Y%m%d_%H%M')
@@ -243,6 +264,7 @@ def main():
     parser.add_argument('--items',          default=None, help='Virgülle ayrılmış 1-tabanlı indeksler (orn. 6,21,25)')
     parser.add_argument('--izahname-chars', type=int, default=0, help='İzahname max karakter (0=kapalı)')
     parser.add_argument('--token-breakdown', action='store_true', help='Her atomun token sayısını JSON\'a yaz')
+    parser.add_argument('--log-prompts',    action='store_true', help='Modele gönderilen tüm promptları JSON\'a yaz (dosya büyür)')
     args = parser.parse_args()
 
     # .env yükle
@@ -421,14 +443,7 @@ def main():
             'max_tokens':  args.max_tokens,
         },
         'results': [
-            {
-                'title':          r['title'][:80],
-                'correct_gtip':   r['correct_gtip'],
-                'predicted_gtip': r['predicted_gtip'],
-                'guven':          r['guven'],
-                'metrics':        r['metrics'],
-                'debug':          r.get('debug', {}),
-            }
+            _build_result_entry(r, log_prompts=args.log_prompts)
             for r in results
         ]
     }

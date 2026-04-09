@@ -179,8 +179,12 @@ def parse_fasil_xls(filepath):
     merged = []
     for pos, desc, olcu in entries:
         if pos == "" and desc != "" and merged:
-            prev = merged[-1]
-            merged[-1] = (prev[0], prev[1] + " " + desc, prev[2] or olcu)
+            # Tire ile başlayan satır → hayalet başlık, bir öncekine merge etme
+            if desc.lstrip().startswith('-'):
+                merged.append(("", desc, olcu))
+            else:
+                prev = merged[-1]
+                merged[-1] = (prev[0], prev[1] + " " + desc, prev[2] or olcu)
         elif pos != "" or desc != "":
             merged.append((pos, desc, olcu))
 
@@ -195,6 +199,23 @@ def parse_fasil_xls(filepath):
 
     for pos, desc, olcu in merged:
         clean = pos.replace(".", "").replace(" ", "")
+
+        # Hayalet başlık: pos boş, desc tire ile başlıyor
+        if not clean and desc.lstrip().startswith('-'):
+            dash_count = 0
+            for ch in desc:
+                if ch == '-':
+                    dash_count += 1
+                elif ch != ' ':
+                    break
+            clean_desc = re.sub(r'^[\s\-]+', '', desc).strip()
+            if clean_desc.endswith(':'):
+                clean_desc = clean_desc[:-1].strip()
+            hierarchy[dash_count] = clean_desc
+            for k in list(hierarchy.keys()):
+                if k > dash_count:
+                    del hierarchy[k]
+            continue
 
         if not clean.isdigit() or len(clean) < 4:
             continue

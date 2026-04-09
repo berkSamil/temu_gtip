@@ -1,0 +1,227 @@
+{
+  "timestamp": "2026-04-08T21:31:43.301109",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 3,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 3,
+      "total": 3,
+      "accuracy": 100.0
+    },
+    "pozisyon": {
+      "hits": 3,
+      "total": 3,
+      "accuracy": 100.0
+    },
+    "alt_poz": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    },
+    "exact": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Tek elle kullanılan bahçe budama makası",
+      "correct_gtip": "8201.50.00.00.11",
+      "predicted_gtip": "8201.50.00.00.11",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          15,
+          9
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Ürün fonksiyonu: Bahçe budama makası, bahçe ve tarım işlerinde bitki kesme amacıyla kullanılan el aracıdır. El aletleri ve bahçe ekipmanları Bolum 20'ye (Muhtelif Mamul Eşya) sınıflandırılır. Metal yapılı el araçları birincil olarak Bolum 20'de yer alır; Bolum 15 (Adi Metaller) sadece metal işlenmiş eşya değil tool kategorisinde değerlendirilir.\",\n  \"aday_bolumler\": [20, 15, 9]\n}\n```",
+        "candidate_fasiller": [
+          82,
+          73,
+          76
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Bahçe budama makası, tek elle kullanılan bir kesme/budama aracıdır. Fonksiyonu bitki kesme işlemidir. Fasil 82 (Adi metallerden aletler, bıçakcı eşyası) bu ürünü en uygun şekilde kapsar çünkü budama makaları bıçakcı eşyası kategorisine girer. Fasil 73 (Demir/çelikten eşya) ve Fasil 76 (Aluminyumdan eşya) ise malzeme bazında yardımcı seçeneklerdir; ancak Fasil 82 spesifik olarak aletleri ve bıçakcı eşyasını tanımladığı için önceliklidir.\",\n  \"aday_fasiller\": [82, 73, 76]\n}\n```",
+        "secilen_pozisyon": "8201",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, tek elle kullanılan bahçe budama makasıdır. Fasil 82 pozisyon 8201'de 'bağcı bıçakları ve benzeri diğer kesici ve yontucu el aletleri' ile 'her tür budama makasları' açıkça tanımlanmıştır. Fasil 82 genel olarak bahçıvanlık ve ziraat aletlerini kapsamaktadır. Ürün bu pozisyonun tanımıyla tam olarak eşleşmektedir.\",\n  \"fasil\": 82,\n  \"pozisyon_kod\": \"8201\"\n}\n```",
+        "secilen_fasil": 82,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün tek elle kullanılan bahçe budama makasıdır. Pozisyon 8201 altında, 8201.50 'Budama makası ve tek elle kullanılan benzeri budayıcılar ve makaslar' başlığı bu ürünü doğrudan kapsar. Bahçe budama makası, 8201.50.00.00.11 'Bağ ve bahçıvan makasları' alt pozisyonuna spesifik olarak girmektedir. 8201.60 (çit makasları, iki elle kullanılan makaslar) ve 8201.90 (diğer ziraat aletleri) uygun değildir; ilki iki elle kullanılan makasları, ikincisi uygun olmayan aletleri kapsar.\",\n  \"guven\": \"yuksek\",\n  \"alternatifler\": [\n    \"8201.50.00.00.19\",\n    \"8201.90.00.90.18\"\n  ],\n  \"fasil\": 82,\n  \"gtip_code\": \"8201.50.00.00.11\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2374,
+            "out": 188,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1044,
+            "out": 239,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 120,
+            "out": 186,
+            "cache_write": 7849,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 135,
+            "out": 309,
+            "cache_write": 4126,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 3673,
+            "out": 922,
+            "cache_write": 11975,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Seyahat tipi dikiş seti (taşınabilir)",
+      "correct_gtip": "9605.00.00.90.00",
+      "predicted_gtip": "9605.00.00.90.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          15,
+          11
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Seyahat tipi dikiş seti taşınabilir bir kit olup, iğne, iplik, makas gibi dikiş aletlerini içeren bir koleksiyon ürünüdür. Fonksiyonu dikiş/onarım işlemidir. Bolum 20 (Muhtlif Mamul Eşya) genel amaçlı taşınabilir setler ve aletleri; Bolum 15 (Adi Metaller) metal iğneler ve makas gibi metal bileşenler; Bolum 11 (Dokumaya Elverişli Maddeler) iplik ve tekstil bileşenleri için aday olabilir.\",\n  \"aday_bolumler\": [20, 15, 11]\n}\n```",
+        "candidate_fasiller": [
+          82,
+          63,
+          96
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Seyahat tipi dikiş seti taşınabilir bir aksesuar olup, dikiş iğnesi, iplik ve diğer dikiş malzemelerinden oluşan bir takımdır. Fasil 82 adi metallerden aletler (dikiş iğneleri) içerir; Fasil 63 dokumaya elverişli maddelerden hazır eşya ve takımlar kapsamında tekstil ürünlerini içerir; Fasil 96 hiçbir başka kategoriye girmeyen çeşitli mamul eşyalar için son çaredir.\",\n  \"aday_fasiller\": [82, 63, 96]\n}\n```",
+        "secilen_pozisyon": "9605",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Seyahat tipi dikiş seti, insanların seyahat sırasında elbise ve ayakkabılarını temizlemekte veya tamir etmekte kullandıkları tuvalet malzemesidir. Fasil 96, Pozisyon 9605 'İnsanların tuvalet malzemesi olarak veya dikiş dikmekte veya elbise ve ayakkabılarını temizlemekte kullandıkları seyahat takımları' başlığı ile doğrudan kapsamaktadır. Ürün, taşınabilir/seyahat formatında bir dikiş takımı olarak bu tanımla tam ortüşmektedir.\",\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9605\"\n}\n```",
+        "secilen_fasil": 96,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, seyahat için tasarlanmış taşınabilir bir dikiş setidir. Pozisyon 9605, insanların tuvalet malzemesi, dikiş dikmekte veya elbise/ayakkabı temizlemekte kullandıkları seyahat takımlarını kapsar. Ürünün ana fonksiyonu dikiş dikmektir ve seyahat takımı niteliğindedir. Tarife cetvelindeki 9605.00.00.90.00 'Diğerleri' kodu yerine, 'dikiş dikmekte' kullanılan takımlar için açıkça tanımlanan spesifik bir kod bulunmamakta; ancak ürün 'dikiş dikmekte kullanılan seyahat takımları' tanımına tam uymaktadır. En uygun kod 9605.00.00.90.00 'Diğerleri'dir çünkü dikiş setleri için özel bir alt pozisyon tanımlanmadığı için genel başlık altında sınıflandırılır.\",\n  \"guven\": \"yuksek\",\n  \"alternatifler\": [\"9605.00.00.10.00\"],\n  \"fasil\": 96,\n  \"gtip_code\": \"9605.00.00.90.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2379,
+            "out": 218,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1480,
+            "out": 194,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 124,
+            "out": 216,
+            "cache_write": 6900,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3794,
+            "out": 364,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7777,
+            "out": 992,
+            "cache_write": 6900,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Manyetik şişe açacağı",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8205.59.80.00.19",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20,
+          7
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, metal yapıdaki basit bir mutfak aletedir. Fonksiyonu şişe açmaktır. Ana malzeme metal olup (manyetik yapı nedeniyle), hiçbir elektrik/mekanik bileşeni yoktur. Basit metal mutfak eşyası olarak Bolum 15 (Adi Metaller ve Adi Metallerden Eşya) birinci seçim; alternatif olarak Bolum 20 (Muhtelf Mamul Eşya) ve Bolum 7 (Plastikler ve Kauçuk - nadir bir durumda plastik/kauçuk karışım ise) değerlendirilebilir.\",\n  \"aday_bolumler\": [15, 20, 7]\n}\n```",
+        "candidate_fasiller": [
+          82,
+          73,
+          83
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, mutfak ve ev kullanımı için tasarlanmış bir araçtır. Fonksiyonu şişe açmaktır. Adi metallerden yapılmış basit el aletleri Fasil 82'ye girer. Manyetik mekanizması olan versiyonları da bu fasile dahildir. Fasil 73 (demir/çelikten eşya) daha geniş kategoridir ancak Fasil 82 adi metallerden aletler için spesifiktir.\",\n  \"aday_fasiller\": [82, 73, 83]\n}\n```",
+        "secilen_pozisyon": "8205",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, şişe açma fonksiyonuna sahip bir el aletiydir. Fasil 82'de yer alan 8211 (Kesici ağızlı bıçaklar) veya 8205 (Tarifenin başka pozisyonlarında yer almayan el aletleri) pozisyonları değerlendirilmiştir. Şişe açacağı kesici ağız içermediğinden 8211'e girmez. 8210 (Yiyecek/içecek hazırlanmasında kullanılan elle işleyen mekanik aletler) ise ağırlık sınırı ve mekanik işletme gerekliliği taşır. Şişe açacağı, tarifenin başka yerinde belirtilmeyen, yiyecek/içecek servisinde kullanılan basit el aletine karşılık geldiğinden, Fasil 82 - Pozisyon 8205 (diğer el aletleri) en uygun sınıflandırmadır.\",\n  \"fasil\": 82,\n  \"pozisyon_kod\": \"8205\"\n}\n```",
+        "secilen_fasil": 82,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, tarifenin 8205 pozisyonunda tanımlanan 'tarifenin başka pozisyonlarında yer almayan el aletleri' kapsamına girmektedir. Ürün, manuel olarak işletilen, şişe açma fonksiyonunu yerine getiren basit bir el aletidir. Pozisyon 8205 içinde çekiçler (8205.20), tornavidalar (8205.40), rendeler (8205.30) ve ev işlerinde kullanılan aletler (8205.51) gibi spesifik alt pozisyonlar mevcuttur, ancak şişe açacağı bunlardan hiçbirine uyumlu değildir. Manyetik özellik, aletin fonksiyonel sınıflandırmasını değiştirmez. Ürün, 8205.59 'Diğerleri' alt pozisyonu altındaki 8205.59.80.00.19 'Diğerleri' kodunda sınıflandırılır; bu, hiçbir diğer spesifik tanıma uymayan el aletlerinin genel kategorisidir.\",\n  \"guven\": \"orta\",\n  \"alternatifler\": [\"8205.51.00.00.00\"],\n  \"fasil\": 82,\n  \"gtip_code\": \"8205.59.80.00.19\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2372,
+            "out": 229,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 980,
+            "out": 182,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 117,
+            "out": 325,
+            "cache_write": 8469,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 135,
+            "out": 389,
+            "cache_write": 4148,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 3604,
+            "out": 1125,
+            "cache_write": 12617,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}
