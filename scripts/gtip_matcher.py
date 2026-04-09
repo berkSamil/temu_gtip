@@ -528,7 +528,7 @@ TARIFE metnini tekrar dikkatle uygula; gtip_code ve alternatifler SADECE mesajda
 12 haneli kodlardan secilsin. Yanit SADECE gecerli JSON (gtip_code, fasil, gerekce, guven, alternatifler)."""
 
 _BOLUM_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
-Gorev: Urun icin en uygun 3 aday BOLUMU belirle.
+Gorev: Urun icin en uygun 5 aday BOLUMU belirle.
 Sadece bolum listesine bak; fasil detayina girme.
 
 KRITIK KURAL — FONKSIYON MATERYALI EZER:
@@ -546,28 +546,17 @@ Orn: balikcilik misinasi (monofilament → Bolum 11, Fasil 54), PE orgu ip (hala
 
 KRITIK: JSON key tam olarak "aday_bolumler" olmali, baska hicbir yazim kabul edilmez.
 Yanitini SADECE asagidaki JSON formatinda ver (gerekce ONCE, sonra bolumler):
-{"gerekce": "Once fonksiyon: urun ne ise yarar? Sonra bolum secimi (1-2 cumle)", "aday_bolumler": [20, 7, 11]}"""
+{"gerekce": "Once fonksiyon: urun ne ise yarar? Sonra bolum secimi (1-2 cumle)", "aday_bolumler": [20, 7, 11, 15, 9]}"""
 
 _FASIL_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
-Gorev: Asagidaki fasil listesinden urun icin 3 aday FASIL belirle.
+Gorev: Asagidaki fasil listesinden urun icin 8 aday FASIL belirle.
 
 {kurallar_blok}
-
-FASIL SECIMI KURALLARI:
-
-1. SPESIFIK FASIL "CESITLI MAMUL" FASILINI EZER:
-   Fasil 96 "Cesitli mamul esya" son caredir; hicbir baska fasila girmeyen urunler icin.
-   - Urun oyuncak / oyun / spor / balikcilik ekipmani → Fasil 95 sec, 96 degil.
-   - Muhakemende "spor", "oyun", "balikcilik" veya "egzersiz" gectiyse → Fasil 95.
-
-2. SPESIFIK FASIL ONCELIKLIDIR: Fasil listesinde urunun fonksiyonuyla dogrudan eslesen
-   bir fasil varsa onu sec. "Cesitli" veya "diger mamul" iceren fasillara ancak
-   spesifik fasil yoksa git.
 
 Yanitini SADECE su JSON formatinda ver (gerekce ONCE, sonra fasiller):
 {{
   "gerekce": "Once fonksiyon: urun ne ise yarar? Sonra fasil secimi (2-3 cumle)",
-  "aday_fasiller": [96, 33, 71]
+  "aday_fasiller": [96, 33, 71, 39, 44, 82, 83, 95]
 }}"""
 
 _POZISYON_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
@@ -595,9 +584,6 @@ POZISYON SECIMI KURALLARI:
 3. "DIGERLERI" MUTLAK SON CAREDIR: "Diger esya" veya "digerleri" iceren pozisyon YALNIZCA
    hicbir spesifik pozisyon uymadığinda kullanilir. Bir spesifik pozisyon ürünün amacini
    veya fonksiyonunu kapsiyorsa, o spesifik pozisyona git.
-   - Orn: "insaat ve insaat urunleri" (3925) = kapi/pencere/raf/dolap/sızdırmazlık
-     plastik aksesuarlari, duvara monte parcalar → 3926 degil.
-   - Model "inşaat malzemesi" diye muhakeme yapmissa 3925'e git, 3926'ya kacma.
    Spesifik pozisyon "dar kapsami" gerekcesiyle reddedilip "digerleri"ne kacilmaz.
 
 4. VE ILE BAGLANAN KAPSAMLAR: "sofra, mutfak, diger ev esyasi VE saglik/tuvalet esyasi"
@@ -679,7 +665,7 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
         parts.append(fts_blok)
         atoms['fts_bloku'] = fts_blok
 
-    for fno in candidate_fasils[:5]:
+    for fno in candidate_fasils[:8]:
         pozlar = get_all_pozisyonlar(conn, fno)
         if not pozlar:
             continue
@@ -957,7 +943,7 @@ def classify_product(client, product_info, conn, opts=None):
     bolum_raw_response = None
     usage_0a = None
     try:
-        bolum_resp = _api_call_with_retry(client, model, 300, bolum_system_prompt, bolum_user_msg)
+        bolum_resp = _api_call_with_retry(client, model, 400, bolum_system_prompt, bolum_user_msg)
         bolum_raw_response = bolum_resp.content[0].text
         usage_0a = {'in': bolum_resp.usage.input_tokens, 'out': bolum_resp.usage.output_tokens,
                     'cache_write': getattr(bolum_resp.usage, 'cache_creation_input_tokens', 0) or 0,
@@ -969,7 +955,7 @@ def classify_product(client, product_info, conn, opts=None):
                                            'candidate_bolumler', 'aday_bolum'))
             if raw:
                 candidate_bolumler = [int(float(x)) for x in raw
-                                      if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 21][:3]
+                                      if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 21][:5]
     except Exception:
         pass
 
@@ -999,7 +985,7 @@ def classify_product(client, product_info, conn, opts=None):
             f"Yanitini SADECE JSON olarak ver."
         )
         try:
-            fasil_resp = _api_call_with_retry(client, model, 300, fasil_system_prompt, fasil_user_msg)
+            fasil_resp = _api_call_with_retry(client, model, 400, fasil_system_prompt, fasil_user_msg)
             fasil_raw_response = fasil_resp.content[0].text
             usage_0b = {'in': fasil_resp.usage.input_tokens, 'out': fasil_resp.usage.output_tokens,
                         'cache_write': getattr(fasil_resp.usage, 'cache_creation_input_tokens', 0) or 0,
@@ -1011,7 +997,7 @@ def classify_product(client, product_info, conn, opts=None):
                                                'anad_fasiller', 'adat_fasiller'))
                 if raw:
                     candidate_fasils = [int(float(x)) for x in raw
-                                        if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 97][:3]
+                                        if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 97][:8]
         except Exception:
             pass
 
