@@ -16,40 +16,6 @@ Bu dosya Cursor ve Claude Code için ortak bağlam kaynağıdır. Her session ba
 - Input: herhangi bir Excel (TEMU manifest, elle giriş, başka kaynak)
 - Model: claude-haiku-4-5 varsayılan, --refine ile sonnet ikinci geçiş
 
-**Mevcut accuracy (en iyi fasıl: run_20260410_1119):**
-- Fasıl: %88.9 | Pozisyon: %66.7 | Exact: %40.7
-
-**Eval geçmişi (gold_set_30.xlsx, 30 ürün):**
-| Run | Fasıl | Poz | Exact | Notlar |
-|-----|-------|-----|-------|--------|
-| run_20260407_0052 (baseline) | %75.9 | %62.1 | %55.2 | 29 ürün, eski prompt |
-| run_20260408_2202 | %75.0 | %64.3 | %42.9 | B1+A1+A2+B2+A3 promptları, parser fix |
-| run_20260409_1327 | %75.9 | %55.2 | %34.5 | 5 bölüm / 8 fasıl aday |
-| run_20260410_1119 | %88.9 | %66.7 | %40.7 | 5 bölüm / 8 fasıl aday, A3+B2 revert, 3 boş tahmin |
-
----
-
-## Son Durum (2026-04-10)
-- **Hedef: fasıl %90+, pozisyon %80+** (exact sonra çözülecek)
-- En iyi fasıl: %88.9 (run_20260410_1119)
-- En iyi pozisyon: %66.7 (run_20260410_1119)
-- En iyi exact: %55.2 (run_20260407_0052 baseline)
-- Son değişiklik: 5 bölüm/8 fasıl aday + A3+B2 revert
-- Sıradaki: 5 bölüm / 3 fasıl aday dene
-
-## Değişiklik Geçmişi
-| ID | Değişiklik | Etki |
-|----|------------|------|
-| P1 | Parser hayalet başlık fix + DB rebuild | + |
-| B1 | JSON sırası (gerekce önce) | nötr |
-| A1 | FONKSIYON MATERYALI EZER kuralı | nötr |
-| A2 | Tekstil form istisnası | nötr |
-| S2 | Atom-level logging + --log-prompts | + (tooling) |
-| A3 | Fasıl 95 vs 96 kuralı | REVERT |
-| B2 | 3925 vs 3926 örnekleri | REVERT |
-| — | 5 bölüm / 8 fasıl aday | fasıl +13pp, exact − |
-| — | note_chars/izahname_chars default 0 | nötr |
-
 ---
 
 ## MİMARİ
@@ -140,14 +106,15 @@ build_db.py sağlık durumu (son kontrol):
 ```
 temu_gtip/
 ├── CLAUDE.md                  ← bu dosya
-├── CLAUDE_PROJECT_HANDOFF.md  ← eski handoff, referans
+├── README.md
 ├── requirements.txt
 ├── .env                       ← ANTHROPIC_API_KEY (gitignore'da)
 ├── scripts/
-│   ├── gtip_matcher.py        ← ana program (1616 satır)
-│   ├── build_db.py            ← tüm veri kaynakları → gtip_2026.db (801 satır)
-│   ├── eval_gtip.py           ← gold set ile accuracy ölçümü (456 satır)
+│   ├── gtip_matcher.py        ← ana program
+│   ├── build_db.py            ← tüm veri kaynakları → gtip_2026.db
+│   ├── eval_gtip.py           ← gold set ile accuracy ölçümü
 │   ├── analyze_run.py         ← offline eval karşılaştırma raporu
+│   ├── _test_live.py          ← canlı test
 │   └── temu_scraper.py        ← ARŞİVLENDİ, dokunma
 ├── data/
 │   ├── gtip_2026.db           ← SQLite (gitignore'da, build_db ile üretilir)
@@ -156,10 +123,10 @@ temu_gtip/
 │   ├── izahname_notlari/      ← 97 fasıl izahname .doc
 │   ├── yorum_kurallari/       ← genel kurallar .xls + .doc
 │   ├── icindekiler/           ← bölüm→fasıl haritası .xls + .doc
+│   ├── gold_set_30.xlsx       ← eval gold set (30 ürün)
 │   └── input.xlsx             ← örnek input
 ├── output/                    ← gitignore'da
-├── experiments/               ← eval run JSON'ları (run_YYYYMMDD_HHMM.json)
-└── tests/                     ← pytest testleri
+└── experiments/               ← eval run JSON'ları + MD raporları (run_YYYYMMDD_HHMM)
 ```
 
 ---
@@ -211,85 +178,6 @@ DB'de olmayan kod geçersizdir — `sanitize_classification()` filtreler.
 
 ---
 
-## TEMEL FONKSİYONLAR (gtip_matcher.py)
-
-### Pipeline (classify_product)
-| Adım | Fonksiyon | Ne yapar |
-|------|-----------|----------|
-| 0a | `get_bolum_listesi()` + API | 21 bölüm → 5 aday bölüm |
-| 0b | `get_fasiller_by_bolumler()` + API | Aday bölüm fasılları → 8 aday fasıl |
-| - | `get_candidate_fasils()` | FTS fallback (0a/0b başarısızsa) |
-| 1 | `build_pozisyon_context()` + API | Fasıl not + izahname + 4'lü poz listesi → pozisyon seç |
-| 2 | `build_gtip_context()` + API | Seçilen poz altındaki 12'liler → GTİP seç |
-| F | `_classify_flat()` | Fallback: eski flat mod (1 API çağrısı) |
-
-### Bağlam oluşturma
-| Fonksiyon | Ne yapar |
-|-----------|----------|
-| `build_pozisyon_context()` | Adım 1: fasıl notu + izahname + 4'lü pozisyonlar + FTS bloku |
-| `build_gtip_context()` | Adım 2: fasıl notu + izahname + pozisyon altındaki tüm 12'liler (ara seviye başlıklı) |
-| `build_gtip_context_multi()` | Adım 2: 2 aday pozisyon için birleşik context |
-| `build_tarife_context()` | Fallback: flat mod için fasıl notu + GTİP listesi + FTS |
-| `get_all_pozisyonlar()` | Fasıldaki tüm 4'lü pozisyonları döner (sentetik prefix ile) |
-| `get_gtips_by_pozisyon()` | 4'lü pozisyon altındaki tüm 12'lileri döner |
-| `get_izahname()` | İzahname metnini döner (max_chars ile kırpılmış) |
-| `get_yorum_kurallari()` | Tüm yorum kurallarını tek metin olarak döner |
-| `retrieve_ranked_gtips()` | FTS per-word, skor sıralı GTİP satırları |
-
-### API çağrıları
-| Fonksiyon | Ne yapar |
-|-----------|----------|
-| `_call_classify()` | Basit API çağrısı (kısa promptlar için) |
-| `_call_classify_ctx()` | Prompt caching ile API çağrısı (context ayrı block) |
-| `_api_call_with_retry()` | Rate limit retry (kısa mesajlar) |
-| `_api_call_ctx_with_retry()` | Rate limit retry (cached context) |
-
-### Promptlar
-| Değişken | Kullanım |
-|----------|----------|
-| `_BOLUM_PROMPT_BASE` | Adım 0a: 21 bölüm → 5 aday (FONKSIYON MATERYALI EZER + tekstil form istisnası) |
-| `_FASIL_PROMPT_BASE` | Adım 0b: fasıl listesi → 8 aday (minimal, kural yok) |
-| `_POZISYON_PROMPT_BASE` | Adım 1: pozisyon seçimi (montaj yöntemi, ham malzeme, diğerleri kuralları dahil) |
-| `SYSTEM_PROMPT` | Adım 2: 12 haneli GTİP seçimi |
-| `REFINE_SYSTEM_PROMPT` | Adım 2 refine geçişi |
-
-Yorum kuralları (6 kural) Adım 2 system prompt'una `get_yorum_kurallari()` ile dinamik eklenir.
-
-### Doğrulama & parse
-| Fonksiyon | Ne yapar |
-|-----------|----------|
-| `extract_first_json_object()` | Brace-balanced JSON parse |
-| `normalize_gtip_code()` | Çeşitli formatları XXXX.XX.XX.XX.XX'e normalize eder |
-| `gtip_exists()` | DB'de bu GTİP var mı? |
-| `sanitize_classification()` | normalize → DB check → alternatif dene → fallback |
-
----
-
-## BİLİNEN SORUNLAR (güncel — run_20260410_1119)
-
-1. **9603 (fırça) vs 9616 (aplikatör) karışıklığı**
-   Kozmetik fırçalar (maskara, kaş, eyeliner, nail art) 9616'ya gidiyor.
-   "Kozmetik amaçlı" → model ürünü aplikatör olarak görüyor, fırça değil.
-
-2. **"Yapışkanlı" kelimesi 3919'a çekiyor**
-   Yapışkanlı fitil/sızdırmazlık ürünleri (doğru: 3925) → 3919 gidiyor.
-   Kural 2 (ham malzeme formu) tetikleniyor ama yanlış yönde.
-
-3. **Kıyafet tokası fasıl karışıklığı**
-   Doğru fasıl 71 (mücevher/taklit mücevher) — bölüm 14 hiç seçilemiyor.
-
-4. **Misina 12'li hâlâ yanlış**
-   Fasıl seviyesi çözüldü (54/56 bulunuyor). Ama 12'li seçimde: 5404.19 yerine 5404.90,
-   5607.49.90 yerine 5607.49.11 seçiliyor.
-
-5. **Görsel desteği yok**
-   image_url varsa Claude'a base64 olarak gönderilebilir ama implemente edilmemiş.
-
-6. **requirements.txt'te playwright var**
-   Scraping bırakıldı, playwright satırı silinmeli.
-
----
-
 ## CLI PARAMETRELERİ
 
 ```bash
@@ -336,9 +224,11 @@ python scripts/gtip_matcher.py input.xlsx \
     "candidate_fasiller": [39, 83, 73],
     "fasil_raw_response": "...",
     "secilen_pozisyon": "3926",
-    "pozisyon_raw_response": "...",
     "secilen_fasil": 39,
-    "token_usage": {"adim_0a": {...}, "adim_0b": {...}, "adim_1": {...}, "adim_2": {...}, "toplam": {...}}
+    "pozisyon_raw_response": "...",
+    "gtip_raw_response": "...",
+    "token_usage": {"adim_0a": {...}, "adim_0b": {...}, "adim_1": {...}, "adim_2": {...}, "toplam": {...}},
+    "token_breakdown": {...}
   }
 }
 ```
@@ -354,7 +244,6 @@ python scripts/gtip_matcher.py input.xlsx \
 ```bash
 pip install -r requirements.txt
 # requirements.txt: xlrd>=2.0, openpyxl>=3.1, anthropic>=0.40
-# ⚠️ playwright satırı silinmeli
 
 # DB build (bir kez, veya --force ile rebuild)
 python scripts/build_db.py data/fasil_dosyalari/ \
@@ -370,19 +259,11 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 ---
 
----
-
 ## ÇALIŞMA KURALLARI (Claude Code ve Cursor için)
 
-1. Her değişiklik öncesi testleri çalıştır: `pytest tests/ -v`
-2. Her eval run'ını kaydet: `experiments/run_YYYYMMDD_HHMM.json`
-3. `defaults` listesine şu an dokunma — FTS fallback için gerekli
-4. `temu_scraper.py`'a dokunma — arşivlenmiş
-5. DB şemasını değiştirirsen `build_db.py --force` ile rebuild test et
-6. Yeni veri kaynağı eklerken: orijinal dosya `data/` altına, parser `build_db.py`'a, çıktı SQLite'a
-7. Session sonu "CLAUDE.md güncelle" dendiğinde:
-   a) "Son Durum" bloğunu güncelle (tarih, exact, son değişiklik, sonuç, sıradaki)
-   b) "Değişiklik Geçmişi" tablosuna yeni satırlar ekle (ID, ne yapıldı, etki: +/−/nötr/REVERT)
-   c) BİLİNEN SORUNLAR ve MÜHENDİSLİK HEDEFLERİ'ni session bulgularına göre güncelle
-   d) Duplicate bilgi oluşturma — her bilgi tek yerde yaşasın
+1. Her eval run'ını kaydet: `experiments/run_YYYYMMDD_HHMM.json`
+2. `defaults` listesine şu an dokunma — FTS fallback için gerekli
+3. `temu_scraper.py`'a dokunma — arşivlenmiş
+4. DB şemasını değiştirirsen `build_db.py --force` ile rebuild test et
+5. Yeni veri kaynağı eklerken: orijinal dosya `data/` altına, parser `build_db.py`'a, çıktı SQLite'a
 
