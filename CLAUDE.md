@@ -16,27 +16,26 @@ Bu dosya Cursor ve Claude Code için ortak bağlam kaynağıdır. Her session ba
 - Input: herhangi bir Excel (TEMU manifest, elle giriş, başka kaynak)
 - Model: claude-haiku-4-5 varsayılan, --refine ile sonnet ikinci geçiş
 
-**Mevcut accuracy (en iyi: run_20260407_0052, 29 ürün, haiku, note_chars=0):**
-- Fasıl: %75.9 | Pozisyon: %62.1 | Exact: %55.2
+**Mevcut accuracy (en iyi fasıl: run_20260410_1119):**
+- Fasıl: %88.9 | Pozisyon: %66.7 | Exact: %40.7
 
 **Eval geçmişi (gold_set_30.xlsx, 30 ürün):**
 | Run | Fasıl | Poz | Exact | Notlar |
 |-----|-------|-----|-------|--------|
 | run_20260407_0052 (baseline) | %75.9 | %62.1 | %55.2 | 29 ürün, eski prompt |
 | run_20260408_2202 | %75.0 | %64.3 | %42.9 | B1+A1+A2+B2+A3 promptları, parser fix |
-| run_20260409_1327 | %75.9 | %55.2 | %34.5 | 5 bölüm / 8 fasıl aday, A3+B2 revert |
-
-**Sonuç:** Prompt değişiklikleri ve parser fix tek başına exact'i düşürdü.
-Fasıl listesini genişletmek (8 aday) gürültü artırıyor. Baseline hâlâ en iyi.
+| run_20260409_1327 | %75.9 | %55.2 | %34.5 | 5 bölüm / 8 fasıl aday |
+| run_20260410_1119 | %88.9 | %66.7 | %40.7 | 5 bölüm / 8 fasıl aday, A3+B2 revert, 3 boş tahmin |
 
 ---
 
-## Son Durum (2026-04-09)
-- Exact: %55.2 (baseline run_20260407_0052)
-- Teorik tavan: —
-- Son değişiklik: 5 bölüm/8 fasıl aday, B1+A1+A2 prompt, parser fix, A3+B2 revert
-- Sonuç: kötü — prompt değişiklikleri %42.9, geniş aday %34.5, baseline hâlâ en iyi
-- Sıradaki: fasıl aday sayısı 5 denemek veya token optimizasyonu
+## Son Durum (2026-04-10)
+- **Hedef: fasıl %90+, pozisyon %80+** (exact sonra çözülecek)
+- En iyi fasıl: %88.9 (run_20260410_1119)
+- En iyi pozisyon: %66.7 (run_20260410_1119)
+- En iyi exact: %55.2 (run_20260407_0052 baseline)
+- Son değişiklik: 5 bölüm/8 fasıl aday + A3+B2 revert
+- Sıradaki: 5 bölüm / 3 fasıl aday dene
 
 ## Değişiklik Geçmişi
 | ID | Değişiklik | Etki |
@@ -48,7 +47,7 @@ Fasıl listesini genişletmek (8 aday) gürültü artırıyor. Baseline hâlâ e
 | S2 | Atom-level logging + --log-prompts | + (tooling) |
 | A3 | Fasıl 95 vs 96 kuralı | REVERT |
 | B2 | 3925 vs 3926 örnekleri | REVERT |
-| — | 5 bölüm / 8 fasıl aday | − (%34.5) |
+| — | 5 bölüm / 8 fasıl aday | fasıl +13pp, exact − |
 | — | note_chars/izahname_chars default 0 | nötr |
 
 ---
@@ -126,8 +125,9 @@ build_db.py sağlık durumu (son kontrol):
        ✅ Hiyerarşik daralma (0a → 0b → 1 → 2)
        ✅ Prompt caching
        ✅ eval_gtip.py
-       ⏳ Prompt kalitesi iyileştirme (materyal > fonksiyon sorunu)
+       ⏳ Prompt kalitesi iyileştirme (fasıl aday sayısı optimizasyonu devam ediyor)
        ⏳ Few-shot örnekler (classifications.db henüz yok)
+       ⏳ Görsel entegrasyon (image_url → base64 → Claude, materyal tespiti için)
   Faz 3: Yeterli veri (1000+) → fine-tuned fasıl seçim modeli
          Claude sadece edge case fallback
   Faz 4: Tamamen local model, Claude API bağımlılığı sıfır
@@ -144,9 +144,10 @@ temu_gtip/
 ├── requirements.txt
 ├── .env                       ← ANTHROPIC_API_KEY (gitignore'da)
 ├── scripts/
-│   ├── gtip_matcher.py        ← ana program (1588 satır)
+│   ├── gtip_matcher.py        ← ana program (1616 satır)
 │   ├── build_db.py            ← tüm veri kaynakları → gtip_2026.db (801 satır)
-│   ├── eval_gtip.py           ← gold set ile accuracy ölçümü (441 satır)
+│   ├── eval_gtip.py           ← gold set ile accuracy ölçümü (456 satır)
+│   ├── analyze_run.py         ← offline eval karşılaştırma raporu
 │   └── temu_scraper.py        ← ARŞİVLENDİ, dokunma
 ├── data/
 │   ├── gtip_2026.db           ← SQLite (gitignore'da, build_db ile üretilir)
@@ -215,7 +216,7 @@ DB'de olmayan kod geçersizdir — `sanitize_classification()` filtreler.
 ### Pipeline (classify_product)
 | Adım | Fonksiyon | Ne yapar |
 |------|-----------|----------|
-| 0a | `get_bolum_listesi()` + API | 21 bölüm → 2 aday bölüm |
+| 0a | `get_bolum_listesi()` + API | 21 bölüm → 5 aday bölüm |
 | 0b | `get_fasiller_by_bolumler()` + API | Aday bölüm fasılları → 8 aday fasıl |
 | - | `get_candidate_fasils()` | FTS fallback (0a/0b başarısızsa) |
 | 1 | `build_pozisyon_context()` + API | Fasıl not + izahname + 4'lü poz listesi → pozisyon seç |
@@ -264,37 +265,27 @@ Yorum kuralları (6 kural) Adım 2 system prompt'una `get_yorum_kurallari()` ile
 
 ---
 
-## BİLİNEN SORUNLAR (güncel — run_20260409_1327 dahil)
+## BİLİNEN SORUNLAR (güncel — run_20260410_1119)
 
-1. **HS form hiyerarşisi çözülemiyor** ⚠️ EN KRİTİK
-   Sentetik monofilament → 5404, PE örgü halat → 5607 — model her iki ürünü de balıkçılık
-   fonksiyonuyla 9507'ye gönderiyor. Fasıl notu/izahname olmadan düzelmiyor.
-   Fasıl notu ve izahname test edildi, işe yaramadı — başka bir yaklaşım gerekiyor.
-
-2. **9603 (fırça) vs 9616 (aplikatör) karışıklığı**
+1. **9603 (fırça) vs 9616 (aplikatör) karışıklığı**
    Kozmetik fırçalar (maskara, kaş, eyeliner, nail art) 9616'ya gidiyor.
-   "Kozmetik amaçlı" → model ürünü madde/aplikatör olarak görüyor, uygulama aracı değil.
-   Prompt kuralları test edildi, etkisi tutarsız.
+   "Kozmetik amaçlı" → model ürünü aplikatör olarak görüyor, fırça değil.
 
-3. **"Yapışkanlı" kelimesi 3919'a çekiyor**
-   Yapışkanlı fitil/sızdırmazlık ürünleri (doğru: 3925) → 3919 (kendinden yapışkanlı levhalar)
-   gidiyor. Kural 2 (ham malzeme formu) tetikleniyor ama yanlış yönde.
+2. **"Yapışkanlı" kelimesi 3919'a çekiyor**
+   Yapışkanlı fitil/sızdırmazlık ürünleri (doğru: 3925) → 3919 gidiyor.
+   Kural 2 (ham malzeme formu) tetikleniyor ama yanlış yönde.
 
-4. **Fasıl listesi genişledikçe gürültü artıyor**
-   8 aday fasıl ile run_20260409_1327: exact %34.5 — baseline %55.2'den kötü.
-   Geniş aday listesi modeli yanlış fasıllara çekiyor (9017, 5907, 8205 gibi).
+3. **Kıyafet tokası fasıl karışıklığı**
+   Doğru fasıl 71 (mücevher/taklit mücevher) — bölüm 14 hiç seçilemiyor.
 
-5. **Saç aksesuarı bölüm karışıklığı**
-   Tekstil kaplı saç bandı / saç tokası → Bölüm 11/12 (tekstil) seçiliyor, doğru Bölüm 20 (96).
-   FONKSIYON MATERYALI EZER kuralı eklendi ama tekstil form istisnasıyla çelişiyor.
+4. **Misina 12'li hâlâ yanlış**
+   Fasıl seviyesi çözüldü (54/56 bulunuyor). Ama 12'li seçimde: 5404.19 yerine 5404.90,
+   5607.49.90 yerine 5607.49.11 seçiliyor.
 
-6. **Kıyafet tokası (broş) fasıl karışıklığı**
-   Doğru fasıl 71 (mücevher), model 83 veya tekstil fasıllarına gidiyor.
-
-7. **Görsel desteği yok**
+5. **Görsel desteği yok**
    image_url varsa Claude'a base64 olarak gönderilebilir ama implemente edilmemiş.
 
-8. **requirements.txt'te playwright var**
+6. **requirements.txt'te playwright var**
    Scraping bırakıldı, playwright satırı silinmeli.
 
 ---
@@ -379,28 +370,6 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 ---
 
-## MÜHENDİSLİK HEDEFLERİ (Sonraki adımlar)
-
-### Öncelik 1 — Fasıl aday sayısı optimizasyonu
-- 8 aday fazla gürültü getiriyor, 3 aday tavan düşük. 5 aday denenebilir.
-- Kritik: doğru fasıl her zaman aday listesinde olmalı. Recall vs precision dengesi.
-
-### Öncelik 2 — 9603 vs 9616 ayrımı
-- Kozmetik fırça → 9603, kozmetik aplikatör/sünger → 9616.
-- "Fırça" kelimesi kesin 9603 sinyali. Bunu Adım 1 pozisyon promptuna spesifik kural olarak ekle.
-
-### Öncelik 3 — "Yapışkanlı" + 3919 problemi
-- Kural 2 (ham malzeme formu) yapışkanlı fitili yanlış 3919'a itiyor.
-- "Belirli bir fonksiyon için tasarlanmış yapışkanlı ürün ≠ yapışkanlı ham levha" ayrımını netleştir.
-
-### Öncelik 4 — Few-shot örnekler
-- Doğru sınıflandırmaları classifications.db'ye kaydet
-- Yeni ürün → nearest neighbor → few-shot örnek olarak context'e ekle
-
-### Öncelik 5 — Görsel entegrasyon
-- Input Excel'de image_url varsa Claude'a base64 olarak gönder
-- Materyal tespiti için kritik
-
 ---
 
 ## ÇALIŞMA KURALLARI (Claude Code ve Cursor için)
@@ -417,29 +386,3 @@ ANTHROPIC_API_KEY=sk-ant-...
    c) BİLİNEN SORUNLAR ve MÜHENDİSLİK HEDEFLERİ'ni session bulgularına göre güncelle
    d) Duplicate bilgi oluşturma — her bilgi tek yerde yaşasın
 
----
-
-## Memory
-
-### 2026-04-07/09 Session'ında Yapılan Değişiklikler
-
-**Kalıcı kalan:**
-- **Parser bug fix:** build_db.py'da hayalet başlık (kodsuz tire satırları) propagasyonu düzeltildi, DB rebuild edildi. Hayalet başlık artık sadece kendi alt dallarına uygulanıyor.
-- **B1 — JSON sırası:** 4 prompt'ta `gerekce` field'ı en başa alındı (model CoT için önce gerekçe yazsın)
-- **A1 — FONKSIYON MATERYALI EZER:** `_BOLUM_PROMPT_BASE`'e kural + örnekler eklendi
-- **A2 — Tekstil form istisnası:** Monofilament/halat → Bölüm 11 istisnası `_BOLUM_PROMPT_BASE`'e eklendi
-- **S2 — Atom-level logging:** `eval_gtip.py`'a `--log-prompts` flag; `debug` dict'e tüm prompt alanları eklendi
-- **note_chars / izahname_chars default 0:** İzahname ve fasıl notları işe yaramıyor, varsayılan kapalı
-- **Bölüm aday sayısı 3→5, fasıl aday sayısı 3→8:** max_tokens 300→400
-
-**Revert edilenler:**
-- **A3 (fasıl 95 vs 96 kuralı):** `_FASIL_PROMPT_BASE`'den kaldırıldı — accuracy düşürdü
-- **B2 (3925 vs 3926 örnekleri):** `_POZISYON_PROMPT_BASE` kural 3'ten iki satır silindi — 3919 sorununa yol açtı
-
-### Temel Bulgular
-
-- İzahname ve fasıl notları işe yaramıyor — test edildi, devre dışı bırakıldı
-- Fasıl aday listesi genişledikçe gürültü artıyor — 8 aday ile exact %34.5'e düştü
-- 9603 (fırça) vs 9616 (aplikatör) karışıklığı devam ediyor — kozmetik fırçalar yanlış gidiyor
-- "Yapışkanlı" kelimesi → 3919 (ham levha) sorun — B2 revert sonrası ortaya çıktı
-- HS form hiyerarşisi (misina 5404, halat 5607) prompt ile çözülemiyor
