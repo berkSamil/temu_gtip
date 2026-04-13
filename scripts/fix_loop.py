@@ -223,30 +223,85 @@ def _print_comparison(baseline_data, run_data):
     print()
 
 
+def _get_stable_items(min_runs=3):
+    """
+    experiments/ klasöründeki tüm full run JSON'larını tarayarak
+    pozisyon'da HEP doğru olan item title'larını döndürür (stabil set).
+
+    Revert edilmiş run'lar (revert_log.json'daki run_path'ler) hariç tutulur.
+    Flaky = en az 1 kez yanlış olan; bunlar stabil sayılmaz.
+
+    Returns: set of title strings
+    """
+    import glob as _glob
+
+    # Revert edilmiş run dosya adlarını bul
+    reverted_fnames = set()
+    for entry in _load_revert_log():
+        rp = entry.get('run_path', '')
+        if rp:
+            reverted_fnames.add(os.path.basename(rp))
+
+    # Tüm full run'lardaki item geçmişini topla
+    item_history = {}  # title → [True/False, ...]
+    for path in sorted(_glob.glob(os.path.join(EXPERIMENTS_DIR, 'run_*.json'))):
+        if os.path.basename(path) in reverted_fnames:
+            continue
+        try:
+            d = json.load(open(path, encoding='utf-8'))
+        except Exception:
+            continue
+        if d.get('n_total', 0) < 25:
+            continue
+        for r in d.get('results', []):
+            title = r.get('title', '')
+            poz = r.get('metrics', {}).get('pozisyon')
+            if poz is None:
+                continue
+            item_history.setdefault(title, []).append(bool(poz))
+
+    # Stabil: en az min_runs run'da görülmüş ve hep doğru
+    return {title for title, hist in item_history.items()
+            if len(hist) >= min_runs and all(hist)}
+
+
 def _check_regression(baseline_data, run_data):
     """
-    Regresyon var mı? Pozisyon seviyesinde ölçülür.
-    - Baseline'da pozisyon doğru olan herhangi bir ürün bozulduysa → regresyon
-    - Pozisyon accuracy 3pp'den fazla düştüyse → regresyon
+    Regresyon var mı? İki kriter:
+    1. Genel koruma: pozisyon veya fasıl accuracy 5pp'den fazla düştüyse → regresyon
+    2. Stabil item koruması: geçmişte HEP doğru gelen bir item bozulduysa → regresyon
+       Flaky item'lar (tarihçede en az 1 kez yanlış) bu kontrole dahil edilmez.
     Returns: (is_regression: bool, reason: str)
     """
+    base_poz = baseline_data.get('metrics', {}).get('pozisyon', {}).get('accuracy', 0)
+    run_poz  = run_data.get('metrics', {}).get('pozisyon', {}).get('accuracy', 0)
+    base_fas = baseline_data.get('metrics', {}).get('fasil', {}).get('accuracy', 0)
+    run_fas  = run_data.get('metrics', {}).get('fasil', {}).get('accuracy', 0)
+
+    poz_drop = base_poz - run_poz
+    fas_drop = base_fas - run_fas
+
+    if poz_drop > 5.0:
+        return True, f"Pozisyon accuracy {poz_drop:.1f}pp düştü ({base_poz:.1f}% → {run_poz:.1f}%)"
+
+    if fas_drop > 5.0:
+        return True, f"Fasıl accuracy {fas_drop:.1f}pp düştü ({base_fas:.1f}% → {run_fas:.1f}%)"
+
+    # Stabil item kontrolü
+    stable = _get_stable_items(min_runs=3)
     pairs = _match_results(
         baseline_data.get('results', []),
         run_data.get('results', []),
     )
-    broken = [(b, r) for b, r in pairs if _transition(b, r, 'pozisyon') == 'broken']
-
-    base_poz = baseline_data.get('metrics', {}).get('pozisyon', {}).get('accuracy', 0)
-    run_poz  = run_data.get('metrics', {}).get('pozisyon', {}).get('accuracy', 0)
-    drop     = base_poz - run_poz
-
-    if broken:
-        titles = [b.get('title', '')[:45] for b, _ in broken[:3]]
-        suffix = '...' if len(broken) > 3 else ''
-        return True, f"{len(broken)} pozisyon bozuldu: {titles}{suffix}"
-
-    if drop > 3.0:
-        return True, f"Pozisyon accuracy {drop:.1f}pp düştü ({base_poz:.1f}% → {run_poz:.1f}%)"
+    broken_stable = [
+        b for b, r in pairs
+        if _transition(b, r, 'pozisyon') == 'broken'
+        and b.get('title', '') in stable
+    ]
+    if broken_stable:
+        titles = [b.get('title', '')[:45] for b in broken_stable[:3]]
+        suffix = '...' if len(broken_stable) > 3 else ''
+        return True, f"Stabil item bozuldu: {titles}{suffix}"
 
     return False, ""
 

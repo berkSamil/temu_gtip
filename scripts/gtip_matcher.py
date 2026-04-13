@@ -288,6 +288,7 @@ def search_gtip_fts(conn, query, limit=20):
         rows = c.execute("""
             SELECT gtip_code, tanim, tanim_hiyerarsi
             FROM gtip_fts WHERE gtip_fts MATCH ?
+            ORDER BY rank
             LIMIT ?
         """, (query, limit)).fetchall()
         return rows
