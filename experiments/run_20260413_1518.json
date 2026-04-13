@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-04-13T15:18:12.142216",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 1,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 0,
+      "total": 1,
+      "accuracy": 0.0
+    },
+    "pozisyon": {
+      "hits": 0,
+      "total": 1,
+      "accuracy": 0.0
+    },
+    "alt_poz": {
+      "hits": 0,
+      "total": 1,
+      "accuracy": 0.0
+    },
+    "exact": {
+      "hits": 0,
+      "total": 1,
+      "accuracy": 0.0
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Tekstil mamul saç tokası",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "6217.10.00.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          12,
+          20,
+          15,
+          11,
+          14
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve düzenlemek için kullanılan bir aksesuar olup, fonksiyonu gereği kişisel bakım ve giyim aksesuarıdır. Tekstil malzeme içermesine rağmen, asıl işlevi saç tutma/düzenleme olduğundan Bolum 12 (İnsan saçından mamul eşya ve benzeri aksesuarlar) veya Bolum 20 (Muhtelif mamul eşya) kapsamına girer. Tekstil formu (halat/kordon) olmadığı için Bolum 11 uygulanmaz.\",\n  \"aday_bolumler\": [12, 20, 15, 11, 14]\n}\n```",
+        "candidate_fasiller": [
+          62,
+          63,
+          65,
+          96,
+          52,
+          54,
+          56,
+          67
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve düzenlemek için kullanılan tekstil tabanlı bir aksesuar ürünüdür. Ürün, dokumaya elverişli maddelerden yapılmış bir giyim aksesuarı olarak sınıflandırılmalıdır. Fasil 62 (giyim aksesuarı), Fasil 63 (tekstil hazır eşya), Fasil 65 (başlık aksesuarı) ve Fasil 96 (çeşitli mamul eşya) ana adaylar olup, malzeme türüne göre Fasil 50-56 da değerlendirilmelidir.\",\n  \"aday_fasiller\": [62, 63, 65, 96, 52, 54, 56, 67]\n}\n```",
+        "secilen_pozisyon": "6217",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve düzenlemek için kullanılan bir aksesuar olup, giyim eşyasının aksesuarı kategorisinde yer alır. Fasil 62 pozisyon 6217, dokumaya elverişli maddelerden yapılmış giyim eşyasının hazır aksesuarlarını kapsar. Tekstil mamul saç tokası bu tanıma tam olarak uygun olup, en spesifik pozisyondur.\",\n  \"fasil\": 62,\n  \"pozisyon_kod\": \"6217\"\n}\n```",
+        "secilen_fasil": 62,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, giyim eşyasının hazır aksesuarı olarak tanımlanır. Fasıl 62 Notu 1'e göre dokumaya elverişli mensucattan hazır eşyaya uygulanır. Pozisyon 6217, giyim eşyasının diğer hazır aksesuarlarını kapsar. Ürün tekstil mamulundan yapılmış saç tokası olduğu için 6217.10 (Aksesuarlar) altında sınıflandırılır. El yapımı olup olmadığı belirtilmediğinden, genel 'Diğerleri' alt pozisyonu uygulanır. Alternatif olarak 6217.90 (Parçalar) düşünülebilir ancak saç tokası bir parça değil, tamamlanmış aksesuar olduğu için 6217.10 daha uygun pozisyondur.\",\n  \"guven\": \"yuksek\",\n  \"alternatifler\": [\n    \"6217.90.00.19.00\"\n  ],\n  \"fasil\": 62,\n  \"gtip_code\": \"6217.10.00.00.19\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2375,
+            "out": 214,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1481,
+            "out": 232,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 115,
+            "out": 171,
+            "cache_write": 14440,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 130,
+            "out": 335,
+            "cache_write": 4389,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 4101,
+            "out": 952,
+            "cache_write": 18829,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}

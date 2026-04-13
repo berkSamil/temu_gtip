@@ -1,0 +1,248 @@
+{
+  "timestamp": "2026-04-13T15:37:24.235499",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 3,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    },
+    "pozisyon": {
+      "hits": 2,
+      "total": 3,
+      "accuracy": 66.67
+    },
+    "alt_poz": {
+      "hits": 1,
+      "total": 3,
+      "accuracy": 33.33
+    },
+    "exact": {
+      "hits": 1,
+      "total": 3,
+      "accuracy": 33.33
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Kozmetik uygulama süngeri (makyaj süngeri)",
+      "correct_gtip": "9616.20.00.00.00",
+      "predicted_gtip": "9616.20.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          7,
+          6,
+          13,
+          15
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Kozmetik uygulama süngeri (makyaj süngeri) fonksiyonu itibariyle makyaj ve kozmetik uygulaması için kullanılan bir araçtır. Malzeme poliüretan veya benzer köpük/sünger olsa da, ürünün birincil amacı kozmetik uygulamadır. Bu tür kozmetik aksesuarları ve makyaj araçları Bolum 20 (Muhtelif Mamul Eşya) altında sınıflandırılır.\",\n  \"aday_bolumler\": [20, 7, 6, 13, 15]\n}\n```",
+        "candidate_fasiller": [
+          33,
+          39,
+          40,
+          96,
+          68,
+          69,
+          70,
+          95
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Kozmetik uygulama süngeri (makyaj süngeri), makyaj ürünlerinin uygulanması için kullanılan bir araçtır. Ürün, poröz yapılı bir sünger malzemeden oluşan ve kozmetik ürünlerin cilde uygulanmasında yardımcı olan bir aksesuardır. Fasil 33 (kozmetik müstahzarları), Fasil 39 (plastik mamulleri), Fasil 40 (kauçuk mamulleri) ve Fasil 96 (çeşitli mamul eşya) ana adaylar olup, malzeme bileşimine göre değişkenlik gösterebilir.\",\n  \"aday_fasiller\": [33, 39, 40, 96, 68, 69, 70, 95]\n}\n```",
+        "secilen_pozisyon": "9616.90",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, makyaj/kozmetik ürünlerinin uygulanmasında kullanılan bir araçtır. Fasil 96 pozisyon 9616, 'pudra ve diğer kozmetik veya tuvalet ürünlerinin kullanılmasına mahsus büyük ve küçük ponponlar' başlığını taşır. Kozmetik uygulama süngeri, ponpon gibi kozmetik ürün aplikatörü olarak işlev görmektedir ve bu pozisyonun kapsamına girmektedir.\",\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9616.90\"\n}\n```",
+        "secilen_fasil": 96,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, makyaj/kozmetik uygulaması için kullanılan bir sünger (ponpon türü) olarak tanımlanmıştır. Tarife cetvelinde pozisyon 9616.20.00.00.00, 'Kozmetik ürünlerinin veya tuvalet müstahzarlarının kullanılmasına mahsus büyük ve küçük ponponlar' başlığı altında yer almaktadır. Makyaj süngeri, kozmetik ürünlerinin (pudra, fondöten vb.) uygulanmasında kullanılan bir araç olup, bu başlığın tanımına tam olarak uymaktadır. Alternatif olarak 9616.10.90.00.00 (püskürtme mekanizmaları) düşünülebilirse de, ürün püskürtme mekanizması değil, aplikatör/ponpon işlevi görmektedir.\",\n  \"guven\": \"yuksek\",\n  \"alternatifler\": [\"9616.10.90.00.00\"],\n  \"fasil\": 96,\n  \"gtip_code\": \"9616.20.00.00.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2385,
+            "out": 185,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1345,
+            "out": 238,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 124,
+            "out": 187,
+            "cache_write": 12248,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3864,
+            "out": 324,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7718,
+            "out": 934,
+            "cache_write": 12248,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Tekstil mamul saç tokası",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "9615.90.00.90.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          12,
+          20,
+          15,
+          11,
+          14
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve düzenlemek için kullanılan bir aksesuar olup, fonksiyonu gereği kişisel bakım ve giyim aksesuarıdır. Tekstil malzeme içermesine rağmen, asıl işlevi saç tutma/düzenleme olduğundan Bolum 12 (İnsan saçından mamul eşya ve benzeri aksesuarlar) veya Bolum 20 (Muhtelif mamul eşya) kapsamına girer. Tekstil formu (halat/kordon) olmadığı için Bolum 11 uygulanmaz.\",\n  \"aday_bolumler\": [12, 20, 15, 11, 14]\n}\n```",
+        "candidate_fasiller": [
+          62,
+          63,
+          65,
+          67,
+          83,
+          96,
+          61,
+          58
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve düzenlemek için kullanılan tekstil tabanlı bir aksessuardır. Ürün, dokumaya elverişli maddelerden yapılmış bir giyim aksesuarı olup, başlık aksesuarları veya çeşitli mamul eşya kategorilerine girmektedir.\",\n  \"aday_fasiller\": [62, 63, 65, 67, 83, 96, 61, 58]\n}\n```",
+        "secilen_pozisyon": "9615",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve şekil vermek için kullanılan giyim aksesuarıdır. Fasil 96, pozisyon 9615'te saç tarakları, süs tarakları, saç tokaları, kıvırma pensleri, saç firketeleri, bigudiler ve benzerleri ile bunların aksam ve parçaları tanımlanmaktadır. Tekstil mamul saç tokası bu tanıma doğrudan uyar ve giyim eşyası aksesuarı olarak sınıflandırılır.\",\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9615\"\n}\n```",
+        "secilen_fasil": 96,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, saç tokası olup 9615 pozisyonunun kapsamına girmektedir. Tekstil mamulden yapılmış saç tokası, 9615.11.00.00.00 (sertleştirilmiş kauçuk veya plastik) ve 9615.19.00.00.00 (diğerleri) alt pozisyonlarının dışında kalmaktadır. Tekstil malzemesi ne sertleştirilmiş kauçuk/plastik ne de 9615.90 altındaki metal kategorilerine (demir/çelik) ait değildir. Bu nedenle 9615.90.00.90.00 'Diğerleri' pozisyonuna sınıflandırılır.\",\n  \"guven\": \"yuksek\",\n  \"alternatifler\": [\n    \"9615.19.00.00.00\"\n  ],\n  \"fasil\": 96,\n  \"gtip_code\": \"9615.90.00.90.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2375,
+            "out": 214,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1481,
+            "out": 146,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 115,
+            "out": 192,
+            "cache_write": 9956,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3826,
+            "out": 282,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7797,
+            "out": 834,
+            "cache_write": 9956,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kablo sabitleme klipsi",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "8548.00.90.90.00",
+      "guven": "dusuk",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          16,
+          7,
+          15,
+          6
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Ürün fonksiyonu: kablo sabitleme ve tutturma (mekanik bağlantı aksesuarı). Kendinden yapışkanlı plastik malzeme kullanılsa da, ürünün asıl işlevi elektrik/harita tesisatında kablo yönetimi sağlamaktır. Bu nedenle elektrik malzemeleri aksesuarı (Bolum 16) veya muhtelf mamul eşya (Bolum 20) kategorisine girer. Plastik malzeme ikincil önem taşır.\",\n  \"aday_bolumler\": [20, 16, 7, 15, 6]\n}\n```",
+        "candidate_fasiller": [
+          39,
+          83,
+          85,
+          84,
+          73,
+          82,
+          76,
+          96
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Kendinden yapışkanlı plastik kablo sabitleme klipsi, elektrik kablolarını sabitlemek ve organize etmek için kullanılan bir aksesuar ürünüdür. Plastik malzemeden yapılmış olup, elektrik tesisatında ve elektronik cihazlarda kablo yönetimi amacıyla kullanılır. Ürün, plastik mamul, metal aksesuar veya elektrik aksessuarı olarak sınıflandırılabilir.\",\n  \"aday_fasiller\": [39, 83, 85, 84, 73, 82, 76, 96]\n}\n```",
+        "secilen_pozisyon": "8548",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün kendinden yapışkanlı plastik bir kablo sabitleme klipsidir. Fonksiyonu kablolari sabitlemek ve organize etmektir. Fasil 39 pozisyon 3919'da 'Plastiklerden kendinden yapışkan levhalar, plakalar, bantlar, şeritler, filmler, folyolar ve diğer yassı şekiller' tanımlanmaktadır. Ancak bu pozisyon HAM MALZEME (rulo halinde film, bant vb.) için geçerlidir. Klips belirli bir işlev için tasarlanmış mamul bir plastik ürün olup, kendi amacı/fonksiyonu pozisyonunda sınıflandırılmalıdır. Fasil 83 pozisyon 8302'de 'Adi metallerden donanım, tertibat ve benzeri eşya (mobilya, kapı, merdiven, pencere, panjur, karoseri, eyer takımları, bavul, sandık, mahfaza ve benzeri eşya için)' ve 'adi metallerden otomatik kapı kapayıcıları' gibi donanım ve tertibat eşyası tanımlanmaktadır. Fasil 84 pozisyon 8487'de 'Bu fasılın başka pozisyonlarında belirtilmeyen veya yer almayan makinaların aksam ve parçaları' yer almaktadır. Kablo sabitleme klipsi, elektrik/elektronik cihazlarda ve makinelerde kullanılan bir aksam/parça niteliğindedir. Fasil 85 pozisyon 8548'de 'Bu fasılın herhangi bir yerinde belirtilmeyen veya yer almayan makina, cihaz veya aletlerin elektrikli aksam ve parçaları' tanımlanmaktadır. Kendinden yapışkanlı plastik kablo klipsi, elektrik tesisatında ve elektronik cihazlarda kullanılan bir aksam olup, en uygun pozisyon 8548'dir.\",\n  \"fasil\": 85,\n  \"pozisyon_kod\": \"8548\"\n}\n```",
+        "secilen_fasil": 85,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Kendinden yapışkanlı plastik kablo sabitleme klipsi, mekanik bir tutma/sabitleme fonksiyonu gören pasif bir bileşendir. Elektrikli aksam veya parça değildir; elektrik iletkenliği, yalıtımı veya elektronik işlevi yoktur. Pozisyon 8548 başlığı 'elektrikli aksam ve parçaları' kapsamında tanımlanmıştır. Verilen alt pozisyonlar (8548.00.20, 8548.00.30, 8548.00.90.10) bellek modülleri, LED arka ışık modülleri ve elektronik mikro montajlar gibi elektrik/elektronik bileşenleri içerir. Plastik kablo klipsi bu tanımlardan hiçbirine uymaz. Ürün, 85. Fasıl dışında (örneğin 39. Fasıl plastik ürünler) daha uygun bir sınıflandırmaya sahip olabilir. Ancak seçilen pozisyon 8548 içinde, en geniş ve kalıntı niteliğindeki 8548.00.90.90.00 'Diğerleri' kodu, cetvel metnine göre uygulanabilir tek seçenektir.\",\n  \"guven\": \"dusuk\",\n  \"alternatifler\": [],\n  \"fasil\": 85,\n  \"gtip_code\": \"8548.00.90.90.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2384,
+            "out": 187,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1436,
+            "out": 179,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 123,
+            "out": 580,
+            "cache_write": 22895,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3940,
+            "out": 410,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7883,
+            "out": 1356,
+            "cache_write": 22895,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}

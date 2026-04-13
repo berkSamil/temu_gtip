@@ -1,0 +1,248 @@
+{
+  "timestamp": "2026-04-13T15:12:54.676231",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 3,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 1,
+      "total": 3,
+      "accuracy": 33.33
+    },
+    "pozisyon": {
+      "hits": 1,
+      "total": 3,
+      "accuracy": 33.33
+    },
+    "alt_poz": {
+      "hits": 0,
+      "total": 3,
+      "accuracy": 0.0
+    },
+    "exact": {
+      "hits": 0,
+      "total": 3,
+      "accuracy": 0.0
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Manyetik şişe açacağı",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "7323.99.00.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20,
+          16,
+          7,
+          13
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, metal yapıdan oluşan ve şişe açmak için kullanılan basit bir el aracıdır. Fonksiyonu mutfak/ev kullanımı aracı olup, adı metallerden yapılmış basit bir alet olduğunu gösterir. Bolum 15 (Adi Metaller ve Adi Metallerden Eşya) birincil seçim, Bolum 20 (Muhtelf Mamul Eşya) genel kategori, Bolum 16 mekanik cihazlar için alternatif olarak değerlendirilmiştir.\",\n  \"aday_bolumler\": [15, 20, 16, 7, 13]\n}\n```",
+        "candidate_fasiller": [
+          82,
+          83,
+          73,
+          39,
+          76,
+          81,
+          96,
+          84
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, şişe açmak için kullanılan basit bir el aracıdır. Manyetik özelliği taşıyan metal veya metal+plastik kombinasyonlu bir alet olup, adi metallerden yapılmış küçük bir aletdir. Fasil 82 (adi metallerden aletler) birincil seçim olmalıdır.\",\n  \"aday_fasiller\": [82, 83, 73, 39, 76, 81, 96, 84]\n}\n```",
+        "secilen_pozisyon": "7323",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün manyetik şişe açacağı olup, temel işlevi şişeleri açmaktır. Bu, mutfak ve sofra eşyası kategorisine giren bir el aletine benzer. Fasil 82 (El aletleri) pozisyon 8211'de 'Kesici ağızlı bıçaklar' yer almakta, ancak şişe açacağı kesici değildir. Fasil 73 pozisyon 7323'te 'Demir veya çelikten sofra, mutfak veya diğer ev işlerinde kullanılan eşya' tanımı bulunmaktadır. Manyetik şişe açacağı, mutfak eşyası olarak bu pozisyona en uygun gelmektedir.\",\n  \"fasil\": 73,\n  \"pozisyon_kod\": \"7323\"\n}\n```",
+        "secilen_fasil": 73,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, demir veya çelikten yapılmış bir mutfak aracıdır ve 7323 pozisyonunun kapsamına girmektedir. Ürün, şişe açma işlevini yerine getiren mekanik bir araç olup, sofra/mutfak ev işlerinde kullanılan eşya kategorisine aittir. 7323.10.00 (yün, sünger, temizleme eşyası) uygun değildir çünkü ürün temizleme/parlatma aracı değildir. 7323.91-94 kodları spesifik malzeme türlerine (döküm demir emayesiz/emaylı, paslanmaz çelik, emaylı demir/çelik) atıfta bulunur. Manyetik şişe açacağının malzeme türü belirtilmediğinden ve genel bir mutfak aracı olduğundan, 7323.99.00 (Diğerleri) en uygun sınıflandırmadır.\",\n  \"guven\": \"orta\",\n  \"alternatifler\": [\n    \"7323.93.00.00.00\",\n    \"7323.94.00.00.00\"\n  ],\n  \"fasil\": 73,\n  \"gtip_code\": \"7323.99.00.00.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2378,
+            "out": 214,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 978,
+            "out": 161,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 118,
+            "out": 250,
+            "cache_write": 19135,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3910,
+            "out": 384,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7384,
+            "out": 1009,
+            "cache_write": 19135,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Plastik tabanlı, metal askı aparatı (yapışkanlı duvar tipi)",
+      "correct_gtip": "8302.50.00.00.00",
+      "predicted_gtip": "3919.90.80.10.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20,
+          7,
+          16,
+          9
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Urun fonksiyonu: duvar tipi yapışkanlı askı aparatı (nesneleri asma/tutma amacı). Plastik tabanlı olsa da, metal askı komponenti ve mekanik tutturma işlevi nedeniyle metal esya kategorisine girer. Yapışkanlı duvar montaj sistemi ise genel amaçlı aksesuar olarak muhtelf mamul esyaya da uygun.\",\n  \"aday_bolumler\": [15, 20, 7, 16, 9]\n}\n```",
+        "candidate_fasiller": [
+          39,
+          83,
+          96,
+          73,
+          76,
+          82,
+          72,
+          94
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, duvar üzerine yapışkanlı olarak monte edilen, plastik tabanlı bir askı aparatıdır. Fonksiyonu nesneleri duvar üzerinde tutmaktır. Plastik ana malzeme olup metal askı aparatı içermektedir. Fasil 39 (Plastikler ve mamulleri) birincil seçim, Fasil 83 (Adi metallerden çeşitli eşya) ve Fasil 96 (Çeşitli mamul eşya) da uygun alternatiflerdir.\",\n  \"aday_fasiller\": [39, 83, 96, 73, 76, 82, 72, 94]\n}\n```",
+        "secilen_pozisyon": "3919",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün plastik tabanlı, metal askı aparatı olup duvar tipi yapışkanlı montajla kullanılmaktadır. Fonksiyonu: duvar üzerine yapışkanlı olarak monte edilen metal askı sistemi. Fasil 39 (Plastikler) pozisyon 3919 'kendinden yapışkan levhalar, plakalar, bantlar, şeritler, filmler, folyolar' tanımı kapsamına girmektedir. Ürün plastik tabanlı yapışkanlı bir ürün olup, metal askı aparatı bu plastik tabanın üzerine entegre edilmiş aksesuar niteliğindedir. Kural 3a uyarınca en özel tanım olan 3919 pozisyonu tercih edilir.\",\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3919\"\n}\n```",
+        "secilen_fasil": 39,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, plastik tabanlı metal askı aparatı olup kendinden yapışkanlı özelliğe sahiptir. Pozisyon 3919, plastiklerden kendinden yapışkan levhalar, plakalar, bantlar, şeritler, filmler, folyolar ve diğer yassı şekilleri kapsar ve ürün bu tanıma uyumludur. Ürün rulo halinde olmayan, yüzey işleminden ileri işlem görmüş (metal askı aparatı monte edilmiş) dikdörtgen/kare dışında şekilde kesilmiş bir kendinden yapışkanlı plastik ürünüdür. Pozisyon 3919.90.80.10.00 (Yüzey işleminden daha ileri işlem görmüş dikdörtgen ve kareden başka şekilde kesilmiş olanlar) bu tanıma en uygun gelmektedir. Alternatif olarak 3919.90.80.90.00 (Diğerleri) düşünülebilir ancak daha spesifik kod tercih edilmiştir.\",\n  \"guven\": \"orta\",\n  \"alternatifler\": [\n    \"3919.90.80.90.00\"\n  ],\n  \"fasil\": 39,\n  \"gtip_code\": \"3919.90.80.10.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2390,
+            "out": 156,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1019,
+            "out": 201,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 129,
+            "out": 246,
+            "cache_write": 13441,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 4129,
+            "out": 373,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7667,
+            "out": 976,
+            "cache_write": 13441,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Tekstil mamul saç tokası",
+      "correct_gtip": "9615.19.00.00.00",
+      "predicted_gtip": "9615.90.00.90.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          12,
+          20,
+          11,
+          15,
+          14
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve düzenlemek için kullanılan bir aksesuar olup, fonksiyonu gereği kişisel bakım ve giyim aksesuarıdır. Tekstil malzeme ile yapılmış olsa da, saç tokası Bolum 12 (İnsan saçından mamul eşya ve aksesuar) veya Bolum 20 (Muhtelf mamul eşya) kapsamına girer. Tekstil formu (kordon/halat) olsa bile, bu ürünün birincil işlevi saç aksesuarı olmaktır.\",\n  \"aday_bolumler\": [12, 20, 11, 15, 14]\n}\n```",
+        "candidate_fasiller": [
+          62,
+          63,
+          65,
+          96,
+          61,
+          58,
+          56,
+          67
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve düzenlemek için kullanılan tekstil tabanlı bir aksessuardır. Dokumaya elverişli maddelerden yapılmış küçük bir eşya olup, giyim aksesuarı kategorisine girmektedir. Fasil 62 (giyim aksesuarı), Fasil 63 (tekstil hazır eşya), Fasil 65 (başlık aksesuarı) ve Fasil 96 (çeşitli mamul eşya) en uygun seçeneklerdir.\",\n  \"aday_fasiller\": [62, 63, 65, 96, 61, 58, 56, 67]\n}\n```",
+        "secilen_pozisyon": "9615",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Saç tokası, saçı tutmak ve düzenlemek için kullanılan giyim eşyası aksesuarıdır. Fasil 62/61 (dokuma/örme giyim eşyası) pozisyon 6217/6117 'Giyim eşyasının diğer hazır aksesuarı' tanımına tam olarak uyar. Fasil 96 pozisyon 9615 'Saç tarakları, süs tarakları ve benzerleri; saç tokaları...' da saç tokaları açıkça listelenmektedir. Tekstil malzemeden yapılmış saç tokası, 9615'in kapsamına girmektedir.\",\n  \"fasil\": 96,\n  \"pozisyon_kod\": \"9615\"\n}\n```",
+        "secilen_fasil": 96,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, saç tokası olup 9615 pozisyonunun kapsamına girmektedir. Tekstil mamulden yapılmış saç tokası, 9615.11.00.00.00 (sertleştirilmiş kauçuk veya plastik) ve 9615.19.00.00.00 (diğerleri) alt pozisyonlarının dışında kalmaktadır. Tekstil malzemesi ne sertleştirilmiş kauçuk/plastik ne de 9615.90 altındaki metal kategorilerine (demir/çelik) ait değildir. Bu nedenle 9615.90.00.90.00 'Diğerleri' pozisyonu uygulanır; bu pozisyon tekstil, ahşap, kemik vb. diğer malzemelerden yapılmış saç tokalarını kapsar.\",\n  \"guven\": \"yuksek\",\n  \"alternatifler\": [\n    \"9615.19.00.00.00\",\n    \"9615.90.00.90.00\"\n  ],\n  \"fasil\": 96,\n  \"gtip_code\": \"9615.90.00.90.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2375,
+            "out": 203,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1481,
+            "out": 205,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 115,
+            "out": 223,
+            "cache_write": 9354,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 3826,
+            "out": 327,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7797,
+            "out": 958,
+            "cache_write": 9354,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-04-13T15:17:50.207790",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 1,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 1,
+      "total": 1,
+      "accuracy": 100.0
+    },
+    "pozisyon": {
+      "hits": 1,
+      "total": 1,
+      "accuracy": 100.0
+    },
+    "alt_poz": {
+      "hits": 1,
+      "total": 1,
+      "accuracy": 100.0
+    },
+    "exact": {
+      "hits": 1,
+      "total": 1,
+      "accuracy": 100.0
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "Manyetik şişe açacağı",
+      "correct_gtip": "8205.51.00.00.00",
+      "predicted_gtip": "8205.51.00.00.00",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          15,
+          16,
+          7,
+          13
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, şişe açmak için kullanılan basit bir el aracıdır. Fonksiyonu şişe kapağını açmaktır. Adı metalden yapılmış olsa da, bu tür basit mutfak/ev aletleri Bolum 20 (Muhtelif Mamul Eşya) altında sınıflandırılır. Metal malzeme içermesine rağmen, işlevi ve kullanım amacı esas alınır.\",\n  \"aday_bolumler\": [20, 15, 16, 7, 13]\n}\n```",
+        "candidate_fasiller": [
+          82,
+          83,
+          73,
+          72,
+          76,
+          81,
+          39,
+          96
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, şişe açmak için kullanılan basit bir el aracıdır. Manyetik özelliği sayesinde metal kapakları tutabilir. Adi metallerden yapılmış bu alet, adi metallerden aletler ve el aletleri kategorisine girmektedir.\",\n  \"aday_fasiller\": [82, 83, 73, 72, 76, 81, 39, 96]\n}\n```",
+        "secilen_pozisyon": "8205",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün manyetik şişe açacağı olup, şişe açmak için tasarlanmış bir el aletiydir. Fonksiyonu itibariyle kesici/yontucu el aletleri kategorisine girmektedir. Fasil 82 'Adi Metallerden Aletler, Bıçakçı Eşyası ve Sofra Takımları' kapsamında değerlendirilir. 82.05 pozisyonu 'Tarifenin başka pozisyonlarında yer almayan el aletleri' olarak tanımlanmış olup, şişe açacağı bu tanıma en uygun pozisyondur.\",\n  \"fasil\": 82,\n  \"pozisyon_kod\": \"8205\"\n}\n```",
+        "secilen_fasil": 82,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Manyetik şişe açacağı, Fasil 82 kapsamında bir el aletleridir. Ürünün ana fonksiyonu şişe açmaktır ve bu işlev için metal (manyetik) bir mekanizma kullanılmaktadır. Fasil 82 Notu, bıçağı veya iş gören kısmı adi metallerden yapılmış aletleri kapsar; şişe açacağının metal iş gören kısmı bu tanıma uyar. Pozisyon 8205 'Tarifenin başka pozisyonlarında yer almayan el aletleri' başlığı altında, şişe açacağı gibi ev işlerinde kullanılan basit metal el aletleri yer alır. Pozisyon 8205.51 (Ev işlerinde kullanılanlar) veya 8205.59.80.19 (Diğerleri) arasında seçim yapılırken, şişe açacağı ev mutfağında kullanılan bir araç olduğu için 8205.51 daha spesifiktir. Ancak cetvel metninde 8205.51 'Ev işlerinde kullanılanlar' olarak genel tanımlandığından ve şişe açacağı bu kategoriye açıkça uyduğundan, bu pozisyon tercih edilmiştir.\",\n  \"guven\": \"yuksek\",\n  \"alternatifler\": [\n    \"8205.59.80.19\",\n    \"8205.90.90.00.00\"\n  ],\n  \"fasil\": 82,\n  \"gtip_code\": \"8205.51.00.00.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2378,
+            "out": 179,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 978,
+            "out": 142,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 117,
+            "out": 222,
+            "cache_write": 18736,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 135,
+            "out": 461,
+            "cache_write": 4815,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 3608,
+            "out": 1004,
+            "cache_write": 23551,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}
