@@ -590,6 +590,13 @@ POZISYON SECIMI KURALLARI:
    gibi birden fazla kategori iceren tanim, bunlardan HERHANGI birini kapsayan urunlere
    uygulanir. Banyo aksesuari = tuvalet esyasi kapsamindadir.
 
+5. KURAL 3a — EN OZEL TANIM ONCELIKLIDIR: Birden fazla pozisyon aday oldugunda, esyayi
+   EN OZEL sekilde tanimlayan pozisyon secilir. Bir pozisyon basligi esyanin amacini ve
+   fonksiyonunu dogrudan kapsiyorsa o "ozel"dir; yalnizca malzemeye, montaj yontemine
+   veya fiziksel forma atifta bulunuyorsa kapsam disidir ve "ozel" sayilmaz.
+   Yanlis kapsamdaki spesifik pozisyon, dogru kapsamdaki "digerleri" pozisyonundan daha
+   kotudur.
+
 Yanitini SADECE su JSON formatinda ver (gerekce ONCE, karar SONRA):
 {{
   "gerekce": "Once fonksiyon analizi: urun ne ise yarar, hangi pozisyon tanimiyla ortuser? (2-3 cumle)",
@@ -816,6 +823,7 @@ def _call_classify(client, model, max_tokens, system_prompt, user_msg):
     return client.messages.create(
         model=model,
         max_tokens=max_tokens,
+        temperature=0,
         system=system_prompt,
         messages=[{"role": "user", "content": user_msg}],
     )
@@ -831,6 +839,7 @@ def _call_classify_ctx(client, model, max_tokens, system_prompt, context_text, q
     return client.messages.create(
         model=model,
         max_tokens=max_tokens,
+        temperature=0,
         system=system_prompt,
         messages=[{
             "role": "user",
