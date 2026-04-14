@@ -53,7 +53,7 @@ def get_candidate_fasils(conn, product_details, keywords, description, title, ma
     scores = {}
 
     words = sorted(
-        set(re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ]{4,}', text)),
+        set(re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}', text)),
         key=len,
         reverse=True,
     )
@@ -299,7 +299,7 @@ def search_gtip_fts(conn, query, limit=20):
 def _product_search_words(title, desc, keywords, product_details, max_words=20):
     text = f"{title} {desc} {keywords} {product_details}".lower()
     words = sorted(
-        set(re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ]{4,}', text)),
+        set(re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}', text)),
         key=len,
         reverse=True,
     )
