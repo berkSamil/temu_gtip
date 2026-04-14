@@ -6,5 +6,57 @@
     "run_path": "",
     "report_path": "",
     "reverted": true
+  },
+  {
+    "timestamp": "2026-04-13T18:18:52.977050",
+    "reason": "auto-revert: Fasıl accuracy 6.9pp düştü (89.7% → 82.8%)",
+    "git_diff": "diff --git a/scripts/gtip_matcher.py b/scripts/gtip_matcher.py\nindex be9fb67..8a40b42 100644\n--- a/scripts/gtip_matcher.py\n+++ b/scripts/gtip_matcher.py\n@@ -296,6 +296,35 @@ def search_gtip_fts(conn, query, limit=20):\n         return []\n \n \n+def _tr_strip_suffix(word):\n+    \"\"\"Bilinen Türkçe çekim ekini tanı ve kes. Ek yoksa None döner. Eşleşirse kök + '*' döner.\"\"\"\n+    if len(word) < 4:\n+        return None\n+    # Uzundan kısaya — en uzun eşleşme kazanır\n+    suffixes_4 = ('sını', 'sini', 'sunu', 'sünü', 'ları', 'leri')\n+    suffixes_3 = ('nın', 'nin', 'nun', 'nün', 'dan', 'den', 'tan', 'ten')\n+    suffixes_2 = ('sı', 'si', 'su', 'sü')\n+    suffixes_g  = ('ğı', 'ği', 'ğu', 'ğü')\n+\n+    for s in suffixes_4:\n+        if word.endswith(s) and len(word) - len(s) >= 3:\n+            return word[:-len(s)] + '*'\n+    for s in suffixes_3:\n+        if word.endswith(s) and len(word) - len(s) >= 3:\n+            return word[:-len(s)] + '*'\n+    for s in suffixes_2:\n+        if word.endswith(s) and len(word) - len(s) >= 3:\n+            return word[:-len(s)] + '*'\n+    for s in suffixes_g:\n+        if word.endswith(s) and len(word) - len(s) >= 3:\n+            root = word[:-len(s)]\n+            # ğ→k yumuşama geri al (son harf ğ kalmıyorsa kök zaten düzelmiş)\n+            if root.endswith('ğ'):\n+                root = root[:-1] + 'k'\n+            return root + '*'\n+    return None\n+\n+\n def _product_search_words(title, desc, keywords, product_details, max_words=20):\n     text = f\"{title} {desc} {keywords} {product_details}\".lower()\n     words = sorted(\n@@ -314,11 +343,20 @@ def retrieve_ranked_gtips(conn, title, desc, keywords, product_details, top_n=50\n     words = _product_search_words(title, desc, keywords, product_details, max_words=22)\n     scores = {}\n     for w in words:\n+        # Exact arama (ağırlık 1.0)\n         rows = search_gtip_fts(conn, w, limit=per_query)\n         for idx, r in enumerate(rows):\n             code = r[0]\n             bump = max(1, per_query - idx)\n-            scores[code] = scores.get(code, 0) + bump\n+            scores[code] = scores.get(code, 0) + bump * 1.0\n+        # Prefix arama (ağırlık 0.4) — sadece bilinen Türkçe ek tanındıysa\n+        stem = _tr_strip_suffix(w)\n+        if stem:\n+            rows2 = search_gtip_fts(conn, stem, limit=per_query)\n+            for idx, r in enumerate(rows2):\n+                code = r[0]\n+                bump = max(1, per_query - idx)\n+                scores[code] = scores.get(code, 0) + bump * 0.4\n     if not scores:\n         return []\n     ordered = sorted(scores.keys(), key=lambda c: (-scores[c], c))[:top_n]\n",
+    "run_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/run_20260413_1818.json",
+    "report_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/report_20260413_1818.md",
+    "reverted": true,
+    "run_metrics": {
+      "fasil": {
+        "hits": 24,
+        "total": 29,
+        "accuracy": 82.76
+      },
+      "pozisyon": {
+        "hits": 21,
+        "total": 29,
+        "accuracy": 72.41
+      },
+      "alt_poz": {
+        "hits": 17,
+        "total": 29,
+        "accuracy": 58.62
+      },
+      "exact": {
+        "hits": 16,
+        "total": 29,
+        "accuracy": 55.17
+      }
+    },
+    "baseline_metrics": {
+      "fasil": {
+        "hits": 26,
+        "total": 29,
+        "accuracy": 89.66
+      },
+      "pozisyon": {
+        "hits": 22,
+        "total": 29,
+        "accuracy": 75.86
+      },
+      "alt_poz": {
+        "hits": 15,
+        "total": 29,
+        "accuracy": 51.72
+      },
+      "exact": {
+        "hits": 13,
+        "total": 29,
+        "accuracy": 44.83
+      }
+    }
   }
 ]
