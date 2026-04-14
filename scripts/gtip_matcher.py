@@ -306,10 +306,11 @@ def _product_search_words(title, desc, keywords, product_details, max_words=20):
     return [w for w in words if w.lower() not in _TEMU_STOP][:max_words]
 
 
-def retrieve_ranked_gtips(conn, title, desc, keywords, product_details, top_n=50, per_query=14):
+def retrieve_ranked_gtips(conn, title, desc, keywords, product_details, top_n=50, per_query=14, filter_fasils=None):
     """
     Urun metninden kelimeler -> FTS; skorla birlestir. Cetvelde gercek satirlari getirir
     (sadece fasil basi sirali liste yerine ilgili 392x/732x vb. satirlari modele sunar).
+    filter_fasils: set of int fasil_no — sadece bu fasillara ait GTIPler skorlara dahil edilir.
     """
     words = _product_search_words(title, desc, keywords, product_details, max_words=22)
     scores = {}
@@ -317,6 +318,12 @@ def retrieve_ranked_gtips(conn, title, desc, keywords, product_details, top_n=50
         rows = search_gtip_fts(conn, w, limit=per_query)
         for idx, r in enumerate(rows):
             code = r[0]
+            if filter_fasils is not None:
+                d = re.sub(r'[^0-9]', '', code)
+                if len(d) < 2:
+                    continue
+                if int(d[:2]) not in filter_fasils:
+                    continue
             bump = max(1, per_query - idx)
             scores[code] = scores.get(code, 0) + bump
     if not scores:
@@ -662,7 +669,8 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
                            izahname_max_chars=1500, return_atoms=False):
     """Adım 1 context: fasıl notları + izahname özeti + tüm 4'lü pozisyonlar."""
     ranked = retrieve_ranked_gtips(
-        conn, title, desc, keywords, product_details, top_n=min(retrieval_top_n, 20)
+        conn, title, desc, keywords, product_details, top_n=min(retrieval_top_n, 20),
+        filter_fasils=set(candidate_fasils[:8]) if candidate_fasils else None,
     )
     parts = []
     atoms = {}
