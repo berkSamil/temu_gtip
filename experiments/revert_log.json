@@ -58,5 +58,57 @@
         "accuracy": 44.83
       }
     }
+  },
+  {
+    "timestamp": "2026-04-14T12:33:17.209834",
+    "reason": "auto-revert: Pozisyon accuracy 7.9pp düştü (79.3% → 71.4%)",
+    "git_diff": "diff --git a/scripts/gtip_matcher.py b/scripts/gtip_matcher.py\nindex 7856f66..4ff1619 100644\n--- a/scripts/gtip_matcher.py\n+++ b/scripts/gtip_matcher.py\n@@ -41,6 +41,7 @@ _TEMU_STOP = frozenset({\n     'can', 'has', 'have', 'pcs', 'pack', 'set', 'piece', 'pieces', 'item', 'items', 'sale',\n     'shop', 'temu', 'free', 'new', 'hot', 'best', 'buy', 'get', 'one', 'two', 'off', 'out',\n     'our', 'was', 'not', 'but', 'its', 'per', 'use', 'may', 'more', 'most', 'some', 'size',\n+    'mamul',\n })\n \n \n",
+    "run_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/run_20260414_1233.json",
+    "report_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/report_20260414_1233.md",
+    "reverted": true,
+    "run_metrics": {
+      "fasil": {
+        "hits": 25,
+        "total": 28,
+        "accuracy": 89.29
+      },
+      "pozisyon": {
+        "hits": 20,
+        "total": 28,
+        "accuracy": 71.43
+      },
+      "alt_poz": {
+        "hits": 15,
+        "total": 28,
+        "accuracy": 53.57
+      },
+      "exact": {
+        "hits": 15,
+        "total": 28,
+        "accuracy": 53.57
+      }
+    },
+    "baseline_metrics": {
+      "fasil": {
+        "hits": 26,
+        "total": 29,
+        "accuracy": 89.66
+      },
+      "pozisyon": {
+        "hits": 23,
+        "total": 29,
+        "accuracy": 79.31
+      },
+      "alt_poz": {
+        "hits": 17,
+        "total": 29,
+        "accuracy": 58.62
+      },
+      "exact": {
+        "hits": 15,
+        "total": 29,
+        "accuracy": 51.72
+      }
+    }
   }
 ]

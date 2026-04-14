@@ -1,0 +1,458 @@
+{
+  "timestamp": "2026-04-14T12:26:01.246201",
+  "model": "claude-haiku-4-5-20251001",
+  "refine": false,
+  "refine_model": null,
+  "n_total": 6,
+  "n_skipped": 0,
+  "metrics": {
+    "fasil": {
+      "hits": 3,
+      "total": 6,
+      "accuracy": 50.0
+    },
+    "pozisyon": {
+      "hits": 1,
+      "total": 6,
+      "accuracy": 16.67
+    },
+    "alt_poz": {
+      "hits": 1,
+      "total": 6,
+      "accuracy": 16.67
+    },
+    "exact": {
+      "hits": 1,
+      "total": 6,
+      "accuracy": 16.67
+    }
+  },
+  "params": {
+    "note_chars": 0,
+    "gtip_rows": 120,
+    "retrieval": 50,
+    "max_tokens": 1200
+  },
+  "results": [
+    {
+      "title": "kıyafetleri sabitleyen, ayarlanabilir ve çıkarılabilir 6’lı pratik metal klips a",
+      "correct_gtip": "7117.90.00.50.00",
+      "predicted_gtip": "8308.10.00.00.11",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          15,
+          20,
+          11,
+          12,
+          8
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Ürün fonksiyonu: kıyafetleri sabitleyen ve ayarlanabilir metal klips aksesuarı. Malzeme: metal. Metal klips, giyim aksesuarı olarak adı metalden yapılmış bir sabitleyici/tutturucu alet. Adi metaller ve bunlardan mamul eşya Bolum 15'e girer. Alternatif olarak, giyim aksesuarı olarak Bolum 20 (muhtelf mamul eşya) da değerlendirilebilir.\",\n  \"aday_bolumler\": [15, 20, 11, 12, 8]\n}\n```",
+        "candidate_fasiller": [
+          62,
+          61,
+          73,
+          82,
+          83,
+          95,
+          96,
+          66
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, kıyafetleri sabitleyen ve ayarlanabilir metal klips aksesuarıdır. Metal malzemeden yapılmış giyim aksesuarı olduğu için, öncelikle giyim aksesuarları fasılları (61, 62), ardından metal eşya fasılları (73, 82, 83) ve genel aksesuarı fasılları (95, 96) değerlendirilmelidir.\",\n  \"aday_fasiller\": [62, 61, 73, 82, 83, 95, 96, 66]\n}\n```",
+        "secilen_pozisyon": "8308",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, kıyafetleri sabitleyen metal klips aksesuarıdır. Fonksiyonu giyim eşyasını tutmak/sabitleştirmektir. Fasil 62 (dokuma giyim) ve Fasil 61 (örme giyim) pozisyonları giyim eşyasının kendisini kapsar. Fasil 83 pozisyon 8308, adi metallerden kancalar, tokalar, kopçalar ve 'giyim eşyası veya aksesuarı' için kullanılan benzeri eşyaları açıkça tanımlar. Metal klips, giyim aksesuarı olarak bu tanıma tam uyar.\",\n  \"fasil\": 83,\n  \"pozisyon_kod\": \"8308\"\n}\n```",
+        "secilen_fasil": 83,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, kıyafetleri sabitleyen ve ayarlanabilen metal klips aksesuarıdır. Ana fonksiyonu giyim eşyasını tutmak ve sabitlemektir. Pozisyon 8308, adı metallerden giyim eşyası veya aksesuarı için kancalar, tokalar, kopçalar ve benzeri eşyaları kapsar. Ürün, kopça/klips türü bir tutma mekanizması olup giyim aksesuarı kategorisine girmektedir. Alternatif olarak 8308.90.00.90.00 (Diğerleri) değerlendirilebilir ancak ürün fonksiyonel bir giyim tutma aksesuarı olduğundan, kopça/klips işlevi nedeniyle 8308.10.00.00.11 (Kopçalar) daha spesifik ve uygun pozisyondur. Boncuk ve pul (8308.90.00.10.00) ürünün işlevsel tutma mekanizması ile uyuşmamaktadır.\",\n  \"guven\": \"orta\",\n  \"alternatifler\": [\n    \"8308.90.00.90.00\"\n  ],\n  \"fasil\": 83,\n  \"gtip_code\": \"8308.10.00.00.11\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2405,
+            "out": 186,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1562,
+            "out": 171,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 144,
+            "out": 226,
+            "cache_write": 12062,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 4000,
+            "out": 372,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 8111,
+            "out": 955,
+            "cache_write": 12062,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Istampa",
+      "correct_gtip": "9612.20.00.00.00",
+      "predicted_gtip": "8462.19.90.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          16,
+          15,
+          20,
+          11,
+          6
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"İstampa, tekstil kumaşına veya diğer materyallere desen/resim basma işlemi için kullanılan bir araç veya makinedir. Fonksiyonu tekstil işleme/dekorasyon amaçlıdır. Malzeme ve yapısına bağlı olarak metal/mekanik parçalardan oluşabilir. Bolum 16 (makine/mekanik cihaz), Bolum 15 (metal eşya), Bolum 20 (muhtelif mamul) veya Bolum 11 (tekstil ile ilgili) arasında değerlendirilir.\",\n  \"aday_bolumler\": [16, 15, 20, 11, 6]\n}\n```",
+        "candidate_fasiller": [
+          82,
+          84,
+          73,
+          83,
+          72,
+          74,
+          76,
+          81
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"İstampa, baskı ve damgalama işlemlerinde kullanılan bir araçtır. Metal veya başka malzemelerden yapılmış bu alet, mekanik bir cihaz olarak sınıflandırılabilir. Fasil 82 (adi metallerden aletler), Fasil 84 (mekanik cihazlar), Fasil 73 (demir/çelikten eşya) ve Fasil 83 (adi metallerden çeşitli eşya) en uygun kategorilerdir.\",\n  \"aday_fasiller\": [82, 84, 73, 83, 72, 74, 76, 81]\n}\n```",
+        "secilen_pozisyon": "8462",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"İstampa (damga), metal işleme için kullanılan bir takım tezgahı aksesuarıdır. Fasil 84'te 8462 pozisyonu 'Metalleri dövme, çekiçleme veya kalıpta dövme suretiyle işlemeye mahsus takım tezgahları (presler dahil)' kapsamında istampa/damga kalıpları yer almaktadır. İstampa, metal işleme preslerinde kullanılan değişebilir alet olup, 8207 pozisyonu 'El aletlerinin veya makinalı aletlerin değişebilen aletleri' ile de ilişkili olabilir. Ancak istampa spesifik olarak metal dövme/kalıplama işleminde kullanılan takım tezgahı aksesuarı olduğundan, 8462 pozisyonunun kapsamına daha uygun düşmektedir.\",\n  \"fasil\": 84,\n  \"pozisyon_kod\": \"8462\"\n}\n```",
+        "secilen_fasil": 84,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"İstampa (damgalama/baskı işlemi), metalleri şekillendirme ve işlemeye yönelik bir takım tezgahıdır. Pozisyon 8462 kapsamında, istampa makineleri metal dövme, kalıpta şekillendirme ve presle işleme işlemlerini gerçekleştiren ekipmanlardır. Ürün tanımında 'istampa' kelimesi, metal kalıpta dövme (kapalı kalıp dövme) veya genel pres işlemini ifade etmektedir. Numerik kontrol özelliği belirtilmediğinden, kontrol tipi bilinmeyen genel istampa makineleri için 8462.19.90.00.00 (Diğer dövme makineleri - Diğerleri) en uygun sınıflandırmadır. Alternatif olarak 8462.69.90.90.00 (Diğer presler - Diğerleri) de değerlendirilebilir, ancak 'istampa' terimi dövme işlemiyle daha yakından ilişkilidir.\",\n  \"guven\": \"orta\",\n  \"alternatifler\": [\n    \"8462.69.90.90.00\",\n    \"8462.90.90.00.19\"\n  ],\n  \"fasil\": 84,\n  \"gtip_code\": \"8462.19.90.00.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2370,
+            "out": 208,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1915,
+            "out": 194,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 110,
+            "out": 296,
+            "cache_write": 18115,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 125,
+            "out": 398,
+            "cache_write": 4771,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 4520,
+            "out": 1096,
+            "cache_write": 22886,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı altı izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3919.90.80.90.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20,
+          6,
+          15,
+          13
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Ürün fonksiyonu: kapı altından hava ve ses izolasyonu sağlayan fitil. Kendinden yapışkanlı plastik malzemeden yapılmış bir bina aksessuarı. Malzeme plastik olsa da, ürünün kullanım amacı bina/inşaat izolasyonudur. Bolum 7 (plastik mamulleri) birincil aday, Bolum 20 (muhtelf mamul eşya) ve Bolum 15 (metal/aksessuarlar) da değerlendirilmiştir.\",\n  \"aday_bolumler\": [7, 20, 6, 15, 13]\n}\n```",
+        "candidate_fasiller": [
+          39,
+          34,
+          68,
+          96,
+          83,
+          40,
+          94,
+          73
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı altı izolasyon fitili, kapı boşluklarından hava ve ses geçişini engellemek için kullanılan bir yapı malzemesidir. Ürün plastik esaslı olup, yapışkanlı bir kaplama içermektedir. Fasil seçiminde plastik mamulleri, yapışkanlı ürünler, inşaat malzemeleri ve çeşitli mamul eşya kategorileri dikkate alınmıştır.\",\n  \"aday_fasiller\": [39, 34, 68, 96, 83, 40, 94, 73]\n}\n```",
+        "secilen_pozisyon": "3919",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün kendinden yapışkanlı plastik malzemeden yapılmış, kapı altına monte edilen izolasyon fitilidir. Fonksiyonu bina/yapı elemanı olarak ısı, ses ve hava sızıntısını önlemektir. Fasil 39 pozisyon 3919'da 'kendinden yapışkan levhalar, plakalar, bantlar, şeritler, filmler, folyolar' tanımlanmaktadır. Ürün bu tanıma uygun olup, inşaat malzemesi olarak kullanılan kendinden yapışkanlı plastik ürün kategorisindedir.\",\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3919\"\n}\n```",
+        "secilen_fasil": 39,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün kendinden yapışkanlı plastik bir izolasyon fitilidir. Fasil 39 pozisyon 3919, plastiklerden kendinden yapışkan levhalar, plakalar, bantlar, şeritler ve diğer yassı şekilleri kapsar. Kapı altı izolasyon fitili, dar bir şerit/bant formunda kendinden yapışkanlı plastik malzemedir. Pozisyon 3919.10 (genişliği 20 cm'yi geçmeyen rulolar) uygun değildir çünkü fitinin genişliği tipik olarak 20 cm'yi aşmaktadır. Pozisyon 3919.90 (Diğerleri) kapsamında, ürün yüzey işleminden daha ileri işlem görmüş şerit/bant formundadır. Spesifik alt pozisyonlar (3919.90.20 - yarı iletken waferleri için pedler, 3919.90.80.30 - dijital baskı folyoları) ürüne uygun değildir. Ürün malzeme türü belirtilmediğinden, genel \\\"Diğerleri\\\" kategorisine girer.\",\n  \"guven\": \"orta\",\n  \"alternatifler\": [\n    \"3919.90.80.20.00\",\n    \"3919.90.80.10.00\"\n  ],\n  \"fasil\": 39,\n  \"gtip_code\": \"3919.90.80.90.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2386,
+            "out": 192,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1346,
+            "out": 185,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 126,
+            "out": 205,
+            "cache_write": 13125,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 4125,
+            "out": 415,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7983,
+            "out": 997,
+            "cache_write": 13125,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Nail art uygulama fırçası",
+      "correct_gtip": "9603.30.90.00.00",
+      "predicted_gtip": "8214.20.00.00.19",
+      "guven": "yuksek",
+      "metrics": {
+        "fasil": false,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          7,
+          15,
+          6,
+          12
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Nail art uygulama fırçası, kozmetik/güzellik uygulaması için kullanılan bir araçtır. Fonksiyonu makyöz ve nail art uzmanları tarafından tırnak dekorasyonu uygulamak için kullanılmaktır. Malzeme (sentetik kıl, plastik sap vb.) ne olursa olsun, ürünün amacı güzellik hizmetleri aracıdır. Bu nedenle Bolum 20 (Muhtelif Mamul Eşya) en uygun sınıflandırmadır.\",\n  \"aday_bolumler\": [20, 7, 15, 6, 12]\n}\n```",
+        "candidate_fasiller": [
+          33,
+          82,
+          83,
+          96,
+          39,
+          95,
+          94,
+          73
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Nail art uygulama fırçası, tırnak sanatı uygulaması için kullanılan bir kozmetik aracıdır. Fırça, tırnaklara dekoratif tasarımlar ve boyalar uygulamak için tasarlanmış bir makyöz/güzellik aracıdır. Bu ürün, kozmetik araçları ve güzellik ürünleri kategorisine girmektedir.\",\n  \"aday_fasiller\": [33, 82, 83, 96, 39, 95, 94, 73]\n}\n```",
+        "secilen_pozisyon": "8214",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Nail art uygulama fırçası, manikür/pedikür amaçlı kullanılan bir araçtır. Fasil 82 (El aletleri) pozisyon 8214'te 'manikür veya pedikür takımları ve aletleri' açıkça belirtilmiştir. Bu pozisyon manikür/pedikür işlemlerinde kullanılan tüm aletleri kapsar. Fasil 96 pozisyon 9603'teki fırçalar ise genel amaçlı temizlik/boyama fırçalarıdır ve manikür amaçlı değildir.\",\n  \"fasil\": 82,\n  \"pozisyon_kod\": \"8214\"\n}\n```",
+        "secilen_fasil": 82,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Nail art uygulama fırçası, manikür/pedikür işlemlerinde kullanılan bir araçtır. Pozisyon 8214 altında 821420 (Manikür ve pedikür takım ve aletleri) bu ürünü kapsamaktadır. Fırça, tırnak törpüsü gibi manikür/pedikür aletleri kategorisine girmektedir. 821410 (Kağıt bıçakları, kalemtraşlar vb.) uygun değildir çünkü kesici bıçak içermez. 821490 (Saç kesme makinaları, hayvan kırkma makinaları vb.) da uygun değildir çünkü bu kategoriler spesifik olarak tanımlanmıştır ve fırça bunlara girmez. Nail art fırçası, 821420 altındaki \\\"Diğerleri\\\" alt pozisyonunda sınıflandırılır.\",\n  \"guven\": \"yuksek\",\n  \"alternatifler\": [\"8214.90.00.90.19\"],\n  \"fasil\": 82,\n  \"gtip_code\": \"8214.20.00.00.19\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2377,
+            "out": 202,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1425,
+            "out": 165,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 117,
+            "out": 209,
+            "cache_write": 12080,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 4050,
+            "out": 335,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7969,
+            "out": 911,
+            "cache_write": 12080,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili",
+      "correct_gtip": "3925.90.80.00.00",
+      "predicted_gtip": "3919.10.19.00.00",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": false,
+        "alt_poz": false,
+        "exact": false
+      },
+      "debug": {
+        "candidate_bolumler": [
+          7,
+          20,
+          15,
+          6,
+          13
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Ürün fonksiyonu: kapı/pencere kenarlarında hava ve su sızıntısını önlemek için kullanılan izolasyon fitili. Kendinden yapışkanlı plastik malzeme olup, bina inşaatı ve bakım-onarım sektöründe kullanılır. Malzeme plastik olsa da, fonksiyonu ve kullanım amacı (bina aksesuarı/izolasyon) ön plandadır. Bolum 7 (plastik mamulleri) birincil seçenek, Bolum 20 (muhtelf mamul eşya) ve Bolum 15 (metal/yapı malzemeleri) alternatif seçeneklerdir.\",\n  \"aday_bolumler\": [7, 20, 15, 6, 13]\n}\n```",
+        "candidate_fasiller": [
+          39,
+          35,
+          68,
+          40,
+          83,
+          94,
+          96,
+          34
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Kendinden yapışkanlı plastik kapı/pencere kenar izolasyon fitili, yapısında plastik malzeme içeren ve yapıştırıcı özellikleri olan bir bina aksessuarıdır. Ürün, plastik esaslı olması nedeniyle Fasil 39'un ana kategorisine girmekte, ancak yapışkanlı özelliği ve tutkal fonksiyonu Fasil 35'i, bina/inşaat uygulaması Fasil 68'i, ve çeşitli mamul eşya kategorileri de değerlendirilmelidir.\",\n  \"aday_fasiller\": [39, 35, 68, 40, 83, 94, 96, 34]\n}\n```",
+        "secilen_pozisyon": "3919",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, plastikten yapılmış, kendinden yapışkanlı bir izolasyon fitilidir. Kapı ve pencere kenarlarında kullanılan bu ürün, plastik malzemenin kendinden yapışkan formda sunulması nedeniyle Fasil 39 kapsamındadır. Pozisyon 3919, plastiklerden kendinden yapışkan levhalar, plakalar, bantlar, şeritler, filmler, folyolar ve diğer yassı şekiller için tanımlanmıştır. Fitil, bu tanımda 'diğer yassı şekiller' olarak değerlendirilir. Pozisyon 3925 (inşaat malzemeleri) daha dar kapsamlı olup, burada ürün kendinden yapışkan plastik malzeme olarak sınıflandırılması daha uygun ve spesifiktir.\",\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3919\"\n}\n```",
+        "secilen_fasil": 39,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, kendinden yapışkanlı plastik malzemeden yapılmış bir izolasyon fitilidir. Fasil 39 Pozisyon 3919, plastiklerden kendinden yapışkan levhalar, plakalar, bantlar, şeritler ve diğer yassı şekilleri kapsar. Ürün, kapı/pencere kenarlarında kullanılan dar genişlikli bir şerit/bant formundadır. Pozisyon 3919.10 (Genişliği 20 cm'yi geçmeyen rulolar) uygun görünmektedir. Ürün malzeme türü (PVC, PE, PP vb.) belirtilmediğinden, 3919.10.19.00.00 (Diğerleri) en uygun seçimdir. Alternatif olarak 3919.90.80.90.00 (Diğerleri) değerlendirilebilir, ancak 20 cm altı genişlikte rulo halinde bir bant için 3919.10.19 daha spesifiktir.\",\n  \"guven\": \"orta\",\n  \"alternatifler\": [\n    \"3919.10.12.00.00\",\n    \"3919.10.15.00.00\",\n    \"3919.90.80.90.00\"\n  ],\n  \"fasil\": 39,\n  \"gtip_code\": \"3919.10.19.00.00\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2389,
+            "out": 233,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1349,
+            "out": 210,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 128,
+            "out": 270,
+            "cache_write": 11880,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 4128,
+            "out": 391,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 7994,
+            "out": 1104,
+            "cache_write": 11880,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    },
+    {
+      "title": "Kendinden yapışkanlı plastik kablo sabitleme klipsi",
+      "correct_gtip": "3926.90.97.90.29",
+      "predicted_gtip": "3926.90.97.90.29",
+      "guven": "orta",
+      "metrics": {
+        "fasil": true,
+        "pozisyon": true,
+        "alt_poz": true,
+        "exact": true
+      },
+      "debug": {
+        "candidate_bolumler": [
+          20,
+          16,
+          7,
+          15,
+          6
+        ],
+        "bolum_raw_response": "```json\n{\n  \"gerekce\": \"Ürün fonksiyonu: kablo sabitleme ve tutturma (mekanik bağlantı aksesuarı). Kendinden yapışkanlı plastik malzeme kullanılsa da, ürünün asıl işlevi elektrik/harita tesisatında kablo yönetimi sağlamaktır. Bu nedenle elektrik malzemeleri aksesuarı (Bolum 16) veya muhtelf mamul eşya (Bolum 20) kategorisine girer. Plastik malzeme ikincil önem taşır.\",\n  \"aday_bolumler\": [20, 16, 7, 15, 6]\n}\n```",
+        "candidate_fasiller": [
+          39,
+          85,
+          84,
+          83,
+          82,
+          73,
+          96,
+          40
+        ],
+        "fasil_raw_response": "```json\n{\n  \"gerekce\": \"Kendinden yapışkanlı plastik kablo sabitleme klipsi, elektrik kablolarını sabitlemek ve organize etmek için kullanılan bir aksesuar ürünüdür. Plastik malzemeden yapılmış olup, elektrik tesisatında ve elektronik cihazlarda kablo yönetimi için uygulanır. Ürün, plastik mamul, elektrik aksessuarı veya genel endüstriyel aksesuar olarak sınıflandırılabilir.\",\n  \"aday_fasiller\": [39, 85, 84, 83, 82, 73, 96, 40]\n}\n```",
+        "secilen_pozisyon": "3926",
+        "pozisyon_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, belirli bir işlev için tasarlanmış mamul bir plastik ürünüdür (kablo sabitleme klipsi). Kendinden yapışkanlı montaj yöntemi, ürünün sınıflandırmasını belirlemez; asıl fonksiyonu kablonun sabitlenmesidir. Fasil 39'deki 3919 pozisyonu 'kendinden yapışkan levhalar, plakalar, bantlar, şeritler, filmler, folyolar' gibi HAM MALZEME formlarını kapsar. Mamul plastik klips, kendi amacı/fonksiyonu pozisyonunda sınıflandırılmalıdır. Fasil 84'teki 8479 pozisyonu 'kendine özgü bir fonksiyonu olan makinalar ve mekanik cihazlar' için aksam ve parçaları kapsar. Fasil 39'teki 3926 pozisyonu 'Plastikten diğer eşya' olarak en uygun genel pozisyondur.\",\n  \"fasil\": 39,\n  \"pozisyon_kod\": \"3926\"\n}\n```",
+        "secilen_fasil": 39,
+        "gtip_raw_response": "```json\n{\n  \"gerekce\": \"Ürün, plastikten yapılmış bir kablo sabitleme klipsidir ve elektrik/elektronik tesisatlarda kablolama düzenlemesi için kullanılır. Fasil 39 Pozisyon 3926 'Plastikten diğer eşya' başlığı kapsamındadır. Ürünün ana fonksiyonu mekanik tutma/sabitleme olup, okul-büro malzemeleri (3926.10), eldivenleri (3926.20), mobilya bağlantı elemanları (3926.30) veya süs eşyası (3926.40) tanımlarına uymamaktadır. Cetvel listesinde kablo sabitleme klipsi için spesifik bir kod bulunmadığından, 3926.90.97.90.29 'Diğerleri' alt pozisyonu uygulanır. Bu kod, yukarıda sayılan kategorilere girmeyen plastik eşyaları kapsar.\",\n  \"guven\": \"orta\",\n  \"alternatifler\": [\n    \"3926.90.97.90.29\"\n  ],\n  \"fasil\": 39,\n  \"gtip_code\": \"3926.90.97.90.29\"\n}\n```",
+        "token_usage": {
+          "adim_0a": {
+            "in": 2384,
+            "out": 187,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_0b": {
+            "in": 1436,
+            "out": 183,
+            "cache_write": 0,
+            "cache_read": 0
+          },
+          "adim_1": {
+            "in": 124,
+            "out": 319,
+            "cache_write": 22946,
+            "cache_read": 0
+          },
+          "adim_2": {
+            "in": 141,
+            "out": 338,
+            "cache_write": 4156,
+            "cache_read": 0
+          },
+          "toplam": {
+            "in": 4085,
+            "out": 1027,
+            "cache_write": 27102,
+            "cache_read": 0
+          }
+        },
+        "token_breakdown": null
+      }
+    }
+  ]
+}
