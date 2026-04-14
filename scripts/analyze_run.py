@@ -694,21 +694,31 @@ def build_report(base_data, run_data, base_path, run_path, conn):
         if ana['run_fasiller']:
             in_run = cf2 in run_fasil_padded
             in_base = cf2 in base_fasil_padded
+            bolum_rank = (ana['run_bolumler'].index(ana['correct_bolum']) + 1
+                          if ana['correct_bolum'] in ana['run_bolumler'] else None)
+            fasil_rank = (run_fasil_padded.index(cf2) + 1 if in_run else None)
+            bolum_rank_str = (f"sıra {bolum_rank}/{len(ana['run_bolumler'])}"
+                              if bolum_rank else "❌ yok")
+            fasil_rank_str = (f"sıra {fasil_rank}/{len(run_fasil_padded)}"
+                              if fasil_rank else "❌ yok")
             a(f"- Doğru bölüm: {ana['correct_bolum']} | "
               f"Run bölüm adayları: {ana['run_bolumler']} | "
-              f"Doğru bölüm adayda: {'✅' if ana['correct_bolum'] in ana['run_bolumler'] else '❌'}")
+              f"{'✅' if bolum_rank else '❌'} {bolum_rank_str}")
             a(f"- Doğru fasıl: {ana['correct_fasil']} | "
               f"Run fasıl adayları: {ana['run_fasiller']} | "
-              f"Doğru fasıl adayda: {'✅' if in_run else '❌'}")
+              f"{'✅' if fasil_rank else '❌'} {fasil_rank_str}")
             if in_run and not in_base:
                 a(f"- ⚠️ Baseline'da yoktu, bu run'da var — ama yine de seçilmedi")
             elif in_run:
                 a(f"- ⚠️ Fasıl candidate'da var ama seçilmedi → Adım 1/2 sorunu")
         else:
             in_base = cf2 in base_fasil_padded
+            fasil_rank = (base_fasil_padded.index(cf2) + 1 if in_base else None)
+            fasil_rank_str = (f"sıra {fasil_rank}/{len(base_fasil_padded)}"
+                              if fasil_rank else "❌ yok")
             a(f"- Doğru fasıl: {ana['correct_fasil']} | "
               f"Base fasıl adayları: {ana['base_fasiller']} | "
-              f"Doğru fasıl adayda: {'✅' if in_base else '❌'}")
+              f"{'✅' if fasil_rank else '❌'} {fasil_rank_str}")
         a(f"")
 
         # c) DB tanımları
