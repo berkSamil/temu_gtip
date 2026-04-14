@@ -267,3 +267,23 @@ ANTHROPIC_API_KEY=sk-ant-...
 4. DB şemasını değiştirirsen `build_db.py --force` ile rebuild test et
 5. Yeni veri kaynağı eklerken: orijinal dosya `data/` altına, parser `build_db.py`'a, çıktı SQLite'a
 
+---
+
+## DEĞİŞİKLİK CYCLE'I (prompt kalitesi / FTS deneyleri için)
+
+Her prompt/FTS değişikliği bu döngüyü takip eder:
+
+1. **Hipotez öner** — değişikliği ve gerekçeyi açıkla, kullanıcı onayı bekle
+2. **Tek değişiklik yap** — iki değişikliği asla birleştirme
+3. **Test cycle çalıştır:**
+   ```bash
+   python3 scripts/fix_loop.py test-cycle --baseline experiments/<baseline_run>.json
+   ```
+4. **Sonuç iyi** → commit → baseline'ı yeni run'a güncelle
+5. **Sonuç kötü** → fix_loop auto-revert eder, `experiments/revert_log.json`'a kaydeder
+6. Bir sonraki değişikliğe geç (yeni session açmak zorunda değilsin ama tercih edilir)
+
+**Sabit parametreler:** `--note-chars 0 --izahname-chars 0`
+**Regresyon kararı:** tamamen `fix_loop._check_regression` verir — elle "fasıl X pp düştü" diye revert etme.
+**revert_log'daki deneyleri tekrar deneme** — başarısız kaydedilmişse nedeni vardır.
+

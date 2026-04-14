@@ -668,9 +668,10 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
                            product_details, note_max_chars, retrieval_top_n,
                            izahname_max_chars=1500, return_atoms=False):
     """Adım 1 context: fasıl notları + izahname özeti + tüm 4'lü pozisyonlar."""
+    fasils_for_context = candidate_fasils[:8]
     ranked = retrieve_ranked_gtips(
         conn, title, desc, keywords, product_details, top_n=min(retrieval_top_n, 20),
-        filter_fasils=set(candidate_fasils[:8]) if candidate_fasils else None,
+        filter_fasils=set(fasils_for_context) if fasils_for_context else None,
     )
     parts = []
     atoms = {}
@@ -681,7 +682,7 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
         parts.append(fts_blok)
         atoms['fts_bloku'] = fts_blok
 
-    for fno in candidate_fasils[:8]:
+    for fno in fasils_for_context:
         pozlar = get_all_pozisyonlar(conn, fno)
         if not pozlar:
             continue
