@@ -1027,20 +1027,14 @@ def classify_product(client, product_info, conn, opts=None):
     # ------------------------------------------------------------------
     # ADIM 1 — Pozisyon seçimi
     # ------------------------------------------------------------------
+    poz_context, poz_atoms = build_pozisyon_context(
+        conn, candidate_fasils, title, desc, keywords,
+        product_details, note_max_chars, retrieval_top_n,
+        izahname_max_chars=izahname_max_chars, return_atoms=True,
+    )
     if do_token_breakdown:
-        poz_context, poz_atoms = build_pozisyon_context(
-            conn, candidate_fasils, title, desc, keywords,
-            product_details, note_max_chars, retrieval_top_n,
-            izahname_max_chars=izahname_max_chars, return_atoms=True,
-        )
         tbd['adim_1'] = {'system_prompt': ct(pozisyon_system_prompt), 'urun_metni': ct(product_text)}
         tbd['adim_1'].update({k: ct(v) for k, v in poz_atoms.items()})
-    else:
-        poz_context = build_pozisyon_context(
-            conn, candidate_fasils, title, desc, keywords,
-            product_details, note_max_chars, retrieval_top_n,
-            izahname_max_chars=izahname_max_chars,
-        )
     poz_context_block = f"TARIFE CETVELI:\n{poz_context}"
     poz_query = (
         f"Asagidaki urun icin dogru FASIL ve 4 haneli POZISYONU sec.\n\n"
@@ -1087,6 +1081,8 @@ def classify_product(client, product_info, conn, opts=None):
             'fasil_system_prompt':   fasil_system_prompt,
             'fasil_user_msg':        fasil_user_msg if candidate_bolumler else None,
             'fasil_raw_response':    fasil_raw_response,
+            'pozisyon_adaylari':     {k: v for k, v in poz_atoms.items() if k.endswith('_pozisyonlar')},
+            'fts_bloku':             poz_atoms.get('fts_bloku'),
             'secilen_pozisyon':      pozisyon_kod,
             'pozisyon_system_prompt': pozisyon_system_prompt,
             'pozisyon_context_block': poz_context_block,
