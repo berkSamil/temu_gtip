@@ -557,14 +557,14 @@ Yanitini SADECE asagidaki JSON formatinda ver (gerekce ONCE, sonra bolumler):
 {"gerekce": "Once fonksiyon: urun ne ise yarar? Sonra bolum secimi (1-2 cumle)", "aday_bolumler": [20, 7, 11, 15, 9]}"""
 
 _FASIL_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
-Gorev: Asagidaki fasil listesinden urun icin 8 aday FASIL belirle.
+Gorev: Asagidaki fasil listesinden urun icin 5 aday FASIL belirle.
 
 {kurallar_blok}
 
 Yanitini SADECE su JSON formatinda ver (gerekce ONCE, sonra fasiller):
 {{
   "gerekce": "Once fonksiyon: urun ne ise yarar? Sonra fasil secimi (2-3 cumle)",
-  "aday_fasiller": [96, 33, 71, 39, 44, 82, 83, 95]
+  "aday_fasiller": [96, 33, 71, 39, 44]
 }}"""
 
 _POZISYON_PROMPT_BASE = """Sen deneyimli bir Turk Gumruk Tarife siniflandirma uzmanisin.
@@ -668,7 +668,7 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
                            product_details, note_max_chars, retrieval_top_n,
                            izahname_max_chars=1500, return_atoms=False):
     """Adım 1 context: fasıl notları + izahname özeti + tüm 4'lü pozisyonlar."""
-    fasils_for_context = candidate_fasils[:8]
+    fasils_for_context = candidate_fasils[:5]
     ranked = retrieve_ranked_gtips(
         conn, title, desc, keywords, product_details, top_n=min(retrieval_top_n, 20),
         filter_fasils=set(fasils_for_context) if fasils_for_context else None,
@@ -1182,7 +1182,7 @@ def classify_product(client, product_info, conn, opts=None):
                 return refined
         return out
     except Exception as e:
-        return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e)[:100], "debug": debug}
+        return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e)[:100], "debug": locals().get('debug', {})}
 
 
 def _classify_flat(client, product_info, conn, opts, candidate_fasils,
