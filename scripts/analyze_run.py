@@ -775,6 +775,11 @@ def build_report(base_data, run_data, base_path, run_path, conn):
                 a(f"")
             if ana['pozisyon_summary'] and ana['pozisyon_summary'] != '(raw response yok)':
                 a(f"**Adım 1 — Pozisyon:**")
+                a(f"")
+                a(f"Doğru pozisyon: {ana['correct_poz']}  \"{ana['correct_poz_tanim'] or '(bulunamadı)'}\"")
+                a(f"")
+                a(f"Model seçti: {ana['pred_poz']}  \"{ana['pred_poz_tanim'] or '(boş)'}\"")
+                a(f"")
                 a(f"> {ana['pozisyon_summary']}")
                 a(f"")
             if ana['gtip_summary'] and ana['gtip_summary'] != '(raw response yok)':

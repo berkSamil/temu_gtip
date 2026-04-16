@@ -36,7 +36,7 @@ from analyze_run import _match_results, _transition, _level_correct, _load_json
 # ---------------------------------------------------------------------------
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 REVERT_LOG   = os.path.join(_ROOT, 'experiments', 'revert_log.json')
-GOLD_SET     = os.path.join(_ROOT, 'data', 'gold_set_30.xlsx')
+GOLD_SET     = os.path.join(_ROOT, 'data', 'gold_set_pozisyon_33.xlsx')
 DB           = os.path.join(_ROOT, 'data', 'gtip_2026.db')
 EVAL_SCRIPT  = os.path.join(_ROOT, 'scripts', 'eval_gtip.py')
 ANALYZE_SCRIPT = os.path.join(_ROOT, 'scripts', 'analyze_run.py')
@@ -251,7 +251,7 @@ def _get_stable_items(min_runs=3):
             d = json.load(open(path, encoding='utf-8'))
         except Exception:
             continue
-        if d.get('n_total', 0) < 25:
+        if d.get('n_total', 0) < 30:
             continue
         for r in d.get('results', []):
             title = r.get('title', '')
@@ -449,7 +449,7 @@ def _do_full_eval(baseline_data, baseline_path):
     30 ürün full eval → analyze → regresyon kontrolü.
     Returns: (run_path, report_path, is_regression, reason)
     """
-    print("  Full eval çalıştırılıyor (30 ürün)...")
+    print("  Full eval çalıştırılıyor (33 ürün)...")
     run_path = _run_eval()
     if not run_path:
         return None, None, False, "eval başarısız"
@@ -583,7 +583,7 @@ def cmd_test_cycle(args):
     print(f"\n✓ {fixed}/{total_chronic} kronik ürün düzeldi — full eval başlatılıyor...")
 
     # ------------------------------------------------------------------ [2/3]
-    print(f"\n[2/3] Full eval (30 ürün)...")
+    print(f"\n[2/3] Full eval (33 ürün)...")
     print()
     full_run_path, report_path, is_regression, reason = _do_full_eval(
         baseline_data, args.baseline

@@ -110,5 +110,109 @@
         "accuracy": 51.72
       }
     }
+  },
+  {
+    "timestamp": "2026-04-16T00:28:10.620636",
+    "reason": "auto-revert: Pozisyon accuracy 10.7pp düştü (35.7% → 25.0%)",
+    "git_diff": "diff --git a/scripts/gtip_matcher.py b/scripts/gtip_matcher.py\nindex edb5ab9..24a5706 100644\n--- a/scripts/gtip_matcher.py\n+++ b/scripts/gtip_matcher.py\n@@ -669,19 +669,9 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,\n                            izahname_max_chars=1500, return_atoms=False):\n     \"\"\"Adım 1 context: fasıl notları + izahname özeti + tüm 4'lü pozisyonlar.\"\"\"\n     fasils_for_context = candidate_fasils[:5]\n-    ranked = retrieve_ranked_gtips(\n-        conn, title, desc, keywords, product_details, top_n=min(retrieval_top_n, 20),\n-        filter_fasils=set(fasils_for_context) if fasils_for_context else None,\n-    )\n     parts = []\n     atoms = {}\n \n-    if ranked:\n-        rlines = \"\\n\".join(f\"  {g[0]}  {g[1]}\" for g in ranked)\n-        fts_blok = f\"=== METNE GORE FTS REFERANS ===\\n{rlines}\"\n-        parts.append(fts_blok)\n-        atoms['fts_bloku'] = fts_blok\n-\n     for fno in fasils_for_context:\n         pozlar = get_all_pozisyonlar(conn, fno)\n         if not pozlar:\n",
+    "run_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/run_20260416_0028.json",
+    "report_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/report_20260416_0028.md",
+    "reverted": true,
+    "run_metrics": {
+      "fasil": {
+        "hits": 18,
+        "total": 28,
+        "accuracy": 64.29
+      },
+      "pozisyon": {
+        "hits": 7,
+        "total": 28,
+        "accuracy": 25.0
+      },
+      "alt_poz": {
+        "hits": 5,
+        "total": 28,
+        "accuracy": 17.86
+      },
+      "exact": {
+        "hits": 5,
+        "total": 28,
+        "accuracy": 17.86
+      }
+    },
+    "baseline_metrics": {
+      "fasil": {
+        "hits": 21,
+        "total": 28,
+        "accuracy": 75.0
+      },
+      "pozisyon": {
+        "hits": 10,
+        "total": 28,
+        "accuracy": 35.71
+      },
+      "alt_poz": {
+        "hits": 9,
+        "total": 28,
+        "accuracy": 32.14
+      },
+      "exact": {
+        "hits": 9,
+        "total": 28,
+        "accuracy": 32.14
+      }
+    }
+  },
+  {
+    "timestamp": "2026-04-16T11:56:17.547796",
+    "reason": "auto-revert: Pozisyon accuracy 6.7pp düştü (35.7% → 29.0%)",
+    "git_diff": "diff --git a/scripts/gtip_matcher.py b/scripts/gtip_matcher.py\nindex edb5ab9..7f35267 100644\n--- a/scripts/gtip_matcher.py\n+++ b/scripts/gtip_matcher.py\n@@ -677,8 +677,13 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,\n     atoms = {}\n \n     if ranked:\n-        rlines = \"\\n\".join(f\"  {g[0]}  {g[1]}\" for g in ranked)\n-        fts_blok = f\"=== METNE GORE FTS REFERANS ===\\n{rlines}\"\n+        seen_poz = {}\n+        for g in ranked:\n+            poz4 = re.sub(r'[^0-9]', '', g[0])[:4]\n+            if poz4 not in seen_poz:\n+                seen_poz[poz4] = g[1]\n+        rlines = \"\\n\".join(f\"  {p}  {t}\" for p, t in seen_poz.items())\n+        fts_blok = f\"=== METNE GORE FTS REFERANS (pozisyon) ===\\n{rlines}\"\n         parts.append(fts_blok)\n         atoms['fts_bloku'] = fts_blok\n \n",
+    "run_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/run_20260416_1156.json",
+    "report_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/report_20260416_1156.md",
+    "reverted": true,
+    "run_metrics": {
+      "fasil": {
+        "hits": 18,
+        "total": 31,
+        "accuracy": 58.06
+      },
+      "pozisyon": {
+        "hits": 9,
+        "total": 31,
+        "accuracy": 29.03
+      },
+      "alt_poz": {
+        "hits": 7,
+        "total": 31,
+        "accuracy": 22.58
+      },
+      "exact": {
+        "hits": 6,
+        "total": 31,
+        "accuracy": 19.35
+      }
+    },
+    "baseline_metrics": {
+      "fasil": {
+        "hits": 21,
+        "total": 28,
+        "accuracy": 75.0
+      },
+      "pozisyon": {
+        "hits": 10,
+        "total": 28,
+        "accuracy": 35.71
+      },
+      "alt_poz": {
+        "hits": 9,
+        "total": 28,
+        "accuracy": 32.14
+      },
+      "exact": {
+        "hits": 9,
+        "total": 28,
+        "accuracy": 32.14
+      }
+    }
   }
 ]

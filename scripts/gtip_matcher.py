@@ -599,11 +599,11 @@ POZISYON SECIMI KURALLARI:
    uygulanir. Banyo aksesuari = tuvalet esyasi kapsamindadir.
 
 5. KURAL 3a — EN OZEL TANIM ONCELIKLIDIR: Birden fazla pozisyon aday oldugunda, esyayi
-   EN OZEL sekilde tanimlayan pozisyon secilir. Bir pozisyon basligi esyanin amacini ve
-   fonksiyonunu dogrudan kapsiyorsa o "ozel"dir; yalnizca malzemeye, montaj yontemine
-   veya fiziksel forma atifta bulunuyorsa kapsam disidir ve "ozel" sayilmaz.
-   Yanlis kapsamdaki spesifik pozisyon, dogru kapsamdaki "digerleri" pozisyonundan daha
-   kotudur.
+   EN OZEL sekilde tanimlayan pozisyon secilir. "Tarifenin baska pozisyonlarinda yer almayan"
+   veya "baska yerde belirtilmemis" iceren pozisyon KALIFIKASYONU GEREGIDIR — ayni fasildaki
+   veya aday fasillardaki baska bir pozisyon bu urunu kapsiyorsa, "baska yerde belirtilmemis"
+   pozisyon gecersiz kalir. Once diger pozisyonlari kontrol et, hicbiri uymuyorsa "baska yerde
+   belirtilmemis" pozisyonu sec.
 
 Yanitini SADECE su JSON formatinda ver (gerekce ONCE, karar SONRA):
 {{
@@ -675,12 +675,6 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
     )
     parts = []
     atoms = {}
-
-    if ranked:
-        rlines = "\n".join(f"  {g[0]}  {g[1]}" for g in ranked)
-        fts_blok = f"=== METNE GORE FTS REFERANS ===\n{rlines}"
-        parts.append(fts_blok)
-        atoms['fts_bloku'] = fts_blok
 
     for fno in fasils_for_context:
         pozlar = get_all_pozisyonlar(conn, fno)
@@ -1081,9 +1075,8 @@ def classify_product(client, product_info, conn, opts=None):
             'fasil_system_prompt':   fasil_system_prompt,
             'fasil_user_msg':        fasil_user_msg if candidate_bolumler else None,
             'fasil_raw_response':    fasil_raw_response,
-            'pozisyon_adaylari':     {k: v for k, v in poz_atoms.items() if k.endswith('_pozisyonlar')},
+
             'fts_bloku':             poz_atoms.get('fts_bloku'),
-            'secilen_pozisyon':      pozisyon_kod,
             'pozisyon_system_prompt': pozisyon_system_prompt,
             'pozisyon_context_block': poz_context_block,
             'pozisyon_query':        poz_query,

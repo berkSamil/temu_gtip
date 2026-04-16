@@ -354,6 +354,22 @@ def main():
                       f"2:{_fmt(tok.get('adim_2'))}  "
                       f"| toplam {toplam.get('in',0)}in + {toplam.get('out',0)}out{cache_str}")
 
+        # Doğru ve tahmin pozisyon tanımlarını DB'den çek
+        def _poz_tanim(gtip_code):
+            if not gtip_code:
+                return ''
+            poz4 = re.sub(r'[^0-9]', '', gtip_code)[:4]
+            row_db = conn.execute(
+                "SELECT tanim FROM pozisyon WHERE kod_clean = ?", (poz4,)
+            ).fetchone()
+            return row_db[0] if row_db else ''
+
+        if dbg is not None:
+            dbg['correct_poz']       = re.sub(r'[^0-9]', '', correct)[:4]
+            dbg['correct_poz_tanim'] = _poz_tanim(correct)
+            dbg['pred_poz']          = re.sub(r'[^0-9]', '', predicted)[:4] if predicted else ''
+            dbg['pred_poz_tanim']    = _poz_tanim(predicted)
+
         results.append({
             'title':          row['title'],
             'correct_gtip':   correct,
