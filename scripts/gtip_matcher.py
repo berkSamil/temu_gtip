@@ -605,9 +605,12 @@ POZISYON SECIMI KURALLARI:
    pozisyon gecersiz kalir. Once diger pozisyonlari kontrol et, hicbiri uymuyorsa "baska yerde
    belirtilmemis" pozisyonu sec.
 
-Yanitini SADECE su JSON formatinda ver (gerekce ONCE, karar SONRA):
+Yanitini SADECE su JSON formatinda ver (degerlendirme ONCE, karar SONRA):
 {{
-  "gerekce": "Once fonksiyon analizi: urun ne ise yarar, hangi pozisyon tanimiyla ortuser? (2-3 cumle)",
+  "degerlendirme": {{
+    "8473": "Uyar: bilgisayar parcalari ve aksesuvarlari kapsaminda — urun bu tanima giriyor",
+    "8471": "Uymaz: bilgisayarin kendisi, parca degil"
+  }},
   "fasil": 84,
   "pozisyon_kod": "84.73"
 }}"""
@@ -1041,7 +1044,7 @@ def classify_product(client, product_info, conn, opts=None):
     pozisyon_raw_response = None
     usage_1 = None
     try:
-        poz_resp = _api_call_ctx_with_retry(client, model, 600, pozisyon_system_prompt,
+        poz_resp = _api_call_ctx_with_retry(client, model, 900, pozisyon_system_prompt,
                                             poz_context_block, poz_query)
         pozisyon_raw_response = poz_resp.content[0].text
         usage_1 = {'in': poz_resp.usage.input_tokens, 'out': poz_resp.usage.output_tokens,
@@ -1094,7 +1097,9 @@ def classify_product(client, product_info, conn, opts=None):
         out = _classify_flat(client, product_info, conn, opts,
                              candidate_fasils, note_max_chars,
                              gtip_rows_per_fasil, retrieval_top_n)
-        out['debug'] = _make_debug()
+        dbg = _make_debug()
+        dbg['flat_mode'] = 'adim_1_parse_fail'
+        out['debug'] = dbg
         return out
 
     fasil_no     = poz_result.get('fasil')
@@ -1105,7 +1110,9 @@ def classify_product(client, product_info, conn, opts=None):
         out = _classify_flat(client, product_info, conn, opts,
                              candidate_fasils, note_max_chars,
                              gtip_rows_per_fasil, retrieval_top_n)
-        out['debug'] = _make_debug(pozisyon_kod, fasil_no)
+        dbg = _make_debug(pozisyon_kod, fasil_no)
+        dbg['flat_mode'] = 'adim_1_pozisyon_db_yok'
+        out['debug'] = dbg
         return out
 
     # ------------------------------------------------------------------

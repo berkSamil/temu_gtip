@@ -360,9 +360,17 @@ def main():
                 return ''
             poz4 = re.sub(r'[^0-9]', '', gtip_code)[:4]
             row_db = conn.execute(
-                "SELECT tanim FROM pozisyon WHERE kod_clean = ?", (poz4,)
+                "SELECT tanim FROM pozisyon WHERE substr(kod_clean,1,4) = ? ORDER BY seviye LIMIT 1",
+                (poz4,)
             ).fetchone()
-            return row_db[0] if row_db else ''
+            if row_db:
+                return row_db[0]
+            # sentetik pozisyon: pozisyon tablosunda hiç kaydı yok, gtip'ten türet
+            g = conn.execute(
+                "SELECT tanim_hiyerarsi FROM gtip WHERE substr(gtip_clean,1,4) = ? ORDER BY gtip_code LIMIT 1",
+                (poz4,)
+            ).fetchone()
+            return g[0] if g else ''
 
         if dbg is not None:
             dbg['correct_poz']       = re.sub(r'[^0-9]', '', correct)[:4]
