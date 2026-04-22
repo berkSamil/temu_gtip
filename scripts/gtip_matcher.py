@@ -181,6 +181,33 @@ def get_izahname(conn, fasil_no, max_chars=3000):
     return row[0][:max_chars]
 
 
+def get_izahname_for_pozisyon(conn, fasil_no, poz4):
+    """Fasıl izahname metninden belirtilen 4'lü pozisyona ait bölümü tam olarak çıkarır.
+
+    poz4: '3924', '9603' gibi 4 haneli kod (noktasız).
+    Sonraki pozisyon başlığına kadar tüm metni döner (kesmez).
+    """
+    row = conn.execute(
+        "SELECT metin FROM izahname_notlari WHERE fasil_no = ?", (fasil_no,)
+    ).fetchone()
+    if not row or not row[0]:
+        return ""
+    text = row[0]
+    poz_dotted = f"{poz4[:2]}.{poz4[2:]}"
+    # Satır başından başlayan bölüm başlığını bul (inline referansları atla)
+    m = re.search(r'(?:^|\n)' + re.escape(poz_dotted) + r'[\s\-\t]', text)
+    if not m:
+        return ""
+    start = m.start()
+    # Satır başı (\n) eşleşmesinde asıl içerik bir sonraki karakterden başlar
+    if text[start] == '\n':
+        start += 1
+    # Sonraki pozisyon başlığına kadar al (satır başında XX.XX formatı)
+    m2 = re.search(r'\n\d{2}\.\d{2}[\s\-\t]', text[start + 1:])
+    end = (start + 1 + m2.start()) if m2 else len(text)
+    return text[start:end].strip()
+
+
 def get_yorum_kurallari(conn):
     """Tüm yorum kurallarını tek metin olarak döner (özet)."""
     c = conn.cursor()
@@ -910,6 +937,7 @@ def classify_product(client, product_info, conn, opts=None):
     do_refine           = bool(opts.get('refine'))
     refine_model        = opts.get('refine_model', 'claude-sonnet-4-20250514')
     refine_max_tokens   = int(opts.get('refine_max_tokens', 1200))
+    do_adim1b           = bool(opts.get('adim1b', True))   # Adım 1b izahname doğrulama
     do_token_breakdown  = bool(opts.get('token_breakdown'))
 
     title           = product_info.get('title', '')
@@ -1043,6 +1071,8 @@ def classify_product(client, product_info, conn, opts=None):
     poz_result = None
     pozisyon_raw_response = None
     usage_1 = None
+    adim1b_raw_response = None
+    usage_1b = None
     try:
         poz_resp = _api_call_ctx_with_retry(client, model, 900, pozisyon_system_prompt,
                                             poz_context_block, poz_query)
@@ -1056,11 +1086,57 @@ def classify_product(client, product_info, conn, opts=None):
     except Exception:
         pass
 
+    # ------------------------------------------------------------------
+    # ADIM 1b — İzahname doğrulaması
+    # Adım 1a'nın degerlendirme dict'indeki pozisyonlar için izahname
+    # bölümleri çekilir; model kararını gözden geçirir.
+    # ------------------------------------------------------------------
+    if do_adim1b and poz_result:
+        deger_dict = poz_result.get('degerlendirme') or {}
+        iz_bloklar = []
+        for poz_key in deger_dict:
+            poz4 = re.sub(r'[^0-9]', '', str(poz_key))[:4]
+            if len(poz4) == 4:
+                fasil_for_iz = int(poz4[:2])
+                snippet = get_izahname_for_pozisyon(conn, fasil_for_iz, poz4)
+                if snippet:
+                    iz_bloklar.append(f"[{poz_key}] İZAHNAME:\n{snippet}")
+        if iz_bloklar:
+            iz_context = "\n\n---\n\n".join(iz_bloklar)
+            adim1b_query = (
+                f"URUN BILGILERI:\n{product_text}\n\n"
+                f"Adım 1'de şu değerlendirmeyi yaptın:\n"
+                f"{json.dumps(deger_dict, ensure_ascii=False, indent=2)}\n\n"
+                f"Yukarıdaki her pozisyon için gerçek izahname bölümleri verildi.\n"
+                f"İzahname'yi esas al — önceki değerlendirmenden bağımsız olarak, "
+                f"hangi pozisyonun izahname kapsamına GERÇEKTEN girdiğini belirle.\n"
+                f"İzahname açıkça başka bir pozisyonu işaret ediyorsa önceki kararını değiştir.\n\n"
+                f"Yanitini SADECE JSON olarak ver (degerlendirme ONCE, karar SONRA)."
+            )
+            try:
+                resp1b = _api_call_ctx_with_retry(
+                    client, model, 1200, pozisyon_system_prompt,
+                    f"POZİSYON İZAHNAMELERİ:\n{iz_context}", adim1b_query,
+                )
+                adim1b_raw_response = resp1b.content[0].text
+                usage_1b = {
+                    'in': resp1b.usage.input_tokens,
+                    'out': resp1b.usage.output_tokens,
+                    'cache_write': getattr(resp1b.usage, 'cache_creation_input_tokens', 0) or 0,
+                    'cache_read':  getattr(resp1b.usage, 'cache_read_input_tokens', 0) or 0,
+                }
+                parsed_1b = extract_first_json_object(adim1b_raw_response)
+                if parsed_1b and parsed_1b.get('pozisyon_kod'):
+                    poz_result = parsed_1b
+            except Exception:
+                pass  # 1b başarısız olursa 1a sonucu korunur
+
     def _make_debug(pozisyon_kod=None, fasil_no=None, usage_2=None, tbd=tbd):
         token_log = {
             'adim_0a': usage_0a,
             'adim_0b': usage_0b,
             'adim_1':  usage_1,
+            'adim_1b': usage_1b,
             'adim_2':  usage_2,
         }
         total_in    = sum(u['in']          for u in token_log.values() if u)
@@ -1084,6 +1160,7 @@ def classify_product(client, product_info, conn, opts=None):
             'pozisyon_context_block': poz_context_block,
             'pozisyon_query':        poz_query,
             'pozisyon_raw_response': pozisyon_raw_response,
+            'adim1b_raw_response':   adim1b_raw_response,
             'secilen_fasil':         fasil_no,
             'gtip_context_block':    gtip_context_block if pozisyon_kod else None,
             'gtip_query':            gtip_query if pozisyon_kod else None,
@@ -1541,6 +1618,11 @@ def main():
         help='Ikinci gecis model id',
     )
     parser.add_argument('--refine-max-tokens', type=int, default=1200)
+    parser.add_argument(
+        '--no-adim1b',
+        action='store_true',
+        help='Adim 1b izahname dogrulama adimini atla',
+    )
     args = parser.parse_args()
 
     api_key = os.environ.get('ANTHROPIC_API_KEY', '')
@@ -1584,6 +1666,7 @@ def main():
         'refine': args.refine,
         'refine_model': args.refine_model,
         'refine_max_tokens': args.refine_max_tokens,
+        'adim1b': not args.no_adim1b,
     }
 
     products = read_scraped_excel(args.input)

@@ -580,48 +580,11 @@ def cmd_test_cycle(args):
         print(f"\n✗ Hiç iyileşme yok ({total_chronic} kronik üründe pozisyon=0). Full eval atlanıyor.")
         return
 
-    print(f"\n✓ {fixed}/{total_chronic} kronik ürün düzeldi — full eval başlatılıyor...")
-
-    # ------------------------------------------------------------------ [2/3]
-    print(f"\n[2/3] Full eval (33 ürün)...")
-    print()
-    full_run_path, report_path, is_regression, reason = _do_full_eval(
-        baseline_data, args.baseline
-    )
-
-    if full_run_path is None:
-        print("Full eval başarısız — durduruluyor.")
-        return
-
-    full_run_data = _load_json(full_run_path)
-
-    # ------------------------------------------------------------------ [3/3]
-    print(f"[3/3] Regresyon kontrolü...")
-    if is_regression:
-        print(f"\n❌ REGRESYON: {reason}")
-        print(f"   Auto-revert yapılıyor...")
-        _do_revert(
-            reason=f"auto-revert: {reason}",
-            run_path=full_run_path,
-            report_path=report_path,
-            run_data=full_run_data,
-            baseline_data=baseline_data,
-        )
-    else:
-        base_poz = baseline_data.get('metrics', {}).get('pozisyon', {}).get('accuracy', 0)
-        run_poz  = full_run_data.get('metrics', {}).get('pozisyon', {}).get('accuracy', 0)
-        diff_pp  = run_poz - base_poz
-
-        if diff_pp > 0:
-            print(f"\n✅ İyileşme: pozisyon {diff_pp:+.1f}pp  ({base_poz:.1f}% → {run_poz:.1f}%)")
-        else:
-            print(f"\n— Regresyon yok, kronik ürünlerde iyileşme ama genel pozisyon değişmedi "
-                  f"({diff_pp:+.1f}pp).")
-
-        if report_path:
-            print(f"   Rapor  : {report_path}")
-        if full_run_path:
-            print(f"   Run    : {full_run_path}")
+    print(f"\n✓ {fixed}/{total_chronic} kronik ürün düzeldi.")
+    print(f"\n─────────────────────────────────────────────────")
+    print(f"Quick-test tamamlandı. Full eval için:")
+    print(f"  python3 scripts/fix_loop.py full-eval --baseline {args.baseline}")
+    print(f"─────────────────────────────────────────────────")
 
 
 # ---------------------------------------------------------------------------

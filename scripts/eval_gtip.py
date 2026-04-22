@@ -265,6 +265,7 @@ def main():
     parser.add_argument('--izahname-chars', type=int, default=0, help='İzahname max karakter (0=kapalı)')
     parser.add_argument('--token-breakdown', action='store_true', help='Her atomun token sayısını JSON\'a yaz')
     parser.add_argument('--log-prompts',    action='store_true', help='Modele gönderilen tüm promptları JSON\'a yaz (dosya büyür)')
+    parser.add_argument('--no-adim1b',      action='store_true', help='Adım 1b izahname doğrulama adımını atla')
     args = parser.parse_args()
 
     # .env yükle
@@ -311,6 +312,7 @@ def main():
         'refine':            args.refine,
         'refine_model':      args.refine_model,
         'refine_max_tokens': args.refine_max_tokens,
+        'adim1b':            not args.no_adim1b,
     }
 
     results = []
