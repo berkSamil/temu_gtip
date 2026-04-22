@@ -641,6 +641,25 @@ Yanitini SADECE su JSON formatinda ver (degerlendirme ONCE, karar SONRA):
   "pozisyon_kod": "84.73"
 }}"""
 
+_POZISYON_1B_PROMPT = """Sen Turk Gumruk Tarife siniflandirma uzmanisin.
+Gorev: Asagida verilen aday pozisyonlar arasından urun icin en dogru olanı sec.
+
+Her pozisyon icin tanim ve izahname verilmistir.
+Her pozisyon icin tanim ve izahname'yi birlikte oku; o pozisyonun tam kapsamini anla.
+Urunun birincil kullanim amaci hangi pozisyonun kapsamina giriyorsa onu sec.
+
+SADECE verilen aday pozisyonlar arasından sec — listede olmayan pozisyon ekleme.
+
+Yanitini SADECE su JSON formatinda ver (degerlendirme ONCE, karar SONRA):
+{{
+  "degerlendirme": {{
+    "9603": "Uyar: kozmetik tatbik fircalari bu pozisyona girer",
+    "9615": "Uymaz: sac taraklari ve tokalar, urun fırça"
+  }},
+  "fasil": 96,
+  "pozisyon_kod": "96.03"
+}}"""
+
 
 def _needs_refine(cls):
     if cls.get('error') or cls.get('parse_hatasi'):
@@ -1093,25 +1112,26 @@ def classify_product(client, product_info, conn, opts=None):
             poz4 = re.sub(r'[^0-9]', '', str(poz_key))[:4]
             if len(poz4) == 4:
                 fasil_for_iz = int(poz4[:2])
+                poz_tanim_1b = _get_pozisyon_tanim(conn, fasil_for_iz, poz4)
                 snippet = get_izahname_for_pozisyon(conn, fasil_for_iz, poz4)
+                blok = f"[{poz_key}]"
+                if poz_tanim_1b:
+                    blok += f" {poz_tanim_1b}"
                 if snippet:
-                    iz_bloklar.append(f"[{poz_key}] İZAHNAME:\n{snippet}")
+                    blok += f"\nİZAHNAME:\n{snippet}"
+                if snippet or poz_tanim_1b:
+                    iz_bloklar.append(blok)
         if iz_bloklar:
             iz_context = "\n\n---\n\n".join(iz_bloklar)
             adim1b_query = (
                 f"URUN BILGILERI:\n{product_text}\n\n"
-                f"Adım 1'de şu değerlendirmeyi yaptın:\n"
-                f"{json.dumps(deger_dict, ensure_ascii=False, indent=2)}\n\n"
-                f"Yukarıdaki her pozisyon için gerçek izahname bölümleri verildi.\n"
-                f"İzahname'yi esas al — önceki değerlendirmenden bağımsız olarak, "
-                f"hangi pozisyonun izahname kapsamına GERÇEKTEN girdiğini belirle.\n"
-                f"İzahname açıkça başka bir pozisyonu işaret ediyorsa önceki kararını değiştir.\n\n"
+                f"Asagida aday pozisyonlarin tanim ve izahnameleri verildi.\n"
                 f"Yanitini SADECE JSON olarak ver (degerlendirme ONCE, karar SONRA)."
             )
             try:
                 resp1b = _api_call_ctx_with_retry(
-                    client, model, 1200, pozisyon_system_prompt,
-                    f"POZİSYON İZAHNAMELERİ:\n{iz_context}", adim1b_query,
+                    client, model, 1200, _POZISYON_1B_PROMPT,
+                    f"ADAY POZİSYONLAR:\n{iz_context}", adim1b_query,
                 )
                 adim1b_raw_response = resp1b.content[0].text
                 usage_1b = {

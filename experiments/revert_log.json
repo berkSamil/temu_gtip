@@ -214,5 +214,76 @@
         "accuracy": 32.14
       }
     }
+  },
+  {
+    "timestamp": "2026-04-22T11:08:00.000000",
+    "reason": "manuel revert: Pozisyon accuracy 44.8pp düştü (51.5% → 6.67%)",
+    "git_diff": "build_pozisyon_prompt içinde kurallar_blok=\"\" yapıldı (H-kurallar-kaldır)",
+    "run_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/run_20260422_1108.json",
+    "report_path": "",
+    "reverted": true,
+    "run_metrics": {
+      "fasil": {
+        "hits": 10,
+        "total": 15,
+        "accuracy": 66.67
+      },
+      "pozisyon": {
+        "hits": 1,
+        "total": 15,
+        "accuracy": 6.67
+      },
+      "alt_poz": {
+        "hits": 1,
+        "total": 15,
+        "accuracy": 6.67
+      },
+      "exact": {
+        "hits": 1,
+        "total": 15,
+        "accuracy": 6.67
+      }
+    },
+    "baseline_metrics": {
+      "fasil": {
+        "hits": 25,
+        "total": 33,
+        "accuracy": 75.76
+      },
+      "pozisyon": {
+        "hits": 17,
+        "total": 33,
+        "accuracy": 51.52
+      },
+      "alt_poz": {
+        "hits": 15,
+        "total": 33,
+        "accuracy": 45.45
+      },
+      "exact": {
+        "hits": 15,
+        "total": 33,
+        "accuracy": 45.45
+      }
+    }
+  },
+  {
+    "timestamp": "2026-04-22T16:00:00.000000",
+    "reason": "manuel revert: KAPSAM DEGERLENDIRME YONTEMI blogu + Kural 5 izahname kapsam modifikasyonu _POZISYON_PROMPT_BASE icinde pozisyon -4.6pp yaptı (53.1% -> 48.5%, run_20260422_1506). 1a izahname gormuyor, bu blok 1a icin anlamsiz; 1b icin ayri prompt olusturuldu.",
+    "run_path": "/Users/berksamiloglu/Desktop/temu_gtip/experiments/run_20260422_1506.json",
+    "report_path": "",
+    "reverted": true,
+    "run_metrics": {
+      "fasil": {
+        "pct": 81.8
+      },
+      "pozisyon": {
+        "pct": 48.5
+      },
+      "exact": {
+        "pct": 45.5
+      }
+    },
+    "note": "KAPSAM YONTEMİ 1a prompt revert edildi; 1b prompt ayrildi (_POZISYON_1B_PROMPT), context formati inline tanim+izahname yapildi, 1a dict yorumlari 1b query den kaldirildi."
   }
 ]
