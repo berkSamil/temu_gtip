@@ -302,8 +302,7 @@ def build_fasil_prompt(conn):
 def build_pozisyon_prompt(conn):
     if 'pozisyon' in _PROMPT_CACHE:
         return _PROMPT_CACHE['pozisyon']
-    kurallar = get_yorum_kurallari(conn)
-    blok = f"TARIFEYE ILISKIN GENEL YORUMLAMA KURALLARI:\n{kurallar}" if kurallar else ""
+    blok = ""  # kurallar_blok Adım 1'den kaldırıldı — POZISYON SECIMI KURALLARI 1-5 yeterli
     result = _POZISYON_PROMPT_BASE.format(kurallar_blok=blok)
     _PROMPT_CACHE['pozisyon'] = result
     return result
@@ -699,10 +698,6 @@ def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
                            izahname_max_chars=1500, return_atoms=False):
     """Adım 1 context: fasıl notları + izahname özeti + tüm 4'lü pozisyonlar."""
     fasils_for_context = candidate_fasils[:5]
-    ranked = retrieve_ranked_gtips(
-        conn, title, desc, keywords, product_details, top_n=min(retrieval_top_n, 20),
-        filter_fasils=set(fasils_for_context) if fasils_for_context else None,
-    )
     parts = []
     atoms = {}
 
