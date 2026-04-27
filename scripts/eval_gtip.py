@@ -266,6 +266,7 @@ def main():
     parser.add_argument('--token-breakdown', action='store_true', help='Her atomun token sayısını JSON\'a yaz')
     parser.add_argument('--log-prompts',    action='store_true', help='Modele gönderilen tüm promptları JSON\'a yaz (dosya büyür)')
     parser.add_argument('--no-adim1b',      action='store_true', help='Adım 1b izahname doğrulama adımını atla')
+    parser.add_argument('--adim1b-model',   default=None, help='Adım 1b için model (default: --model ile aynı)')
     args = parser.parse_args()
 
     # .env yükle
@@ -313,6 +314,7 @@ def main():
         'refine_model':      args.refine_model,
         'refine_max_tokens': args.refine_max_tokens,
         'adim1b':            not args.no_adim1b,
+        'adim1b_model':      args.adim1b_model or 'claude-sonnet-4-20250514',
     }
 
     results = []

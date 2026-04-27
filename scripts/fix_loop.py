@@ -146,6 +146,7 @@ def _run_eval(items_str=None):
         '--delay', '0',
         '--note-chars', '0',
         '--izahname-chars', '0',
+        '--adim1b-model', 'claude-sonnet-4-20250514',
     ]
     if items_str:
         cmd += ['--items', items_str]

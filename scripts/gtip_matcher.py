@@ -952,6 +952,7 @@ def classify_product(client, product_info, conn, opts=None):
     refine_model        = opts.get('refine_model', 'claude-sonnet-4-20250514')
     refine_max_tokens   = int(opts.get('refine_max_tokens', 1200))
     do_adim1b           = bool(opts.get('adim1b', True))   # Adım 1b izahname doğrulama
+    adim1b_model        = opts.get('adim1b_model', 'claude-sonnet-4-20250514')  # 1b sabit sonnet
     do_token_breakdown  = bool(opts.get('token_breakdown'))
 
     title           = product_info.get('title', '')
@@ -1130,7 +1131,7 @@ def classify_product(client, product_info, conn, opts=None):
             )
             try:
                 resp1b = _api_call_ctx_with_retry(
-                    client, model, 1200, _POZISYON_1B_PROMPT,
+                    client, adim1b_model, 1200, _POZISYON_1B_PROMPT,
                     f"ADAY POZİSYONLAR:\n{iz_context}", adim1b_query,
                 )
                 adim1b_raw_response = resp1b.content[0].text
@@ -1638,6 +1639,11 @@ def main():
         action='store_true',
         help='Adim 1b izahname dogrulama adimini atla',
     )
+    parser.add_argument(
+        '--adim1b-model',
+        default=None,
+        help='Adim 1b icin model (default: --model ile ayni)',
+    )
     args = parser.parse_args()
 
     api_key = os.environ.get('ANTHROPIC_API_KEY', '')
@@ -1682,6 +1688,7 @@ def main():
         'refine_model': args.refine_model,
         'refine_max_tokens': args.refine_max_tokens,
         'adim1b': not args.no_adim1b,
+        'adim1b_model': args.adim1b_model or 'claude-sonnet-4-20250514',
     }
 
     products = read_scraped_excel(args.input)
