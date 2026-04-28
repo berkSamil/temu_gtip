@@ -644,20 +644,33 @@ Yanitini SADECE su JSON formatinda ver (degerlendirme ONCE, karar SONRA):
 _POZISYON_1B_PROMPT = """Sen Turk Gumruk Tarife siniflandirma uzmanisin.
 Gorev: Asagida verilen aday pozisyonlar arasından urun icin en dogru olanı sec.
 
-Her pozisyon icin tanim ve izahname verilmistir.
-Her pozisyon icin tanim ve izahname'yi birlikte oku; o pozisyonun tam kapsamini anla.
-Urunun birincil kullanim amaci hangi pozisyonun kapsamina giriyorsa onu sec.
+Her pozisyon icin izahname verilmistir. Her pozisyonu su alanlari doldurarak degerlendir:
+- kapsam: izahnamede bu pozisyonun kapsadigi urunler ve ornekler
+- haric: haric tutulanlar, hangi urun tiplerine uygulandigi, nereye yonlendirildigi
+- eslestirme: urun izahnamedeki hangi ornek veya kategoriye benziyor
+- karar: Uyar veya Uymaz + gerekcesi
 
+Izahname yoksa kapsam/haric/eslestirme alanlarina "(izahname yok)" yaz.
 SADECE verilen aday pozisyonlar arasından sec — listede olmayan pozisyon ekleme.
 
-Yanitini SADECE su JSON formatinda ver (degerlendirme ONCE, karar SONRA):
+Yanitini SADECE su JSON formatinda ver:
 {{
   "degerlendirme": {{
-    "9603": "Uyar: kozmetik tatbik fircalari bu pozisyona girer",
-    "9615": "Uymaz: sac taraklari ve tokalar, urun fırça"
+    "9603": {{
+      "kapsam": "kozmetik tatbik fircalari, dis fircalari, boyama fircalari",
+      "haric": "sac fircalari → 9615",
+      "eslestirme": "urun kozmetik tatbik fircasi, kapsam ornegine dogrudan uyuyor",
+      "karar": "Uyar"
+    }},
+    "9615": {{
+      "kapsam": "sac taraklari, sac tokalar ve benzeri",
+      "haric": "(yok)",
+      "eslestirme": "urun firca, tarak veya toka degil",
+      "karar": "Uymaz"
+    }}
   }},
   "fasil": 96,
-  "pozisyon_kod": "96.03"
+  "pozisyon_kod": "9603"
 }}"""
 
 
@@ -1085,6 +1098,8 @@ def classify_product(client, product_info, conn, opts=None):
 
     poz_result = None
     pozisyon_raw_response = None
+    poz_parsed = None
+    parsed_1b = None
     usage_1 = None
     adim1b_raw_response = None
     usage_1b = None
@@ -1175,8 +1190,8 @@ def classify_product(client, product_info, conn, opts=None):
             'pozisyon_system_prompt': pozisyon_system_prompt,
             'pozisyon_context_block': poz_context_block,
             'pozisyon_query':        poz_query,
-            'pozisyon_raw_response': pozisyon_raw_response,
-            'adim1b_raw_response':   adim1b_raw_response,
+            'adim1a_parsed':         poz_parsed,
+            'adim1b_parsed':         parsed_1b,
             'secilen_fasil':         fasil_no,
             'gtip_context_block':    gtip_context_block if pozisyon_kod else None,
             'gtip_query':            gtip_query if pozisyon_kod else None,

@@ -28,7 +28,8 @@ yok_vakalar = []
 for r in data["results"]:
     correct = r.get("debug", {}).get("correct_poz", "")
     pred    = r.get("debug", {}).get("pred_poz", "")
-    raw     = r.get("debug", {}).get("pozisyon_raw_response", "")
+    _raw = r.get("debug", {}).get("adim1a_parsed") or r.get("debug", {}).get("pozisyon_raw_response") or ""
+    raw  = str(_raw)
     if pred and correct and pred != correct and correct not in raw:
         yok_vakalar.append({
             "title":            r.get("title", ""),

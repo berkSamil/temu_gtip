@@ -304,7 +304,7 @@ def _analyze_error(conn, base_item, run_item, run_name):
     # Raw gerekçe — tam metin (kısaltmasız)
     bolum_summary    = _raw_summary(dbg_main.get('bolum_raw_response'))
     fasil_summary    = _raw_summary(dbg_main.get('fasil_raw_response'))
-    pozisyon_summary = _raw_summary(dbg_main.get('pozisyon_raw_response'))
+    pozisyon_summary = _raw_summary(dbg_main.get('adim1a_parsed') or dbg_main.get('adim1a_raw_response') or dbg_main.get('pozisyon_raw_response'))
     gtip_summary     = _raw_summary(dbg_main.get('gtip_raw_response'))
 
     return {
