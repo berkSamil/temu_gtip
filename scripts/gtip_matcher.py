@@ -603,6 +603,7 @@ Verilen fasil notlari, izahname ve pozisyon listesine gore en uygun pozisyonu se
 - Fasil notu ve izahname dahil/haric hukumlerini aynen uygula.
 - En ozel pozisyonu sec; "Digerleri"ni son care olarak kullan.
 - Listede olmayan pozisyon uydurma.
+- Degerlendirme dict'ine EN AZ 5 pozisyon yaz (uyar veya uymaz).
 
 POZISYON SECIMI KURALLARI:
 1. MONTAJ YONTEMI SINIF DEGILDIR: Urunun montaj bicimi (kendinden yapiskanlı, vidalı,
@@ -652,6 +653,7 @@ Her pozisyon icin izahname verilmistir. Her pozisyonu su alanlari doldurarak deg
 
 Izahname yoksa kapsam/haric/eslestirme alanlarina "(izahname yok)" yaz.
 SADECE verilen aday pozisyonlar arasından sec — listede olmayan pozisyon ekleme.
+Siniflandirmani iyilestirecek herhangi bir sorun varsa "soru" alanina yaz.
 
 Yanitini SADECE su JSON formatinda ver:
 {{
@@ -670,7 +672,8 @@ Yanitini SADECE su JSON formatinda ver:
     }}
   }},
   "fasil": 96,
-  "pozisyon_kod": "9603"
+  "pozisyon_kod": "9603",
+  "soru": ""
 }}"""
 
 
@@ -1276,6 +1279,7 @@ def classify_product(client, product_info, conn, opts=None):
         out.pop('parse_hatasi', None)
         debug = _make_debug(pozisyon_kod, fasil_no, usage_2)
         out['debug'] = debug
+        out['soru'] = (parsed_1b.get('soru') or '') if parsed_1b else ''
         if do_refine and _needs_refine(out):
             refined = run_step2(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)
             refined.pop('parse_hatasi', None)
@@ -1283,6 +1287,7 @@ def classify_product(client, product_info, conn, opts=None):
                     and gtip_exists(conn, refined['gtip_code'])):
                 refined['gerekce'] = ('[Ikinci gecis] ' + str(refined.get('gerekce', '')))[:2500]
                 refined['debug'] = debug
+                refined['soru'] = out.get('soru', '')
                 return refined
         return out
     except Exception as e:

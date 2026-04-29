@@ -156,7 +156,7 @@ def write_eval_excel(path, results):
     headers = [
         'title', 'correct_gtip', 'predicted_gtip', 'guven',
         'fasil_ok', 'pozisyon_ok', 'alt_poz_ok', 'exact_ok',
-        'gerekce', 'alternatifler', 'error'
+        'gerekce', 'soru', 'alternatifler', 'error'
     ]
     ws.append(headers)
 
@@ -176,6 +176,7 @@ def write_eval_excel(path, results):
             fmt(m['alt_poz']),
             fmt(m['exact']),
             r['gerekce'][:300] if r['gerekce'] else '',
+            r.get('soru', ''),
             ', '.join(r.get('alternatifler') or []),
             r.get('error', ''),
         ])
@@ -224,6 +225,7 @@ def _build_result_entry(r, log_prompts=False):
         'correct_gtip':   r['correct_gtip'],
         'predicted_gtip': r['predicted_gtip'],
         'guven':          r['guven'],
+        'soru':           r.get('soru', ''),
         'metrics':        r['metrics'],
         'debug':          dbg,
     }
@@ -328,14 +330,26 @@ def main():
         correct   = row['correct_gtip']
         metrics   = compute_metrics(correct, predicted)
 
+        # 1b Uyar kontrolü: doğru pozisyon 1b degerlendirme dict'inde "Uyar" olarak geçti mi?
+        adim1b_parsed = cls.get('debug', {}).get('adim1b_parsed') or {}
+        deger_dict    = adim1b_parsed.get('degerlendirme') or {}
+        correct_poz4  = re.sub(r'[^0-9]', '', correct)[:4] if correct else ''
+        if deger_dict and correct_poz4:
+            entry = deger_dict.get(correct_poz4) or {}
+            karar = (entry.get('karar') or '').strip()
+            metrics['pozisyon_1b_uyar'] = karar == 'Uyar'
+        else:
+            metrics['pozisyon_1b_uyar'] = None
+
         fasil_sym = '✓' if metrics['fasil']    else ('?' if metrics['fasil']    is None else '✗')
         poz_sym   = '✓' if metrics['pozisyon'] else ('?' if metrics['pozisyon'] is None else '✗')
         alt_sym   = '✓' if metrics['alt_poz']  else ('?' if metrics['alt_poz']  is None else '✗')
         ex_sym    = '✓' if metrics['exact']     else ('?' if metrics['exact']    is None else '✗')
+        uyar_sym  = '✓' if metrics['pozisyon_1b_uyar'] else ('?' if metrics['pozisyon_1b_uyar'] is None else '✗')
 
         print(f"         Doğru: {correct}  |  Tahmin: {predicted or '(boş)'}  |  "
               f"Fasıl:{fasil_sym} Poz:{poz_sym} AltPoz:{alt_sym} Exact:{ex_sym}  "
-              f"[{cls.get('guven', '?')}]")
+              f"1b:{uyar_sym}  [{cls.get('guven', '?')}]")
 
         dbg = cls.get('debug', {})
         if dbg:
@@ -343,8 +357,10 @@ def main():
             fasiller = dbg.get('candidate_fasiller') or []
             pozisyon = dbg.get('secilen_pozisyon') or '-'
             gtip_out = predicted or '-'
+            soru_out = cls.get('soru', '') or ''
+            soru_str = f"\n         SORU: {soru_out}" if soru_out else ''
             print(f"         Bölümler: {bolumler} → Fasıllar: {fasiller} "
-                  f"→ Pozisyon: {pozisyon} → GTİP: {gtip_out}")
+                  f"→ Pozisyon: {pozisyon} → GTİP: {gtip_out}{soru_str}")
             tok = dbg.get('token_usage', {})
             if tok:
                 def _fmt(u): return f"{u['in']}+{u['out']}" if u else '-'
@@ -388,6 +404,7 @@ def main():
             'predicted_gtip': predicted,
             'guven':          cls.get('guven', ''),
             'gerekce':        cls.get('gerekce', ''),
+            'soru':           cls.get('soru', ''),
             'alternatifler':  cls.get('alternatifler', []),
             'error':          cls.get('error', ''),
             'metrics':        metrics,
@@ -408,16 +425,18 @@ def main():
         denom = sum(1 for r in results if r['metrics'].get(key) is not None)
         return hits, denom, (hits / denom * 100 if denom else 0.0)
 
-    f_h, f_d, f_acc   = pct('fasil')
-    p_h, p_d, p_acc   = pct('pozisyon')
-    a_h, a_d, a_acc   = pct('alt_poz')
-    e_h, e_d, e_acc   = pct('exact')
+    f_h, f_d, f_acc     = pct('fasil')
+    p_h, p_d, p_acc     = pct('pozisyon')
+    a_h, a_d, a_acc     = pct('alt_poz')
+    e_h, e_d, e_acc     = pct('exact')
+    p1b_h, p1b_d, p1b_acc = pct('pozisyon_1b_uyar')
 
     print(f"\n{'='*55}")
     print(f"EVAL SONUÇLARI  ({n} ürün, {skipped} boş tahmin)")
     print(f"{'='*55}")
     print(f"  Fasıl    (2 hane): {f_h:3d}/{f_d}  —  {f_acc:5.1f}%")
     print(f"  Pozisyon (4 hane): {p_h:3d}/{p_d}  —  {p_acc:5.1f}%")
+    print(f"  Poz 1b Uyar      : {p1b_h:3d}/{p1b_d}  —  {p1b_acc:5.1f}%  (1b doğru pozu Uyar dedi)")
     print(f"  Alt poz  (6 hane): {a_h:3d}/{a_d}  —  {a_acc:5.1f}%")
     print(f"  Exact   (12 hane): {e_h:3d}/{e_d}  —  {e_acc:5.1f}%")
     print(f"{'='*55}")
@@ -459,10 +478,11 @@ def main():
         'n_total':    n,
         'n_skipped':  skipped,
         'metrics': {
-            'fasil':    {'hits': f_h, 'total': f_d, 'accuracy': round(f_acc, 2)},
-            'pozisyon': {'hits': p_h, 'total': p_d, 'accuracy': round(p_acc, 2)},
-            'alt_poz':  {'hits': a_h, 'total': a_d, 'accuracy': round(a_acc, 2)},
-            'exact':    {'hits': e_h, 'total': e_d, 'accuracy': round(e_acc, 2)},
+            'fasil':            {'hits': f_h,   'total': f_d,   'accuracy': round(f_acc,   2)},
+            'pozisyon':         {'hits': p_h,   'total': p_d,   'accuracy': round(p_acc,   2)},
+            'pozisyon_1b_uyar': {'hits': p1b_h, 'total': p1b_d, 'accuracy': round(p1b_acc, 2)},
+            'alt_poz':          {'hits': a_h,   'total': a_d,   'accuracy': round(a_acc,   2)},
+            'exact':            {'hits': e_h,   'total': e_d,   'accuracy': round(e_acc,   2)},
         },
         'params': {
             'note_chars':  args.note_chars,
