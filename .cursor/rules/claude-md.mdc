@@ -1,9 +1,0 @@
----
-description: GTİP sınıflandırma projesi bağlamı
-globs: []
-alwaysApply: true
----
-
-Her oturumda önce depo kökündeki `CLAUDE.md` dosyasını oku ve içindeki mimari, veri akışı, şema, bilinen sorunlar ve çalışma kurallarını uygula.
-
-Kod veya veri değişikliği yapmadan önce `CLAUDE.md` ile çelişme; orada “dokunma” denen dosyalara ve test / rebuild beklentilerine uy. Proje bağlamı (gtip_matcher, build_db, `data/`, SQLite şeması) için ayrıntı `CLAUDE.md` içindedir — tekrar etmek yerine oraya dayan.
