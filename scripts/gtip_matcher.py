@@ -893,32 +893,8 @@ def _call_classify(client, model, max_tokens, system_prompt, user_msg):
     )
 
 
-def _call_classify_ctx(client, model, max_tokens, system_prompt, context_text, query_text):
-    """
-    Prompt caching ile API çağrısı: context_text ayrı bir content block olarak
-    cache_control ile işaretlenir. Aynı context (aynı pozisyon/fasıl) ile yapılan
-    sonraki çağrılarda cache_read_input_tokens artar.
-    Minimum 2048 token altındaysa API cache_control'ü sessizce görmezden gelir.
-    """
-    return client.messages.create(
-        model=model,
-        max_tokens=max_tokens,
-        temperature=0,
-        system=system_prompt,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "text", "text": context_text,
-                 "cache_control": {"type": "ephemeral"}},
-                {"type": "text", "text": query_text},
-            ]
-        }],
-        extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"},
-    )
-
-
 def _api_call_with_retry(client, model, max_tokens, system_prompt, user_msg):
-    """Rate limit retry mantığıyla API çağrısı yapar (kısa mesajlar için)."""
+    """Rate limit retry mantığıyla API çağrısı yapar."""
     try:
         return _call_classify(client, model, max_tokens, system_prompt, user_msg)
     except anthropic.RateLimitError:
@@ -933,18 +909,9 @@ def _api_call_with_retry(client, model, max_tokens, system_prompt, user_msg):
 
 
 def _api_call_ctx_with_retry(client, model, max_tokens, system_prompt, context_text, query_text):
-    """Rate limit retry mantığıyla context-cached API çağrısı."""
-    try:
-        return _call_classify_ctx(client, model, max_tokens, system_prompt, context_text, query_text)
-    except anthropic.RateLimitError:
-        for wait in [30, 60]:
-            print(f"\n    Rate limit, {wait}s bekleniyor...", end="", flush=True)
-            time.sleep(wait)
-            try:
-                return _call_classify_ctx(client, model, max_tokens, system_prompt, context_text, query_text)
-            except anthropic.RateLimitError:
-                continue
-        raise
+    """Rate limit retry mantığıyla API çağrısı (context + query birleştirilir)."""
+    return _api_call_with_retry(client, model, max_tokens, system_prompt,
+                                context_text + "\n\n" + query_text)
 
 
 def classify_product(client, product_info, conn, opts=None):
