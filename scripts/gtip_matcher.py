@@ -893,6 +893,22 @@ def _call_classify(client, model, max_tokens, system_prompt, user_msg):
     )
 
 
+def _extract_text_and_reasoning(response):
+    """response.content'ten (text, reasoning) çifti döndürür.
+    DeepSeek thinking mode'da ThinkingBlock + TextBlock olarak gelir."""
+    text = ''
+    reasoning = ''
+    for block in (response.content or []):
+        btype = getattr(block, 'type', None)
+        if btype == 'thinking':
+            reasoning = getattr(block, 'thinking', '') or ''
+        elif btype == 'text':
+            text = getattr(block, 'text', '') or ''
+        elif not text:
+            text = getattr(block, 'text', '') or ''
+    return text, reasoning
+
+
 def _api_call_with_retry(client, model, max_tokens, system_prompt, user_msg):
     """Rate limit retry mantığıyla API çağrısı yapar."""
     try:
@@ -925,7 +941,8 @@ def classify_product(client, product_info, conn, opts=None):
           refine, refine_model, refine_max_tokens
     """
     opts = opts or {}
-    model               = opts.get('model', 'claude-haiku-4-5-20251001')
+    _is_ds              = opts.get('provider') == 'deepseek'
+    model               = opts.get('model')        or ('deepseek-v4-flash' if _is_ds else 'claude-haiku-4-5-20251001')
     max_tokens          = int(opts.get('max_tokens', 1200))
     note_max_chars      = int(opts.get('note_max_chars', 0))
     izahname_max_chars  = int(opts.get('izahname_max_chars', 0))
@@ -935,8 +952,9 @@ def classify_product(client, product_info, conn, opts=None):
     refine_model        = opts.get('refine_model', 'claude-sonnet-4-20250514')
     refine_max_tokens   = int(opts.get('refine_max_tokens', 1200))
     do_adim1b           = bool(opts.get('adim1b', True))   # Adım 1b izahname doğrulama
-    adim1b_model        = opts.get('adim1b_model', 'claude-sonnet-4-20250514')  # 1b sabit sonnet
+    adim1b_model        = opts.get('adim1b_model') or ('deepseek-v4-pro' if _is_ds else 'claude-sonnet-4-20250514')
     do_token_breakdown  = bool(opts.get('token_breakdown'))
+    do_adim2            = bool(opts.get('adim2', False))
 
     title           = product_info.get('title', '')
     desc            = product_info.get('description', '')
@@ -983,10 +1001,11 @@ def classify_product(client, product_info, conn, opts=None):
 
     candidate_bolumler = []
     bolum_raw_response = None
+    reasoning_0a = None
     usage_0a = None
     try:
         bolum_resp = _api_call_with_retry(client, model, 400, bolum_system_prompt, bolum_user_msg)
-        bolum_raw_response = bolum_resp.content[0].text
+        bolum_raw_response, reasoning_0a = _extract_text_and_reasoning(bolum_resp)
         usage_0a = {'in': bolum_resp.usage.input_tokens, 'out': bolum_resp.usage.output_tokens,
                     'cache_write': getattr(bolum_resp.usage, 'cache_creation_input_tokens', 0) or 0,
                     'cache_read':  getattr(bolum_resp.usage, 'cache_read_input_tokens', 0) or 0}
@@ -1006,6 +1025,7 @@ def classify_product(client, product_info, conn, opts=None):
     # ------------------------------------------------------------------
     candidate_fasils = []
     fasil_raw_response = None
+    reasoning_0b = None
     fasil_user_msg = None
     usage_0b = None
     gtip_context_block = None
@@ -1028,7 +1048,7 @@ def classify_product(client, product_info, conn, opts=None):
         )
         try:
             fasil_resp = _api_call_with_retry(client, model, 400, fasil_system_prompt, fasil_user_msg)
-            fasil_raw_response = fasil_resp.content[0].text
+            fasil_raw_response, reasoning_0b = _extract_text_and_reasoning(fasil_resp)
             usage_0b = {'in': fasil_resp.usage.input_tokens, 'out': fasil_resp.usage.output_tokens,
                         'cache_write': getattr(fasil_resp.usage, 'cache_creation_input_tokens', 0) or 0,
                         'cache_read':  getattr(fasil_resp.usage, 'cache_read_input_tokens', 0) or 0}
@@ -1068,15 +1088,17 @@ def classify_product(client, product_info, conn, opts=None):
 
     poz_result = None
     pozisyon_raw_response = None
+    reasoning_1a = None
     poz_parsed = None
     parsed_1b = None
     usage_1 = None
     adim1b_raw_response = None
+    reasoning_1b = None
     usage_1b = None
     try:
         poz_resp = _api_call_ctx_with_retry(client, model, 900, pozisyon_system_prompt,
                                             poz_context_block, poz_query)
-        pozisyon_raw_response = poz_resp.content[0].text
+        pozisyon_raw_response, reasoning_1a = _extract_text_and_reasoning(poz_resp)
         usage_1 = {'in': poz_resp.usage.input_tokens, 'out': poz_resp.usage.output_tokens,
                    'cache_write': getattr(poz_resp.usage, 'cache_creation_input_tokens', 0) or 0,
                    'cache_read':  getattr(poz_resp.usage, 'cache_read_input_tokens', 0) or 0}
@@ -1115,11 +1137,12 @@ def classify_product(client, product_info, conn, opts=None):
                 f"Yanitini SADECE JSON olarak ver (degerlendirme ONCE, karar SONRA)."
             )
             try:
+                adim1b_max_tokens = 8000 if _is_ds else 1200
                 resp1b = _api_call_ctx_with_retry(
-                    client, adim1b_model, 1200, _POZISYON_1B_PROMPT,
+                    client, adim1b_model, adim1b_max_tokens, _POZISYON_1B_PROMPT,
                     f"ADAY POZİSYONLAR:\n{iz_context}", adim1b_query,
                 )
-                adim1b_raw_response = resp1b.content[0].text
+                adim1b_raw_response, reasoning_1b = _extract_text_and_reasoning(resp1b)
                 usage_1b = {
                     'in': resp1b.usage.input_tokens,
                     'out': resp1b.usage.output_tokens,
@@ -1162,10 +1185,15 @@ def classify_product(client, product_info, conn, opts=None):
             'pozisyon_query':        poz_query,
             'adim1a_parsed':         poz_parsed,
             'adim1b_parsed':         parsed_1b,
+            'secilen_pozisyon':      pozisyon_kod,
             'secilen_fasil':         fasil_no,
             'gtip_context_block':    gtip_context_block if pozisyon_kod else None,
             'gtip_query':            gtip_query if pozisyon_kod else None,
             'gtip_raw_response':     gtip_raw_response if pozisyon_kod else None,
+            'reasoning_0a':          reasoning_0a,
+            'reasoning_0b':          reasoning_0b,
+            'reasoning_1a':          reasoning_1a,
+            'reasoning_1b':          reasoning_1b,
             'token_usage':           token_log,
             'token_breakdown':       tbd if tbd else None,
         }
@@ -1191,6 +1219,41 @@ def classify_product(client, product_info, conn, opts=None):
         dbg = _make_debug(pozisyon_kod, fasil_no)
         dbg['flat_mode'] = 'adim_1_pozisyon_db_yok'
         out['debug'] = dbg
+        return out
+
+    # ------------------------------------------------------------------
+    # Adım 2 kapalıysa pozisyon sonucunu doğrudan döndür
+    # ------------------------------------------------------------------
+    if not do_adim2:
+        poz4_clean = re.sub(r'[^0-9]', '', pozisyon_kod)[:4]
+        src = parsed_1b or poz_result or {}
+        deger = src.get('degerlendirme') or {}
+        gerekce_parts = []
+        for k, v in deger.items():
+            if isinstance(v, dict):
+                karar = (v.get('karar') or '').strip()
+                eslestirme = (v.get('eslestirme') or '').strip()
+                gerekce_parts.append(f"[{k}] {karar}: {eslestirme}")
+            elif v:
+                gerekce_parts.append(f"[{k}] {v}")
+        gerekce = ' | '.join(gerekce_parts)
+        if parsed_1b:
+            uyar_count = sum(
+                1 for v in (parsed_1b.get('degerlendirme') or {}).values()
+                if isinstance(v, dict) and (v.get('karar') or '').strip() == 'Uyar'
+            )
+            guven = 'yuksek' if uyar_count == 1 else ('orta' if uyar_count > 1 else 'dusuk')
+        else:
+            guven = 'orta'
+        out = {
+            'gtip_code':    poz4_clean,
+            'fasil':        fasil_no,
+            'gerekce':      gerekce[:2500],
+            'guven':        guven,
+            'alternatifler': [],
+            'soru':         (parsed_1b.get('soru') or '') if parsed_1b else '',
+        }
+        out['debug'] = _make_debug(pozisyon_kod, fasil_no)
         return out
 
     # ------------------------------------------------------------------
@@ -1228,7 +1291,8 @@ def classify_product(client, product_info, conn, opts=None):
         usage = {'in': resp.usage.input_tokens, 'out': resp.usage.output_tokens,
                  'cache_write': getattr(resp.usage, 'cache_creation_input_tokens', 0) or 0,
                  'cache_read':  getattr(resp.usage, 'cache_read_input_tokens', 0) or 0}
-        text = resp.content[0].text.strip()
+        text, _ = _extract_text_and_reasoning(resp)
+        text = text.strip()
         parsed = extract_first_json_object(text)
         if parsed is None:
             result = {"gtip_code": "", "gerekce": text[:300], "guven": "dusuk",
@@ -1291,7 +1355,8 @@ def _classify_flat(client, product_info, conn, opts, candidate_fasils,
 
     def run_once(sys_p, mdl, mtok):
         resp = _api_call_with_retry(client, mdl, mtok, sys_p, user_msg)
-        text = resp.content[0].text.strip()
+        text, _ = _extract_text_and_reasoning(resp)
+        text = text.strip()
         parsed = extract_first_json_object(text)
         if parsed is None:
             return {"gtip_code": "", "gerekce": text[:300], "guven": "dusuk",
@@ -1578,8 +1643,14 @@ def main():
     parser.add_argument('--delay', type=float, default=0.5, help='API istekleri arasi bekleme (saniye)')
     parser.add_argument(
         '--model',
-        default='claude-haiku-4-5-20251001',
-        help='Ilk gecis Claude model id',
+        default=None,
+        help='Model id (varsayılan: provider\'a göre otomatik seçilir)',
+    )
+    parser.add_argument(
+        '--provider',
+        default='deepseek',
+        choices=['anthropic', 'deepseek'],
+        help='API provider (default: deepseek)',
     )
     parser.add_argument('--max-tokens', type=int, default=1200, help='Ilk gecis max_tokens')
     parser.add_argument(
@@ -1622,6 +1693,11 @@ def main():
     )
     parser.add_argument('--refine-max-tokens', type=int, default=1200)
     parser.add_argument(
+        '--adim2',
+        action='store_true',
+        help='Adım 2 GTİP seçimini etkinleştir (varsayılan: kapalı, 4 haneli pozisyon döner)',
+    )
+    parser.add_argument(
         '--no-adim1b',
         action='store_true',
         help='Adim 1b izahname dogrulama adimini atla',
@@ -1633,19 +1709,15 @@ def main():
     )
     args = parser.parse_args()
 
-    api_key = os.environ.get('ANTHROPIC_API_KEY', '')
-    if not api_key:
-        env_file = os.path.join(os.path.dirname(__file__), '..', '.env')
-        if os.path.exists(env_file):
-            with open(env_file) as f:
-                for line in f:
-                    if line.strip().startswith('ANTHROPIC_API_KEY='):
-                        api_key = line.strip().split('=', 1)[1].strip().strip('"').strip("'")
-
-    if not api_key:
-        print("Hata: ANTHROPIC_API_KEY bulunamadi.")
-        print("  .env dosyasina ANTHROPIC_API_KEY=sk-ant-... yazin")
-        sys.exit(1)
+    # .env dosyasını yükle (tüm anahtarlar)
+    env_file = os.path.join(os.path.dirname(__file__), '..', '.env')
+    if os.path.exists(env_file):
+        with open(env_file) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
     if not os.path.isfile(args.input):
         print(f"Hata: {args.input} bulunamadi")
@@ -1662,20 +1734,39 @@ def main():
     os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
 
     conn = sqlite3.connect(args.db)
-    client = anthropic.Anthropic(api_key=api_key)
+
+    _is_ds = args.provider == 'deepseek'
+    if _is_ds:
+        ds_key = os.environ.get('DEEPSEEK_API_KEY', '')
+        if not ds_key:
+            print("Hata: DEEPSEEK_API_KEY bulunamadi (.env veya ortam degiskeni)")
+            sys.exit(1)
+        client = anthropic.Anthropic(
+            base_url='https://api.deepseek.com/anthropic',
+            api_key=ds_key,
+        )
+    else:
+        api_key = os.environ.get('ANTHROPIC_API_KEY', '')
+        if not api_key:
+            print("Hata: ANTHROPIC_API_KEY bulunamadi.")
+            print("  .env dosyasina ANTHROPIC_API_KEY=sk-ant-... yazin")
+            sys.exit(1)
+        client = anthropic.Anthropic(api_key=api_key)
 
     classify_opts = {
-        'model': args.model,
-        'max_tokens': args.max_tokens,
-        'note_max_chars': args.note_chars,
+        'model':             args.model or ('deepseek-v4-flash' if _is_ds else 'claude-haiku-4-5-20251001'),
+        'max_tokens':        args.max_tokens,
+        'note_max_chars':    args.note_chars,
         'izahname_max_chars': args.izahname_chars,
         'gtip_rows_per_fasil': args.gtip_rows,
-        'retrieval_top_n': args.retrieval,
-        'refine': args.refine,
-        'refine_model': args.refine_model,
+        'retrieval_top_n':   args.retrieval,
+        'refine':            args.refine,
+        'refine_model':      args.refine_model,
         'refine_max_tokens': args.refine_max_tokens,
-        'adim1b': not args.no_adim1b,
-        'adim1b_model': args.adim1b_model or 'claude-sonnet-4-20250514',
+        'adim1b':            not args.no_adim1b,
+        'adim1b_model':      args.adim1b_model or ('deepseek-v4-pro' if _is_ds else 'claude-sonnet-4-20250514'),
+        'adim2':             args.adim2,
+        'provider':          args.provider,
     }
 
     products = read_scraped_excel(args.input)

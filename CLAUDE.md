@@ -14,7 +14,7 @@ Bu dosya Cursor ve Claude Code için ortak bağlam kaynağıdır. Her session ba
 **Sayısal durum (güncel):**
 - DB: 15,718 GTİP, 3,986 pozisyon, 96 fasıl notu, 97 izahname, 6 yorum kuralı, 99 bölüm-fasıl kaydı
 - Input: herhangi bir Excel (TEMU manifest, elle giriş, başka kaynak)
-- Model: claude-haiku-4-5 varsayılan, --refine ile sonnet ikinci geçiş
+- Model: deepseek-v4-flash varsayılan (--provider deepseek), anthropic için claude-haiku-4-5
 
 ---
 
@@ -31,20 +31,20 @@ INPUT (herhangi bir Excel — Temu manifest, elle giriş, başka kaynak)
   [ADIM 0b] FASIL SEÇİMİ (seçilen bölümlerin fasılları → 8 aday fasıl)
       Adım 0a başarısız olursa FTS fallback devreye girer. (max_tokens=400)
        ↓
-  [ADIM 1] POZİSYON SEÇİMİ (4'lü pozisyon)
+  [ADIM 1a] POZİSYON SEÇİMİ (4'lü pozisyon)
       Her aday fasıl için: fasıl notu + izahname özeti + tüm 4'lü pozisyonlar
-      FTS ranked bloku da eklenir.
       Model fasıl + 4'lü pozisyon kodu seçer.
        ↓
-  [ADIM 2] GTİP SEÇİMİ (12 haneli)
+  [ADIM 1b] POZİSYON DOĞRULAMA (reasoning model)
+      Aday pozisyonlar için izahname karşılaştırması. JSON: kapsam/haric/eslestirme/karar
+      deepseek-v4-pro (reasoning), max_tokens=8000
+       ↓
+  ► ÇIKIŞ: 4 haneli pozisyon kodu (varsayılan)
+      Pipeline burada durur. gtip_code = 4 haneli pozisyon.
+       ↓  (sadece --adim2 flag ile)
+  [ADIM 2] GTİP SEÇİMİ (12 haneli) — VARSAYILAN KAPALI
       Seçilen pozisyon altındaki TÜM 12'li GTİP'ler + fasıl notu + izahname
       Yorum kuralları system prompt'a gömülü.
-      Model 12 haneli GTİP kodu seçer.
-      → guven düşük/orta + --refine → sonnet ile 2. geçiş
-       ↓
-  DOĞRULAMA
-      normalize_gtip_code() → format düzelt
-      gtip_exists() → DB'de var mı? Yoksa alternatiflerden dene.
        ↓
   OUTPUT: _classified.xlsx + _classified.html
 ```
@@ -84,20 +84,7 @@ build_db.py sağlık durumu (son kontrol):
 
 ## UZUN VADELİ EVRİM
 
-```
-  Faz 1 (ATLANDI): Claude API, izahname yok, flat sınıflandırma
-  ► Faz 2 (BÜYÜK ÖLÇÜDE TAMAMLANDI):
-       ✅ İzahname + yorum kuralları + içindekiler entegre
-       ✅ Hiyerarşik daralma (0a → 0b → 1 → 2)
-       ✅ Prompt caching
-       ✅ eval_gtip.py
-       ⏳ Prompt kalitesi iyileştirme (fasıl aday sayısı optimizasyonu devam ediyor)
-       ⏳ Few-shot örnekler (classifications.db henüz yok)
-       ⏳ Görsel entegrasyon (image_url → base64 → Claude, materyal tespiti için)
-  Faz 3: Yeterli veri (1000+) → fine-tuned fasıl seçim modeli
-         Claude sadece edge case fallback
-  Faz 4: Tamamen local model, Claude API bağımlılığı sıfır
-```
+Aktif hipotezler ve yol haritası → memory'de.
 
 ---
 
@@ -184,16 +171,16 @@ DB'de olmayan kod geçersizdir — `sanitize_classification()` filtreler.
 python scripts/gtip_matcher.py input.xlsx \
   --db data/gtip_2026.db \              # DB yolu
   -o output/classified.xlsx \            # çıktı dosyası
-  --model claude-haiku-4-5-20251001 \    # varsayılan
-  --max-tokens 1200 \                    # Adım 2 max token
-  --delay 0.5 \                          # API istekleri arası bekleme (saniye)
+  --provider deepseek \                  # varsayılan: deepseek | anthropic
+  --model deepseek-v4-flash \            # varsayılan: provider'a göre otomatik
+  --adim1b-model deepseek-v4-pro \       # 1b reasoning model
+  --max-tokens 1200 \                    # max token
+  --delay 0 \                            # API istekleri arası bekleme (saniye)
   --note-chars 0 \                       # fasıl notu max karakter (default: 0=kapalı)
   --izahname-chars 0 \                   # izahname max karakter (default: 0=kapalı)
   --gtip-rows 120 \                      # fallback modda fasıl başına GTİP satırı
   --retrieval 50 \                       # FTS ranked satır sayısı
-  --refine \                             # düşük güvende sonnet ile 2. geçiş
-  --refine-model claude-sonnet-4-20250514 \
-  --refine-max-tokens 1200
+  --adim2                                # 12 haneli GTİP seçimini etkinleştir (varsayılan: kapalı)
 ```
 
 ---
@@ -254,7 +241,8 @@ python scripts/build_db.py data/fasil_dosyalari/ \
   --db data/gtip_2026.db --force
 
 # .env
-ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_API_KEY=sk-ant-...   # anthropic provider için
+DEEPSEEK_API_KEY=sk-...        # deepseek provider için (varsayılan)
 ```
 
 ---

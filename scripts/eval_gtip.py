@@ -119,21 +119,22 @@ def _clean(code):
 
 def compute_metrics(correct, predicted):
     """
-    correct, predicted: XXXX.XX.XX.XX.XX formatında GTİP kodu (veya boş)
-    Returns: dict{fasil, pozisyon, alt_poz, exact}  — her biri True/False/None
+    correct, predicted: XXXX.XX.XX.XX.XX veya 4 haneli kod (veya boş)
+    Returns: dict{fasil, pozisyon_secim, alt_poz, exact}  — her biri True/False/None
     None = predicted boş/geçersiz
+    pozisyon_1b_kapsama eval döngüsünde ayrıca eklenir.
     """
     if not predicted:
-        return {'fasil': None, 'pozisyon': None, 'alt_poz': None, 'exact': None}
+        return {'fasil': None, 'pozisyon_secim': None, 'alt_poz': None, 'exact': None}
 
     c = _clean(correct)
     p = _clean(predicted)
 
     return {
-        'fasil':    p[:2]  == c[:2],
-        'pozisyon': p[:4]  == c[:4],
-        'alt_poz':  p[:6]  == c[:6],
-        'exact':    p[:12] == c[:12],
+        'fasil':           p[:2]  == c[:2],
+        'pozisyon_secim':  p[:4]  == c[:4],
+        'alt_poz':         p[:6]  == c[:6],
+        'exact':           p[:12] == c[:12],
     }
 
 
@@ -155,7 +156,7 @@ def write_eval_excel(path, results):
 
     headers = [
         'title', 'correct_gtip', 'predicted_gtip', 'guven',
-        'fasil_ok', 'pozisyon_ok', 'alt_poz_ok', 'exact_ok',
+        'fasil_ok', 'poz_secim_ok', 'poz_kapsama_ok', 'alt_poz_ok', 'exact_ok',
         'gerekce', 'soru', 'alternatifler', 'error'
     ]
     ws.append(headers)
@@ -171,29 +172,27 @@ def write_eval_excel(path, results):
             r['correct_gtip'],
             r['predicted_gtip'],
             r['guven'],
-            fmt(m['fasil']),
-            fmt(m['pozisyon']),
-            fmt(m['alt_poz']),
-            fmt(m['exact']),
+            fmt(m.get('fasil')),
+            fmt(m.get('pozisyon_secim')),
+            fmt(m.get('pozisyon_1b_kapsama')),
+            fmt(m.get('alt_poz')),
+            fmt(m.get('exact')),
             r['gerekce'][:300] if r['gerekce'] else '',
             r.get('soru', ''),
             ', '.join(r.get('alternatifler') or []),
             r.get('error', ''),
         ])
 
-    # Renklendirme
     from openpyxl.styles import PatternFill
     green = PatternFill(fill_type='solid', fgColor='C6EFCE')
     red   = PatternFill(fill_type='solid', fgColor='FFC7CE')
     grey  = PatternFill(fill_type='solid', fgColor='D9D9D9')
 
-    col_map = {'fasil_ok': 5, 'pozisyon_ok': 6, 'alt_poz_ok': 7, 'exact_ok': 8}
+    col_map = {5: 'fasil', 6: 'pozisyon_secim', 7: 'pozisyon_1b_kapsama', 8: 'alt_poz', 9: 'exact'}
     for row_idx, r in enumerate(results, 2):
         m = r['metrics']
-        for col_name, col_idx in col_map.items():
-            key = col_name.replace('_ok', '')
-            if col_name == 'alt_poz_ok': key = 'alt_poz'
-            val = m.get(key if key != 'fasil_ok' else 'fasil')
+        for col_idx, metric_key in col_map.items():
+            val = m.get(metric_key)
             cell = ws.cell(row=row_idx, column=col_idx)
             if val is None:
                 cell.fill = grey
@@ -257,7 +256,7 @@ def main():
     parser.add_argument('--note-chars',    type=int, default=0)
     parser.add_argument('--gtip-rows',     type=int, default=120)
     parser.add_argument('--retrieval',     type=int, default=50)
-    parser.add_argument('--delay',         type=float, default=15)
+    parser.add_argument('--delay',         type=float, default=0)
     parser.add_argument('--refine',        action='store_true')
     parser.add_argument('--refine-model',  default='claude-sonnet-4-20250514')
     parser.add_argument('--refine-max-tokens', type=int, default=1200)
@@ -269,6 +268,9 @@ def main():
     parser.add_argument('--log-prompts',    action='store_true', help='Modele gönderilen tüm promptları JSON\'a yaz (dosya büyür)')
     parser.add_argument('--no-adim1b',      action='store_true', help='Adım 1b izahname doğrulama adımını atla')
     parser.add_argument('--adim1b-model',   default=None, help='Adım 1b için model (default: --model ile aynı)')
+    parser.add_argument('--adim2',          action='store_true', help='Adım 2 GTİP seçimini etkinleştir (varsayılan: kapalı)')
+    parser.add_argument('--provider',       default='deepseek', choices=['anthropic', 'deepseek'],
+                        help='API provider (default: deepseek)')
     args = parser.parse_args()
 
     # .env yükle
@@ -281,10 +283,17 @@ def main():
                     k, v = line.split('=', 1)
                     os.environ.setdefault(k.strip(), v.strip())
 
-    api_key = os.environ.get('ANTHROPIC_API_KEY', '')
-    if not api_key:
-        print("Hata: ANTHROPIC_API_KEY bulunamadı (.env veya ortam değişkeni)")
-        sys.exit(1)
+    _is_ds = args.provider == 'deepseek'
+    if _is_ds:
+        api_key = os.environ.get('DEEPSEEK_API_KEY', '')
+        if not api_key:
+            print("Hata: DEEPSEEK_API_KEY bulunamadı (.env veya ortam değişkeni)")
+            sys.exit(1)
+    else:
+        api_key = os.environ.get('ANTHROPIC_API_KEY', '')
+        if not api_key:
+            print("Hata: ANTHROPIC_API_KEY bulunamadı (.env veya ortam değişkeni)")
+            sys.exit(1)
 
     if not os.path.exists(args.db):
         print(f"Hata: DB bulunamadı: {args.db}")
@@ -302,10 +311,17 @@ def main():
     print()
 
     conn = sqlite3.connect(args.db)
-    client = anthropic.Anthropic(api_key=api_key)
+
+    if _is_ds:
+        client = anthropic.Anthropic(
+            base_url='https://api.deepseek.com/anthropic',
+            api_key=api_key,
+        )
+    else:
+        client = anthropic.Anthropic(api_key=api_key)
 
     opts = {
-        'model':             args.model,
+        'model':             args.model or ('deepseek-v4-flash' if _is_ds else 'claude-haiku-4-5-20251001'),
         'max_tokens':        args.max_tokens,
         'note_max_chars':    args.note_chars,
         'izahname_max_chars': args.izahname_chars,
@@ -316,7 +332,9 @@ def main():
         'refine_model':      args.refine_model,
         'refine_max_tokens': args.refine_max_tokens,
         'adim1b':            not args.no_adim1b,
-        'adim1b_model':      args.adim1b_model or 'claude-sonnet-4-20250514',
+        'adim1b_model':      args.adim1b_model or ('deepseek-v4-pro' if _is_ds else 'claude-sonnet-4-20250514'),
+        'adim2':             args.adim2,
+        'provider':          args.provider,
     }
 
     results = []
@@ -335,21 +353,21 @@ def main():
         deger_dict    = adim1b_parsed.get('degerlendirme') or {}
         correct_poz4  = re.sub(r'[^0-9]', '', correct)[:4] if correct else ''
         if deger_dict and correct_poz4:
-            entry = deger_dict.get(correct_poz4) or {}
-            karar = (entry.get('karar') or '').strip()
-            metrics['pozisyon_1b_uyar'] = karar == 'Uyar'
+            metrics['pozisyon_1b_kapsama'] = any(
+                re.sub(r'[^0-9]', '', str(k))[:4] == correct_poz4
+                and isinstance(v, dict) and (v.get('karar') or '').strip() == 'Uyar'
+                for k, v in deger_dict.items()
+            )
         else:
-            metrics['pozisyon_1b_uyar'] = None
+            metrics['pozisyon_1b_kapsama'] = None
 
-        fasil_sym = '✓' if metrics['fasil']    else ('?' if metrics['fasil']    is None else '✗')
-        poz_sym   = '✓' if metrics['pozisyon'] else ('?' if metrics['pozisyon'] is None else '✗')
-        alt_sym   = '✓' if metrics['alt_poz']  else ('?' if metrics['alt_poz']  is None else '✗')
-        ex_sym    = '✓' if metrics['exact']     else ('?' if metrics['exact']    is None else '✗')
-        uyar_sym  = '✓' if metrics['pozisyon_1b_uyar'] else ('?' if metrics['pozisyon_1b_uyar'] is None else '✗')
+        def _sym(v): return '✓' if v else ('?' if v is None else '✗')
+        fasil_sym   = _sym(metrics.get('fasil'))
+        secim_sym   = _sym(metrics.get('pozisyon_secim'))
+        kapsama_sym = _sym(metrics.get('pozisyon_1b_kapsama'))
 
         print(f"         Doğru: {correct}  |  Tahmin: {predicted or '(boş)'}  |  "
-              f"Fasıl:{fasil_sym} Poz:{poz_sym} AltPoz:{alt_sym} Exact:{ex_sym}  "
-              f"1b:{uyar_sym}  [{cls.get('guven', '?')}]")
+              f"Fasıl:{fasil_sym} Seçim:{secim_sym} Kapsama:{kapsama_sym}  [{cls.get('guven', '?')}]")
 
         dbg = cls.get('debug', {})
         if dbg:
@@ -425,21 +443,22 @@ def main():
         denom = sum(1 for r in results if r['metrics'].get(key) is not None)
         return hits, denom, (hits / denom * 100 if denom else 0.0)
 
-    f_h, f_d, f_acc     = pct('fasil')
-    p_h, p_d, p_acc     = pct('pozisyon')
-    a_h, a_d, a_acc     = pct('alt_poz')
-    e_h, e_d, e_acc     = pct('exact')
-    p1b_h, p1b_d, p1b_acc = pct('pozisyon_1b_uyar')
+    f_h, f_d, f_acc = pct('fasil')
+    p_h, p_d, p_acc = pct('pozisyon_secim')
+    k_h, k_d, k_acc = pct('pozisyon_1b_kapsama')
+    a_h, a_d, a_acc = pct('alt_poz')
+    e_h, e_d, e_acc = pct('exact')
 
-    print(f"\n{'='*55}")
+    print(f"\n{'='*62}")
     print(f"EVAL SONUÇLARI  ({n} ürün, {skipped} boş tahmin)")
-    print(f"{'='*55}")
-    print(f"  Fasıl    (2 hane): {f_h:3d}/{f_d}  —  {f_acc:5.1f}%")
-    print(f"  Pozisyon (4 hane): {p_h:3d}/{p_d}  —  {p_acc:5.1f}%")
-    print(f"  Poz 1b Uyar      : {p1b_h:3d}/{p1b_d}  —  {p1b_acc:5.1f}%  (1b doğru pozu Uyar dedi)")
-    print(f"  Alt poz  (6 hane): {a_h:3d}/{a_d}  —  {a_acc:5.1f}%")
-    print(f"  Exact   (12 hane): {e_h:3d}/{e_d}  —  {e_acc:5.1f}%")
-    print(f"{'='*55}")
+    print(f"{'='*62}")
+    print(f"  Fasıl          (2 hane) : {f_h:3d}/{f_d}  —  {f_acc:5.1f}%")
+    print(f"  Poz Seçim      (4 hane) : {p_h:3d}/{p_d}  —  {p_acc:5.1f}%  ← pipeline tek seçim")
+    print(f"  Poz Kapsama    (1b Uyar): {k_h:3d}/{k_d}  —  {k_acc:5.1f}%  ← Uyar listesinde var mı")
+    if args.adim2:
+        print(f"  Alt poz        (6 hane) : {a_h:3d}/{a_d}  —  {a_acc:5.1f}%")
+        print(f"  Exact         (12 hane) : {e_h:3d}/{e_d}  —  {e_acc:5.1f}%")
+    print(f"{'='*62}")
 
     # Fasıl bazında breakdown
     fasil_stats = {}
@@ -471,18 +490,20 @@ def main():
 
     # --- Experiment JSON ---
     run_data = {
-        'timestamp':  datetime.now().isoformat(),
-        'model':      args.model,
-        'refine':     args.refine,
+        'timestamp':    datetime.now().isoformat(),
+        'provider':     args.provider,
+        'model':        opts['model'],
+        'adim1b_model': opts['adim1b_model'],
+        'refine':       args.refine,
         'refine_model': args.refine_model if args.refine else None,
         'n_total':    n,
         'n_skipped':  skipped,
         'metrics': {
-            'fasil':            {'hits': f_h,   'total': f_d,   'accuracy': round(f_acc,   2)},
-            'pozisyon':         {'hits': p_h,   'total': p_d,   'accuracy': round(p_acc,   2)},
-            'pozisyon_1b_uyar': {'hits': p1b_h, 'total': p1b_d, 'accuracy': round(p1b_acc, 2)},
-            'alt_poz':          {'hits': a_h,   'total': a_d,   'accuracy': round(a_acc,   2)},
-            'exact':            {'hits': e_h,   'total': e_d,   'accuracy': round(e_acc,   2)},
+            'fasil':               {'hits': f_h, 'total': f_d, 'accuracy': round(f_acc, 2)},
+            'pozisyon_secim':      {'hits': p_h, 'total': p_d, 'accuracy': round(p_acc, 2)},
+            'pozisyon_1b_kapsama': {'hits': k_h, 'total': k_d, 'accuracy': round(k_acc, 2)},
+            'alt_poz':             {'hits': a_h, 'total': a_d, 'accuracy': round(a_acc, 2)},
+            'exact':               {'hits': e_h, 'total': e_d, 'accuracy': round(e_acc, 2)},
         },
         'params': {
             'note_chars':  args.note_chars,
