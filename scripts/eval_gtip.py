@@ -25,6 +25,7 @@ import json
 import sqlite3
 import argparse
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 try:
@@ -240,6 +241,71 @@ def save_experiment(exp_dir, run_data):
 
 
 # ---------------------------------------------------------------------------
+# Paralel işleme
+# ---------------------------------------------------------------------------
+
+def _process_one(task):
+    i, row, db_path, client, opts = task
+    conn = sqlite3.connect(db_path)
+    try:
+        cls = classify_product(client, row, conn, opts)
+        predicted = cls.get('gtip_code', '') or ''
+        correct   = row['correct_gtip']
+        metrics   = compute_metrics(correct, predicted)
+
+        adim1b_parsed = cls.get('debug', {}).get('adim1b_parsed') or {}
+        deger_dict    = adim1b_parsed.get('degerlendirme') or {}
+        correct_poz4  = re.sub(r'[^0-9]', '', correct)[:4] if correct else ''
+        if deger_dict and correct_poz4:
+            metrics['pozisyon_1b_kapsama'] = any(
+                re.sub(r'[^0-9]', '', str(k))[:4] == correct_poz4
+                and isinstance(v, dict) and (v.get('karar') or '').strip() == 'Uyar'
+                for k, v in deger_dict.items()
+            )
+        else:
+            metrics['pozisyon_1b_kapsama'] = None
+
+        def _poz_tanim(gtip_code):
+            if not gtip_code:
+                return ''
+            poz4 = re.sub(r'[^0-9]', '', gtip_code)[:4]
+            row_db = conn.execute(
+                "SELECT tanim FROM pozisyon WHERE substr(kod_clean,1,4) = ? ORDER BY seviye LIMIT 1",
+                (poz4,)
+            ).fetchone()
+            if row_db:
+                return row_db[0]
+            g = conn.execute(
+                "SELECT tanim_hiyerarsi FROM gtip WHERE substr(gtip_clean,1,4) = ? ORDER BY gtip_code LIMIT 1",
+                (poz4,)
+            ).fetchone()
+            return g[0] if g else ''
+
+        dbg = cls.get('debug', {})
+        if dbg is not None:
+            dbg['correct_poz']       = re.sub(r'[^0-9]', '', correct)[:4]
+            dbg['correct_poz_tanim'] = _poz_tanim(correct)
+            dbg['pred_poz']          = re.sub(r'[^0-9]', '', predicted)[:4] if predicted else ''
+            dbg['pred_poz_tanim']    = _poz_tanim(predicted)
+
+        result = {
+            'title':          row['title'],
+            'correct_gtip':   correct,
+            'predicted_gtip': predicted,
+            'guven':          cls.get('guven', ''),
+            'gerekce':        cls.get('gerekce', ''),
+            'soru':           cls.get('soru', ''),
+            'alternatifler':  cls.get('alternatifler', []),
+            'error':          cls.get('error', ''),
+            'metrics':        metrics,
+            'debug':          dbg,
+        }
+        return i, result
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -271,6 +337,8 @@ def main():
     parser.add_argument('--adim2',          action='store_true', help='Adım 2 GTİP seçimini etkinleştir (varsayılan: kapalı)')
     parser.add_argument('--provider',       default='deepseek', choices=['anthropic', 'deepseek'],
                         help='API provider (default: deepseek)')
+    parser.add_argument('--workers',        type=int, default=50,
+                        help='Paralel iş parçacığı sayısı (default: 50)')
     args = parser.parse_args()
 
     # .env yükle
@@ -337,102 +405,25 @@ def main():
         'provider':          args.provider,
     }
 
-    results = []
-    for i, row in enumerate(gold_rows, 1):
-        title_short = (row['title'] or '')[:50]
-        print(f"[{i:3d}/{len(gold_rows)}] {title_short}")
+    n_items = len(gold_rows)
+    tasks = [(i, row, args.db, client, opts) for i, row in enumerate(gold_rows, 1)]
+    results_map = {}
 
-        cls = classify_product(client, row, conn, opts)
+    def _sym(v): return '✓' if v else ('?' if v is None else '✗')
 
-        predicted = cls.get('gtip_code', '') or ''
-        correct   = row['correct_gtip']
-        metrics   = compute_metrics(correct, predicted)
+    print(f"Paralel çalıştırılıyor ({min(args.workers, n_items)} worker)...\n")
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        futs = {executor.submit(_process_one, t): t[0] for t in tasks}
+        for fut in as_completed(futs):
+            i, result = fut.result()
+            results_map[i] = result
+            m = result['metrics']
+            print(f"[{i:3d}/{n_items}] {(result['title'] or '')[:40]:40s}  "
+                  f"→ {result['predicted_gtip'] or '(boş)':14s}  "
+                  f"F:{_sym(m.get('fasil'))} P:{_sym(m.get('pozisyon_secim'))} "
+                  f"K:{_sym(m.get('pozisyon_1b_kapsama'))}  [{result['guven']}]")
 
-        # 1b Uyar kontrolü: doğru pozisyon 1b degerlendirme dict'inde "Uyar" olarak geçti mi?
-        adim1b_parsed = cls.get('debug', {}).get('adim1b_parsed') or {}
-        deger_dict    = adim1b_parsed.get('degerlendirme') or {}
-        correct_poz4  = re.sub(r'[^0-9]', '', correct)[:4] if correct else ''
-        if deger_dict and correct_poz4:
-            metrics['pozisyon_1b_kapsama'] = any(
-                re.sub(r'[^0-9]', '', str(k))[:4] == correct_poz4
-                and isinstance(v, dict) and (v.get('karar') or '').strip() == 'Uyar'
-                for k, v in deger_dict.items()
-            )
-        else:
-            metrics['pozisyon_1b_kapsama'] = None
-
-        def _sym(v): return '✓' if v else ('?' if v is None else '✗')
-        fasil_sym   = _sym(metrics.get('fasil'))
-        secim_sym   = _sym(metrics.get('pozisyon_secim'))
-        kapsama_sym = _sym(metrics.get('pozisyon_1b_kapsama'))
-
-        print(f"         Doğru: {correct}  |  Tahmin: {predicted or '(boş)'}  |  "
-              f"Fasıl:{fasil_sym} Seçim:{secim_sym} Kapsama:{kapsama_sym}  [{cls.get('guven', '?')}]")
-
-        dbg = cls.get('debug', {})
-        if dbg:
-            bolumler = dbg.get('candidate_bolumler') or []
-            fasiller = dbg.get('candidate_fasiller') or []
-            pozisyon = dbg.get('secilen_pozisyon') or '-'
-            gtip_out = predicted or '-'
-            soru_out = cls.get('soru', '') or ''
-            soru_str = f"\n         SORU: {soru_out}" if soru_out else ''
-            print(f"         Bölümler: {bolumler} → Fasıllar: {fasiller} "
-                  f"→ Pozisyon: {pozisyon} → GTİP: {gtip_out}{soru_str}")
-            tok = dbg.get('token_usage', {})
-            if tok:
-                def _fmt(u): return f"{u['in']}+{u['out']}" if u else '-'
-                toplam = tok.get('toplam', {})
-                cw = toplam.get('cache_write', 0)
-                cr = toplam.get('cache_read', 0)
-                cache_str = f"  cw:{cw} cr:{cr}" if (cw or cr) else ""
-                print(f"         Token  0a:{_fmt(tok.get('adim_0a'))}  "
-                      f"0b:{_fmt(tok.get('adim_0b'))}  "
-                      f"1:{_fmt(tok.get('adim_1'))}  "
-                      f"2:{_fmt(tok.get('adim_2'))}  "
-                      f"| toplam {toplam.get('in',0)}in + {toplam.get('out',0)}out{cache_str}")
-
-        # Doğru ve tahmin pozisyon tanımlarını DB'den çek
-        def _poz_tanim(gtip_code):
-            if not gtip_code:
-                return ''
-            poz4 = re.sub(r'[^0-9]', '', gtip_code)[:4]
-            row_db = conn.execute(
-                "SELECT tanim FROM pozisyon WHERE substr(kod_clean,1,4) = ? ORDER BY seviye LIMIT 1",
-                (poz4,)
-            ).fetchone()
-            if row_db:
-                return row_db[0]
-            # sentetik pozisyon: pozisyon tablosunda hiç kaydı yok, gtip'ten türet
-            g = conn.execute(
-                "SELECT tanim_hiyerarsi FROM gtip WHERE substr(gtip_clean,1,4) = ? ORDER BY gtip_code LIMIT 1",
-                (poz4,)
-            ).fetchone()
-            return g[0] if g else ''
-
-        if dbg is not None:
-            dbg['correct_poz']       = re.sub(r'[^0-9]', '', correct)[:4]
-            dbg['correct_poz_tanim'] = _poz_tanim(correct)
-            dbg['pred_poz']          = re.sub(r'[^0-9]', '', predicted)[:4] if predicted else ''
-            dbg['pred_poz_tanim']    = _poz_tanim(predicted)
-
-        results.append({
-            'title':          row['title'],
-            'correct_gtip':   correct,
-            'predicted_gtip': predicted,
-            'guven':          cls.get('guven', ''),
-            'gerekce':        cls.get('gerekce', ''),
-            'soru':           cls.get('soru', ''),
-            'alternatifler':  cls.get('alternatifler', []),
-            'error':          cls.get('error', ''),
-            'metrics':        metrics,
-            'debug':          dbg,
-        })
-
-        if i < len(gold_rows):
-            time.sleep(args.delay)
-
-    conn.close()
+    results = [results_map[i] for i in range(1, n_items + 1)]
 
     # --- Özet hesapla ---
     n = len(results)
