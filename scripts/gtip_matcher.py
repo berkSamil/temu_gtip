@@ -491,7 +491,7 @@ Verilen fasil notlari, izahname ve pozisyon listesine gore en uygun pozisyonu se
 - Fasil notu ve izahname dahil/haric hukumlerini aynen uygula.
 - En ozel pozisyonu sec; "Digerleri"ni son care olarak kullan.
 - Listede olmayan pozisyon uydurma.
-- Degerlendirme dict'ine TAM OLARAK 8 pozisyon yaz (uyar veya uymaz), ne eksik ne fazla.
+- Degerlendirme dict'ine TAM OLARAK 5 pozisyon yaz (uyar veya uymaz), ne eksik ne fazla.
 - Urun hakkinda siniflandirmayi etkileyen belirsiz bir bilgi varsa (malzeme, kullanim amaci,
   bagimsiz mi parca mi, vb.) "soru" alanina tek net soru yaz. Belirsizlik yoksa bos birak.
 
@@ -841,6 +841,14 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
     do_token_breakdown  = bool(opts.get('token_breakdown'))
     do_adim2            = bool(opts.get('adim2', False))
 
+    # DeepSeek V4 Flash thinking-by-default — reasoning blokları cikti budget'ini
+    # yiyor. Adim 0a/0b/1a/2 icin daha yuksek limit; anthropic icin eski degerler.
+    # (Adim 1b zaten 10000 ile handle ediyor.)
+    _mt_0a = 5000 if _is_ds else 400
+    _mt_0b = 5000 if _is_ds else 400
+    _mt_1a = 8000 if _is_ds else 1500
+    _mt_2  = 6000 if _is_ds else max_tokens
+
     title           = product_info.get('title', '')
     desc            = product_info.get('description', '')
     keywords        = product_info.get('keywords', '')
@@ -889,7 +897,7 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
     reasoning_0a = None
     usage_0a = None
     try:
-        bolum_resp = _api_call_with_retry(client, model, 400, bolum_system_prompt, bolum_user_msg)
+        bolum_resp = _api_call_with_retry(client, model, _mt_0a, bolum_system_prompt, bolum_user_msg)
         bolum_raw_response, reasoning_0a = _extract_text_and_reasoning(bolum_resp)
         usage_0a = {'in': bolum_resp.usage.input_tokens, 'out': bolum_resp.usage.output_tokens,
                     'cache_write': getattr(bolum_resp.usage, 'cache_creation_input_tokens', 0) or 0,
@@ -905,8 +913,23 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
     except Exception as _e:
         import sys as _sys; print(f"[ADIM_0a HATA] {type(_e).__name__}: {_e}", file=_sys.stderr)
 
+    if not candidate_bolumler:
+        return {
+            'gtip_code': '', 'fasil': None, 'gerekce': '',
+            'guven': 'dusuk', 'alternatifler': [], 'soru': '',
+            'error': 'adim_0a_parse_fail',
+            'debug': {
+                'candidate_bolumler': candidate_bolumler,
+                'bolum_system_prompt': bolum_system_prompt,
+                'bolum_user_msg':     bolum_user_msg,
+                'bolum_raw_response': bolum_raw_response,
+                'reasoning_0a':       reasoning_0a,
+                'token_usage':        {'adim_0a': usage_0a},
+            },
+        }
+
     # ------------------------------------------------------------------
-    # ADIM 0b — Fasıl seçimi (seçilen bölümlerin fasılları → 3 aday fasıl)
+    # ADIM 0b — Fasıl seçimi (seçilen bölümlerin fasılları → 5 aday fasıl)
     # ------------------------------------------------------------------
     candidate_fasils = []
     fasil_raw_response = None
@@ -932,7 +955,7 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
             f"Yanitini SADECE JSON olarak ver."
         )
         try:
-            fasil_resp = _api_call_with_retry(client, model, 400, fasil_system_prompt, fasil_user_msg)
+            fasil_resp = _api_call_with_retry(client, model, _mt_0b, fasil_system_prompt, fasil_user_msg)
             fasil_raw_response, reasoning_0b = _extract_text_and_reasoning(fasil_resp)
             usage_0b = {'in': fasil_resp.usage.input_tokens, 'out': fasil_resp.usage.output_tokens,
                         'cache_write': getattr(fasil_resp.usage, 'cache_creation_input_tokens', 0) or 0,
@@ -947,6 +970,24 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
                                         if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 97][:8]
         except Exception as _e:
             import sys as _sys; print(f"[ADIM_0b HATA] {type(_e).__name__}: {_e}", file=_sys.stderr)
+
+    if not candidate_fasils:
+        return {
+            'gtip_code': '', 'fasil': None, 'gerekce': '',
+            'guven': 'dusuk', 'alternatifler': [], 'soru': '',
+            'error': 'adim_0b_parse_fail',
+            'debug': {
+                'candidate_bolumler': candidate_bolumler,
+                'bolum_raw_response': bolum_raw_response,
+                'reasoning_0a':       reasoning_0a,
+                'candidate_fasiller': candidate_fasils,
+                'fasil_system_prompt': fasil_system_prompt,
+                'fasil_user_msg':     fasil_user_msg,
+                'fasil_raw_response': fasil_raw_response,
+                'reasoning_0b':       reasoning_0b,
+                'token_usage':        {'adim_0a': usage_0a, 'adim_0b': usage_0b},
+            },
+        }
 
     # ------------------------------------------------------------------
     # ADIM 1 — Pozisyon seçimi
@@ -982,12 +1023,18 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
     parsed_1b_turn2 = None
     usage_1b_turn2 = None
     try:
-        poz_resp = _api_call_ctx_with_retry(client, model, 1500, pozisyon_system_prompt,
+        poz_resp = _api_call_ctx_with_retry(client, model, _mt_1a, pozisyon_system_prompt,
                                             poz_context_block, poz_query)
         pozisyon_raw_response, reasoning_1a = _extract_text_and_reasoning(poz_resp)
         usage_1 = {'in': poz_resp.usage.input_tokens, 'out': poz_resp.usage.output_tokens,
                    'cache_write': getattr(poz_resp.usage, 'cache_creation_input_tokens', 0) or 0,
                    'cache_read':  getattr(poz_resp.usage, 'cache_read_input_tokens', 0) or 0}
+        if not (pozisyon_raw_response or '').strip():
+            import sys as _sys
+            _sys.stderr.write(
+                f"[ADIM_1a UYARI] Text bos donduren cevap. "
+                f"reasoning_len={len(reasoning_1a or '')}, out_tokens={poz_resp.usage.output_tokens}\n"
+            )
         poz_parsed = extract_first_json_object(pozisyon_raw_response)
         if poz_parsed and poz_parsed.get('pozisyon_kod'):
             poz_result = poz_parsed
@@ -1118,6 +1165,7 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
             'pozisyon_system_prompt': pozisyon_system_prompt,
             'pozisyon_context_block': poz_context_block,
             'pozisyon_query':        poz_query,
+            'pozisyon_raw_response': pozisyon_raw_response,
             'adim1a_parsed':         poz_parsed,
             'adim1b_parsed':         parsed_1b_turn1 if parsed_1b_turn1 is not None else parsed_1b,
             'adim1b_turn2_raw':      adim1b_turn2_raw,
@@ -1248,7 +1296,7 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
         return result
 
     try:
-        out = run_step2(system_step2, model, max_tokens)
+        out = run_step2(system_step2, model, _mt_2)
         usage_2 = out.pop('_usage', None)
         gtip_raw_response = out.pop('_raw', None)
         out.pop('parse_hatasi', None)

@@ -15,7 +15,6 @@ Kullanım:
     python scripts/eval_gtip.py data/gold_set.xlsx
     python scripts/eval_gtip.py data/gold_set.xlsx --db data/gtip_2026.db
     python scripts/eval_gtip.py data/gold_set.xlsx --refine --model claude-sonnet-4-20250514
-    python scripts/eval_gtip.py data/gold_set.xlsx --out output/eval_result.xlsx
 """
 
 import sys
@@ -152,61 +151,6 @@ def accuracy(hits, total, skipped):
 # Excel çıktısı
 # ---------------------------------------------------------------------------
 
-def write_eval_excel(path, results):
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Eval Sonuçları"
-
-    headers = [
-        'title', 'correct_gtip', 'predicted_gtip', 'guven',
-        'fasil_ok', 'poz_secim_ok', 'poz_kapsama_ok', 'alt_poz_ok', 'exact_ok',
-        'gerekce', 'soru', 'alternatifler', 'error'
-    ]
-    ws.append(headers)
-
-    for r in results:
-        m = r['metrics']
-        def fmt(v):
-            if v is None: return 'BILINEMEZ'
-            return 'OK' if v else 'YANLIS'
-
-        ws.append([
-            r['title'],
-            r['correct_gtip'],
-            r['predicted_gtip'],
-            r['guven'],
-            fmt(m.get('fasil')),
-            fmt(m.get('pozisyon_secim')),
-            fmt(m.get('pozisyon_1b_kapsama')),
-            fmt(m.get('alt_poz')),
-            fmt(m.get('exact')),
-            r['gerekce'][:300] if r['gerekce'] else '',
-            r.get('soru', ''),
-            ', '.join(r.get('alternatifler') or []),
-            r.get('error', ''),
-        ])
-
-    from openpyxl.styles import PatternFill
-    green = PatternFill(fill_type='solid', fgColor='C6EFCE')
-    red   = PatternFill(fill_type='solid', fgColor='FFC7CE')
-    grey  = PatternFill(fill_type='solid', fgColor='D9D9D9')
-
-    col_map = {5: 'fasil', 6: 'pozisyon_secim', 7: 'pozisyon_1b_kapsama', 8: 'alt_poz', 9: 'exact'}
-    for row_idx, r in enumerate(results, 2):
-        m = r['metrics']
-        for col_idx, metric_key in col_map.items():
-            val = m.get(metric_key)
-            cell = ws.cell(row=row_idx, column=col_idx)
-            if val is None:
-                cell.fill = grey
-            elif val:
-                cell.fill = green
-            else:
-                cell.fill = red
-
-    wb.save(path)
-
-
 # ---------------------------------------------------------------------------
 # JSON experiment kaydı
 # ---------------------------------------------------------------------------
@@ -318,7 +262,6 @@ def main():
     )
     parser.add_argument('gold',            help='Gold set Excel yolu (correct_gtip kolonu zorunlu)')
     parser.add_argument('--db',            default='data/gtip_2026.db')
-    parser.add_argument('--out',           default=None, help='Çıktı Excel yolu (varsayılan: output/eval_YYYYMMDD.xlsx)')
     parser.add_argument('--model',         default='claude-haiku-4-5-20251001')
     parser.add_argument('--max-tokens',    type=int, default=1200)
     parser.add_argument('--note-chars',    type=int, default=0)
@@ -548,15 +491,6 @@ def main():
             print(f"  Fasıl {fn}: {s['total']} ürün | "
                   f"fasıl %{s['fasil_ok']/s['total']*100:.0f} | "
                   f"exact %{s['exact_ok']/s['total']*100:.0f}")
-
-    # --- Excel çıktısı ---
-    if args.out is None:
-        os.makedirs('output', exist_ok=True)
-        ts = datetime.now().strftime('%Y%m%d_%H%M')
-        args.out = f'output/eval_{ts}.xlsx'
-
-    write_eval_excel(args.out, results)
-    print(f"\nExcel kaydedildi : {args.out}")
 
     # --- Experiment JSON ---
     run_data = {
