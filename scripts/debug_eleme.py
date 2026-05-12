@@ -74,7 +74,7 @@ for vaka in yok_vakalar:
     product_text = f"Baslik: {title}"
     poz_context = build_pozisyon_context(
         conn, cand_fasils, title, "", "", "",
-        note_max_chars=0, retrieval_top_n=20, izahname_max_chars=0,
+        note_max_chars=0, izahname_max_chars=0,
     )
     poz_context_block = f"TARIFE CETVELI:\n{poz_context}"
     poz_query = (

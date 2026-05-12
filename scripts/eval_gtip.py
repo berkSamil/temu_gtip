@@ -22,8 +22,10 @@ import sys
 import os
 import re
 import json
+import queue
 import sqlite3
 import argparse
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
@@ -245,10 +247,10 @@ def save_experiment(exp_dir, run_data):
 # ---------------------------------------------------------------------------
 
 def _process_one(task):
-    i, row, db_path, client, opts = task
+    i, row, db_path, client, opts, question_fn = task
     conn = sqlite3.connect(db_path)
     try:
-        cls = classify_product(client, row, conn, opts)
+        cls = classify_product(client, row, conn, opts, question_fn=question_fn)
         predicted = cls.get('gtip_code', '') or ''
         correct   = row['correct_gtip']
         metrics   = compute_metrics(correct, predicted)
@@ -320,8 +322,6 @@ def main():
     parser.add_argument('--model',         default='claude-haiku-4-5-20251001')
     parser.add_argument('--max-tokens',    type=int, default=1200)
     parser.add_argument('--note-chars',    type=int, default=0)
-    parser.add_argument('--gtip-rows',     type=int, default=120)
-    parser.add_argument('--retrieval',     type=int, default=50)
     parser.add_argument('--delay',         type=float, default=0)
     parser.add_argument('--refine',        action='store_true')
     parser.add_argument('--refine-model',  default='claude-sonnet-4-20250514')
@@ -339,6 +339,8 @@ def main():
                         help='API provider (default: deepseek)')
     parser.add_argument('--workers',        type=int, default=50,
                         help='Paralel iş parçacığı sayısı (default: 50)')
+    parser.add_argument('--interactive',    action='store_true',
+                        help='1b karar özetini kullanıcıya göster, müdahale imkanı ver (Turn 2)')
     args = parser.parse_args()
 
     # .env yükle
@@ -394,8 +396,6 @@ def main():
         'note_max_chars':    args.note_chars,
         'izahname_max_chars': args.izahname_chars,
         'token_breakdown':   args.token_breakdown,
-        'gtip_rows_per_fasil': args.gtip_rows,
-        'retrieval_top_n':   args.retrieval,
         'refine':            args.refine,
         'refine_model':      args.refine_model,
         'refine_max_tokens': args.refine_max_tokens,
@@ -406,22 +406,101 @@ def main():
     }
 
     n_items = len(gold_rows)
-    tasks = [(i, row, args.db, client, opts) for i, row in enumerate(gold_rows, 1)]
     results_map = {}
 
     def _sym(v): return '✓' if v else ('?' if v is None else '✗')
 
-    print(f"Paralel çalıştırılıyor ({min(args.workers, n_items)} worker)...\n")
-    with ThreadPoolExecutor(max_workers=args.workers) as executor:
-        futs = {executor.submit(_process_one, t): t[0] for t in tasks}
-        for fut in as_completed(futs):
-            i, result = fut.result()
-            results_map[i] = result
-            m = result['metrics']
-            print(f"[{i:3d}/{n_items}] {(result['title'] or '')[:40]:40s}  "
-                  f"→ {result['predicted_gtip'] or '(boş)':14s}  "
-                  f"F:{_sym(m.get('fasil'))} P:{_sym(m.get('pozisyon_secim'))} "
-                  f"K:{_sym(m.get('pozisyon_1b_kapsama'))}  [{result['guven']}]")
+    # Interactive mode: question_queue + print_lock kurulumu
+    question_queue = queue.Queue()
+    print_lock = threading.Lock()
+    karar_counter = [0]
+
+    def make_question_fn(index, title):
+        def ask(product_info, parsed_1b):
+            response_q = queue.Queue(maxsize=1)
+            question_queue.put({
+                'index':          index,
+                'title':          (title or '')[:50],
+                'pozisyon_kod':   parsed_1b.get('pozisyon_kod', ''),
+                'alternatif':     parsed_1b.get('alternatif_pozisyon', ''),
+                'karar_noktasi':  parsed_1b.get('karar_noktasi', ''),
+                'varsayimlar':    parsed_1b.get('varsayimlar', ''),
+                'soru':           parsed_1b.get('soru', ''),
+                'response_q':     response_q,
+            })
+            try:
+                return response_q.get(timeout=300)
+            except queue.Empty:
+                return ''
+        return ask
+
+    if args.interactive:
+        tasks = [(i, row, args.db, client, opts,
+                  make_question_fn(i, row.get('title', '')))
+                 for i, row in enumerate(gold_rows, 1)]
+    else:
+        tasks = [(i, row, args.db, client, opts, None)
+                 for i, row in enumerate(gold_rows, 1)]
+
+    def _print_result(i, result):
+        m = result['metrics']
+        print(f"[{i:3d}/{n_items}] {(result['title'] or '')[:40]:40s}  "
+              f"→ {result['predicted_gtip'] or '(boş)':14s}  "
+              f"F:{_sym(m.get('fasil'))} P:{_sym(m.get('pozisyon_secim'))} "
+              f"K:{_sym(m.get('pozisyon_1b_kapsama'))}  [{result['guven']}]")
+
+    if args.interactive:
+        print(f"Interactive mode — paralel çalışıyor ({min(args.workers, n_items)} worker)...")
+        print("Her karar geldikçe terminale düşer. [enter]=onayla [cevap]=düzelt [s]=atla\n")
+
+        all_done = threading.Event()
+
+        def result_collector():
+            with ThreadPoolExecutor(max_workers=args.workers) as executor:
+                futs = {executor.submit(_process_one, t): t[0] for t in tasks}
+                for fut in as_completed(futs):
+                    i, result = fut.result()
+                    results_map[i] = result
+                    with print_lock:
+                        _print_result(i, result)
+            all_done.set()
+
+        collector_thread = threading.Thread(target=result_collector, daemon=True)
+        collector_thread.start()
+
+        while not all_done.is_set() or not question_queue.empty():
+            try:
+                q = question_queue.get(timeout=0.5)
+            except queue.Empty:
+                continue
+            karar_counter[0] += 1
+            with print_lock:
+                print(f"\n{'─'*60}")
+                print(f"  KARAR #{karar_counter[0]}  [Ürün {q['index']}] {q['title']}")
+                print(f"  Seçim       : {q['pozisyon_kod']}")
+                print(f"  Alternatif  : {q['alternatif']}")
+                print(f"  Karar nokt. : {q['karar_noktasi']}")
+                print(f"  Varsayımlar : {q['varsayimlar']}")
+                if q['soru']:
+                    print(f"  Soru        : {q['soru']}")
+                print(f"  [enter]=onayla  [cevap yaz]=düzelt/bilgi ver  [s]=atla")
+            try:
+                answer = input("  > ").strip()
+            except EOFError:
+                answer = ''
+            if answer.lower() == 's':
+                answer = ''
+            q['response_q'].put(answer)
+
+        collector_thread.join()
+    else:
+        print(f"Paralel çalıştırılıyor ({min(args.workers, n_items)} worker)...\n")
+        with ThreadPoolExecutor(max_workers=args.workers) as executor:
+            futs = {executor.submit(_process_one, t): t[0] for t in tasks}
+            for fut in as_completed(futs):
+                i, result = fut.result()
+                results_map[i] = result
+                _print_result(i, result)
 
     results = [results_map[i] for i in range(1, n_items + 1)]
 
@@ -498,8 +577,6 @@ def main():
         },
         'params': {
             'note_chars':  args.note_chars,
-            'gtip_rows':   args.gtip_rows,
-            'retrieval':   args.retrieval,
             'max_tokens':  args.max_tokens,
         },
         'results': [

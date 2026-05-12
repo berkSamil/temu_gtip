@@ -29,27 +29,38 @@ INPUT (herhangi bir Excel — Temu manifest, elle giriş, başka kaynak)
       FONKSIYON MATERYALI EZER kuralı + tekstil form istisnası prompt'ta mevcut.
        ↓
   [ADIM 0b] FASIL SEÇİMİ (seçilen bölümlerin fasılları → 8 aday fasıl)
-      Adım 0a başarısız olursa FTS fallback devreye girer. (max_tokens=400)
+      max_tokens=400. Adım 0a/0b parse fail olursa pipeline hata döner.
        ↓
   [ADIM 1a] POZİSYON SEÇİMİ (4'lü pozisyon)
-      Her aday fasıl için: fasıl notu + izahname özeti + tüm 4'lü pozisyonlar
-      Model fasıl + 4'lü pozisyon kodu seçer.
+      İlk 5 aday fasıl için: fasıl notu + izahname özeti + tüm 4'lü pozisyonlar
+      Model fasıl + 4'lü pozisyon kodu seçer. (max_tokens=1500)
+      Parse fail olursa pipeline hata döner ({"error": "adim_1_parse_fail"}).
        ↓
   [ADIM 1b] POZİSYON DOĞRULAMA (reasoning model)
-      Aday pozisyonlar için izahname karşılaştırması. JSON: kapsam/haric/eslestirme/karar
-      deepseek-v4-pro (reasoning), max_tokens=8000
+      Aday pozisyonlar için izahname karşılaştırması.
+      JSON: degerlendirme(kapsam/haric/eslestirme/karar) + varsayimlar
+          + alternatif_pozisyon + karar_noktasi + soru
+      DeepSeek: deepseek-v4-pro (reasoning), max_tokens=10000
+      Anthropic: claude-sonnet-4-*, max_tokens=1200
+       ↓
+  [ADIM 1b — TURN 2] (sadece --interactive flag ile)
+      Kullanıcıya 1b karar özeti gösterilir (pozisyon_kod, alternatif,
+      karar_noktasi, varsayimlar, soru). Cevap girilirse 1b multi-turn
+      olarak ikinci kez çağrılır, ek bilgiyle yeniden değerlendirir.
+      Turn 1 JSON ayrı saklanır (adim1b_parsed); Turn 2 JSON ayrı
+      (adim1b_turn2_parsed). Turn 2 başarısız olursa Turn 1 korunur.
        ↓
   ► ÇIKIŞ: 4 haneli pozisyon kodu (varsayılan)
       Pipeline burada durur. gtip_code = 4 haneli pozisyon.
        ↓  (sadece --adim2 flag ile)
   [ADIM 2] GTİP SEÇİMİ (12 haneli) — VARSAYILAN KAPALI
       Seçilen pozisyon altındaki TÜM 12'li GTİP'ler + fasıl notu + izahname
-      Yorum kuralları system prompt'a gömülü.
+      Yorum kuralları system prompt'a gömülü. (max_tokens default 1200)
        ↓
   OUTPUT: _classified.xlsx + _classified.html
 ```
 
-Fallback: Adım 1 pozisyon bulamazsa `_classify_flat()` eski tek-adımlı moda düşer.
+FTS fallback yok — Adım 0 veya 1 fail olursa pipeline hata döner. `_classify_flat()` ve FTS-tabanlı candidate fonksiyonları kaldırıldı (2026-05-12).
 
 ---
 
@@ -76,7 +87,7 @@ build_db.py sağlık durumu (son kontrol):
   ✅ 97 fasıl (77 reserved, beklenen eksik)
   ✅ 96 fasıl notu, bölüm/fasıl ayrımı doğru
   ✅ 3,986 pozisyon, hierarchy tracking doğru
-  ✅ FTS5 indeksleri çalışıyor (gtip_fts, notlar_fts, izahname_fts)
+  ✅ FTS5 indeksleri DB'de var (gtip_fts, notlar_fts, izahname_fts) — runtime sınıflandırmada kullanılmıyor
   ✅ 97 izahname kaydı, 6 yorum kuralı, 99 bölüm-fasıl kaydı
   ✅ .doc → .docx dönüşümü soffice ile otomatik (build_db.py içinde)
 
@@ -174,13 +185,22 @@ python scripts/gtip_matcher.py input.xlsx \
   --provider deepseek \                  # varsayılan: deepseek | anthropic
   --model deepseek-v4-flash \            # varsayılan: provider'a göre otomatik
   --adim1b-model deepseek-v4-pro \       # 1b reasoning model
-  --max-tokens 1200 \                    # max token
+  --max-tokens 1200 \                    # Adım 2 için max token (default 1200)
   --delay 0 \                            # API istekleri arası bekleme (saniye)
   --note-chars 0 \                       # fasıl notu max karakter (default: 0=kapalı)
   --izahname-chars 0 \                   # izahname max karakter (default: 0=kapalı)
-  --gtip-rows 120 \                      # fallback modda fasıl başına GTİP satırı
-  --retrieval 50 \                       # FTS ranked satır sayısı
+  --no-adim1b \                          # 1b izahname doğrulamasını atla
   --adim2                                # 12 haneli GTİP seçimini etkinleştir (varsayılan: kapalı)
+```
+
+**eval_gtip.py ek parametreler:**
+```bash
+python scripts/eval_gtip.py data/gold_set_30.xlsx \
+  --workers 50 \                         # paralel iş parçacığı (default 50; DeepSeek yüklendiğinde düşür)
+  --interactive \                        # 1b karar özetini göster, Turn 2 müdahalesine izin ver
+  --limit 5 \                            # ilk N ürünü çalıştır (smoke test için)
+  --items 6,21,25 \                      # 1-tabanlı belirli indeksler
+  --log-prompts                          # tüm promptları JSON'a yaz (dosya büyür)
 ```
 
 ---
@@ -197,25 +217,31 @@ python scripts/gtip_matcher.py input.xlsx \
   url / product_url
 ```
 
-**Output JSON yapısı:**
+**Output JSON yapısı (--adim2 kapalı, varsayılan):**
 ```json
 {
-  "gtip_code": "3926.90.97.90.29",
+  "gtip_code": "3926",                    // 4 haneli pozisyon (--adim2 ile 12 hane)
   "fasil": 39,
-  "gerekce": "Türkçe muhakeme...",
-  "guven": "yuksek|orta|dusuk",
-  "alternatifler": ["3926.90.97.90.11"],
+  "gerekce": "[3926] Uyar: ... | [3924] Uymaz: ...",
+  "guven": "yuksek|orta|dusuk",           // 1b Uyar sayısı 1→yuksek, >1→orta, 0→dusuk
+  "alternatifler": [],
+  "soru": "",                             // 1b'nin sorduğu netleştirme sorusu (varsa)
+  "error": "",                            // adim_1_parse_fail, adim_1_pozisyon_db_yok, vs
   "debug": {
     "candidate_bolumler": [7, 20],
-    "bolum_raw_response": "...",
     "candidate_fasiller": [39, 83, 73],
+    "bolum_raw_response": "...",
     "fasil_raw_response": "...",
-    "secilen_pozisyon": "3926",
-    "secilen_fasil": 39,
-    "pozisyon_raw_response": "...",
-    "gtip_raw_response": "...",
-    "token_usage": {"adim_0a": {...}, "adim_0b": {...}, "adim_1": {...}, "adim_2": {...}, "toplam": {...}},
-    "token_breakdown": {...}
+    "adim1a_parsed":      { ... },         // 1a JSON (degerlendirme + pozisyon_kod)
+    "adim1b_parsed":      { ... },         // 1b Turn 1 JSON (snapshot, Turn 2 override etse bile kalır)
+    "adim1b_turn2_parsed": { ... },        // 1b Turn 2 JSON (--interactive ile)
+    "adim1b_turn2_raw":   "...",
+    "reasoning_0a/0b/1a/1b/1b_turn2": "...",  // DeepSeek thinking blokları
+    "secilen_pozisyon":   "3926",
+    "secilen_fasil":      39,
+    "token_usage": {"adim_0a": {...}, "adim_0b": {...}, "adim_1": {...},
+                    "adim_1b": {...}, "adim_1b_turn2": {...}, "adim_2": {...}, "toplam": {...}},
+    "token_breakdown":    { ... }
   }
 }
 ```
@@ -250,28 +276,28 @@ DEEPSEEK_API_KEY=sk-...        # deepseek provider için (varsayılan)
 ## ÇALIŞMA KURALLARI (Claude Code ve Cursor için)
 
 1. Her eval run'ını kaydet: `experiments/run_YYYYMMDD_HHMM.json`
-2. `defaults` listesine şu an dokunma — FTS fallback için gerekli
+2. FTS fallback yok — yeni recovery yolu önerme (silindi, kalıcı karar)
 3. `temu_scraper.py`'a dokunma — arşivlenmiş
 4. DB şemasını değiştirirsen `build_db.py --force` ile rebuild test et
 5. Yeni veri kaynağı eklerken: orijinal dosya `data/` altına, parser `build_db.py`'a, çıktı SQLite'a
 
 ---
 
-## DEĞİŞİKLİK CYCLE'I (prompt kalitesi / FTS deneyleri için)
-
-Her prompt/FTS değişikliği bu döngüyü takip eder:
+## DEĞİŞİKLİK CYCLE'I (prompt değişiklikleri için)
 
 1. **Hipotez öner** — değişikliği ve gerekçeyi açıkla, kullanıcı onayı bekle
 2. **Tek değişiklik yap** — iki değişikliği asla birleştirme
-3. **Test cycle çalıştır:**
+3. **Eval çalıştır:**
    ```bash
-   python3 scripts/fix_loop.py test-cycle --baseline experiments/<baseline_run>.json
+   python3 scripts/eval_gtip.py data/gold_set_pozisyon_33.xlsx --workers 50
    ```
-4. **Sonuç iyi** → commit → baseline'ı yeni run'a güncelle
-5. **Sonuç kötü** → fix_loop auto-revert eder, `experiments/revert_log.json`'a kaydeder
-6. Bir sonraki değişikliğe geç (yeni session açmak zorunda değilsin ama tercih edilir)
+4. **Sonucu yorumla** → `feedback_eval_yorumlama.md` kuralları:
+   - Tek run baseline değil, run-to-run varyasyon var (2-3 run ile değerlendir)
+   - Metric düşüşü ≠ otomatik regresyon; vaka-vaka bak
+   - Multi-Uyar normal davranış (Kural 3a), failure sadece "1b yanlış olanı seçti"
+5. **İyi/Belirsiz** → commit. **Kötü** → revert.
 
-**Sabit parametreler:** `--note-chars 0 --izahname-chars 0`
-**Regresyon kararı:** tamamen `fix_loop._check_regression` verir — elle "fasıl X pp düştü" diye revert etme.
-**revert_log'daki deneyleri tekrar deneme** — başarısız kaydedilmişse nedeni vardır.
+**Sabit parametreler:** `--note-chars 0 --izahname-chars 0` (varsayılan).
+**fix_loop** pause'da — `_check_regression` mantığı tek-run baseline kabul ediyordu, GTİP gri-alan domainine uygun değil.
+**FTS deneyleri yok** — FTS fallback kalıcı kapalı ([[feedback_fts_kapali]]).
 

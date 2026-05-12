@@ -36,59 +36,6 @@ except ImportError:
 # DB queries
 # ---------------------------------------------------------------------------
 
-_TEMU_STOP = frozenset({
-    'the', 'and', 'for', 'with', 'from', 'this', 'that', 'your', 'are', 'you', 'all', 'any',
-    'can', 'has', 'have', 'pcs', 'pack', 'set', 'piece', 'pieces', 'item', 'items', 'sale',
-    'shop', 'temu', 'free', 'new', 'hot', 'best', 'buy', 'get', 'one', 'two', 'off', 'out',
-    'our', 'was', 'not', 'but', 'its', 'per', 'use', 'may', 'more', 'most', 'some', 'size',
-})
-
-
-def get_candidate_fasils(conn, product_details, keywords, description, title, max_fasils=8):
-    """
-    Aday fasillari belirle: urun metninden kelimeler -> FTS (gtip_fts + notlar_fts) ile
-    eslesen satirlarin fasil numaralari. Material hints kaldirildi — tarife mantığına aykırı.
-    """
-    text = f"{title} {description} {keywords} {product_details}".lower()
-    scores = {}
-
-    words = sorted(
-        set(re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}', text)),
-        key=len,
-        reverse=True,
-    )
-    words = [w for w in words if w.lower() not in _TEMU_STOP][:14]
-
-    for w in words:
-        rows = search_gtip_fts(conn, w, limit=18)
-        for r in rows:
-            code = r[0]
-            parts = str(code).split('.')
-            if not parts or not parts[0].isdigit():
-                continue
-            fn = int(parts[0][:2])
-            scores[fn] = scores.get(fn, 0) + 1
-
-    ordered = sorted(scores.keys(), key=lambda x: (-scores[x], x))
-    out = []
-    seen = set()
-    for fn in ordered:
-        if fn not in seen:
-            seen.add(fn)
-            out.append(fn)
-        if len(out) >= max_fasils:
-            return out
-
-    defaults = [39, 73, 82, 83, 84, 85, 90, 94, 96, 61, 62, 33, 42, 95, 87, 71, 91, 48, 64]
-    for d in defaults:
-        if d not in seen:
-            seen.add(d)
-            out.append(d)
-        if len(out) >= max_fasils:
-            break
-    return out
-
-
 def get_fasil_gtip_list(conn, fasil_no, limit=200):
     c = conn.cursor()
     rows = c.execute("""
@@ -306,65 +253,6 @@ def build_pozisyon_prompt(conn):
     result = _POZISYON_PROMPT_BASE.format(kurallar_blok=blok)
     _PROMPT_CACHE['pozisyon'] = result
     return result
-
-
-def search_gtip_fts(conn, query, limit=20):
-    c = conn.cursor()
-    try:
-        rows = c.execute("""
-            SELECT gtip_code, tanim, tanim_hiyerarsi
-            FROM gtip_fts WHERE gtip_fts MATCH ?
-            ORDER BY rank
-            LIMIT ?
-        """, (query, limit)).fetchall()
-        return rows
-    except Exception:
-        return []
-
-
-def _product_search_words(title, desc, keywords, product_details, max_words=20):
-    text = f"{title} {desc} {keywords} {product_details}".lower()
-    words = sorted(
-        set(re.findall(r'[a-zA-ZğüşıöçĞÜŞİÖÇ]{3,}', text)),
-        key=len,
-        reverse=True,
-    )
-    return [w for w in words if w.lower() not in _TEMU_STOP][:max_words]
-
-
-def retrieve_ranked_gtips(conn, title, desc, keywords, product_details, top_n=50, per_query=14, filter_fasils=None):
-    """
-    Urun metninden kelimeler -> FTS; skorla birlestir. Cetvelde gercek satirlari getirir
-    (sadece fasil basi sirali liste yerine ilgili 392x/732x vb. satirlari modele sunar).
-    filter_fasils: set of int fasil_no — sadece bu fasillara ait GTIPler skorlara dahil edilir.
-    """
-    words = _product_search_words(title, desc, keywords, product_details, max_words=22)
-    scores = {}
-    for w in words:
-        rows = search_gtip_fts(conn, w, limit=per_query)
-        for idx, r in enumerate(rows):
-            code = r[0]
-            if filter_fasils is not None:
-                d = re.sub(r'[^0-9]', '', code)
-                if len(d) < 2:
-                    continue
-                if int(d[:2]) not in filter_fasils:
-                    continue
-            bump = max(1, per_query - idx)
-            scores[code] = scores.get(code, 0) + bump
-    if not scores:
-        return []
-    ordered = sorted(scores.keys(), key=lambda c: (-scores[c], c))[:top_n]
-    cur = conn.cursor()
-    out = []
-    for code in ordered:
-        row = cur.execute(
-            "SELECT gtip_code, tanim, tanim_hiyerarsi FROM gtip WHERE gtip_code = ?",
-            (code,),
-        ).fetchone()
-        if row:
-            out.append(row)
-    return out
 
 
 def _json_from_balanced_braces(s):
@@ -603,7 +491,9 @@ Verilen fasil notlari, izahname ve pozisyon listesine gore en uygun pozisyonu se
 - Fasil notu ve izahname dahil/haric hukumlerini aynen uygula.
 - En ozel pozisyonu sec; "Digerleri"ni son care olarak kullan.
 - Listede olmayan pozisyon uydurma.
-- Degerlendirme dict'ine EN AZ 5 pozisyon yaz (uyar veya uymaz).
+- Degerlendirme dict'ine TAM OLARAK 8 pozisyon yaz (uyar veya uymaz), ne eksik ne fazla.
+- Urun hakkinda siniflandirmayi etkileyen belirsiz bir bilgi varsa (malzeme, kullanim amaci,
+  bagimsiz mi parca mi, vb.) "soru" alanina tek net soru yaz. Belirsizlik yoksa bos birak.
 
 POZISYON SECIMI KURALLARI:
 1. MONTAJ YONTEMI SINIF DEGILDIR: Urunun montaj bicimi (kendinden yapiskanlı, vidalı,
@@ -639,7 +529,8 @@ Yanitini SADECE su JSON formatinda ver (degerlendirme ONCE, karar SONRA):
     "8471": "Uymaz: bilgisayarin kendisi, parca degil"
   }},
   "fasil": 84,
-  "pozisyon_kod": "84.73"
+  "pozisyon_kod": "84.73",
+  "soru": ""
 }}"""
 
 _POZISYON_1B_PROMPT = """Sen Turk Gumruk Tarife siniflandirma uzmanisin.
@@ -653,7 +544,21 @@ Her pozisyon icin izahname verilmistir. Her pozisyonu su alanlari doldurarak deg
 
 Izahname yoksa kapsam/haric/eslestirme alanlarina "(izahname yok)" yaz.
 SADECE verilen aday pozisyonlar arasından sec — listede olmayan pozisyon ekleme.
-Siniflandirmani iyilestirecek herhangi bir sorun varsa "soru" alanina yaz.
+
+ZORUNLU: "varsayimlar" alanini her zaman doldur.
+Karar verirken urun hakkinda dogrudan bilgi verilmemis ama dogru oldugunu kabul ettigin
+her seyi buraya yaz (malzeme, kullanim amaci, bagimsiz urun mu parca mi, hedef kullanici,
+ortam, vb.). Hic varsayim yoksa "(yok)" yaz — bos birakmak yasaktir.
+
+Varsayimlardan siniflandirmayi degistirme ihtimali olan biri varsa "soru" alanina tek net
+soru yaz. Tum varsayimlar kesin/bilgi verilerek destekleniyorsa bos birak.
+
+ZORUNLU: "alternatif_pozisyon" alanini doldur.
+Degerlendirmede birden fazla Uyar varsa secilmeyen en guclu Uyar'i yaz.
+Tek Uyar varsa Uymaz'lardan siniflandirmayi degistirme ihtimali en yuksek olani yaz.
+Alternatif yoksa bos string yaz.
+"karar_noktasi": pozisyon_kod ve alternatif arasindaki belirleyici farki tek cumlede yaz.
+Alternatif yoksa bos string.
 
 Yanitini SADECE su JSON formatinda ver:
 {{
@@ -671,6 +576,9 @@ Yanitini SADECE su JSON formatinda ver:
       "karar": "Uymaz"
     }}
   }},
+  "varsayimlar": "Urunun bagimsiz satilan bir firca oldugunu varsaydim, baska bir urunun parcasi degil",
+  "alternatif_pozisyon": "9615",
+  "karar_noktasi": "Urun firca ise 9603, tarak/toka ise 9615 — urun firca oldugu icin 9603",
   "fasil": 96,
   "pozisyon_kod": "9603",
   "soru": ""
@@ -686,50 +594,8 @@ def _needs_refine(cls):
     return g in ('dusuk', 'orta')
 
 
-def build_tarife_context(
-    conn,
-    title,
-    desc,
-    keywords,
-    product_details,
-    note_max_chars,
-    gtip_rows_per_fasil,
-    retrieval_top_n,
-):
-    ranked = retrieve_ranked_gtips(
-        conn, title, desc, keywords, product_details, top_n=retrieval_top_n
-    )
-    parts = []
-    if ranked:
-        rlines = "\n".join(
-            f"  {g[0]}  {g[1]}" + (f"  [{g[2]}]" if g[2] else "")
-            for g in ranked
-        )
-        parts.append(f"=== METNE GORE ONCELIKLI GTIP (FTS skor) ===\n{rlines}")
-
-    candidate_fasils = get_candidate_fasils(conn, product_details, keywords, desc, title)
-    for fno in candidate_fasils[:6]:
-        gtips = get_fasil_gtip_list(conn, fno, limit=200)
-        if not gtips:
-            continue
-        note = get_fasil_notu(conn, fno)
-        excerpt = (note[:note_max_chars] if note else "(not yok)")
-
-        gtip_lines = "\n".join(
-            f"  {g[0]}  {g[1]}" + (f"  [{g[2]}]" if g[2] else "")
-            for g in gtips[:gtip_rows_per_fasil]
-        )
-        parts.append(
-            f"=== FASIL {fno} ===\n"
-            f"FASIL NOTU:\n{excerpt}\n\n"
-            f"GTIP KODLARI:\n{gtip_lines}"
-        )
-
-    return "\n\n".join(parts), candidate_fasils
-
-
 def build_pozisyon_context(conn, candidate_fasils, title, desc, keywords,
-                           product_details, note_max_chars, retrieval_top_n,
+                           product_details, note_max_chars,
                            izahname_max_chars=1500, return_atoms=False):
     """Adım 1 context: fasıl notları + izahname özeti + tüm 4'lü pozisyonlar."""
     fasils_for_context = candidate_fasils[:5]
@@ -930,14 +796,35 @@ def _api_call_ctx_with_retry(client, model, max_tokens, system_prompt, context_t
                                 context_text + "\n\n" + query_text)
 
 
-def classify_product(client, product_info, conn, opts=None):
+def _api_call_messages_with_retry(client, model, max_tokens, messages):
+    """Multi-turn messages için rate-limit retry'lı API çağrısı (system YOK, messages içinde)."""
+    def _call():
+        return client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            temperature=0,
+            messages=messages,
+        )
+    try:
+        return _call()
+    except anthropic.RateLimitError:
+        for wait in [30, 60]:
+            print(f"\n    Rate limit, {wait}s bekleniyor...", end="", flush=True)
+            time.sleep(wait)
+            try:
+                return _call()
+            except anthropic.RateLimitError:
+                continue
+        raise
+
+
+def classify_product(client, product_info, conn, opts=None, question_fn=None):
     """
     2-adımlı hiyerarşik sınıflandırma:
       Adım 1: Aday fasıllar → 4'lü pozisyon seçimi
       Adım 2: Seçilen pozisyon altındaki tüm 12'liler → GTİP seçimi
 
     opts: model, max_tokens, note_max_chars, izahname_max_chars,
-          gtip_rows_per_fasil (fallback için), retrieval_top_n,
           refine, refine_model, refine_max_tokens
     """
     opts = opts or {}
@@ -946,8 +833,6 @@ def classify_product(client, product_info, conn, opts=None):
     max_tokens          = int(opts.get('max_tokens', 1200))
     note_max_chars      = int(opts.get('note_max_chars', 0))
     izahname_max_chars  = int(opts.get('izahname_max_chars', 0))
-    gtip_rows_per_fasil = int(opts.get('gtip_rows_per_fasil', 120))
-    retrieval_top_n     = int(opts.get('retrieval_top_n', 50))
     do_refine           = bool(opts.get('refine'))
     refine_model        = opts.get('refine_model', 'claude-sonnet-4-20250514')
     refine_max_tokens   = int(opts.get('refine_max_tokens', 1200))
@@ -1017,8 +902,8 @@ def classify_product(client, product_info, conn, opts=None):
             if raw:
                 candidate_bolumler = [int(float(x)) for x in raw
                                       if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 21][:5]
-    except Exception:
-        pass
+    except Exception as _e:
+        import sys as _sys; print(f"[ADIM_0a HATA] {type(_e).__name__}: {_e}", file=_sys.stderr)
 
     # ------------------------------------------------------------------
     # ADIM 0b — Fasıl seçimi (seçilen bölümlerin fasılları → 3 aday fasıl)
@@ -1060,19 +945,15 @@ def classify_product(client, product_info, conn, opts=None):
                 if raw:
                     candidate_fasils = [int(float(x)) for x in raw
                                         if isinstance(x, (int, float)) and 1 <= int(float(x)) <= 97][:8]
-        except Exception:
-            pass
-
-    # Adım 0 başarısız olursa FTS fallback
-    if not candidate_fasils:
-        candidate_fasils = get_candidate_fasils(conn, product_details, keywords, desc, title)
+        except Exception as _e:
+            import sys as _sys; print(f"[ADIM_0b HATA] {type(_e).__name__}: {_e}", file=_sys.stderr)
 
     # ------------------------------------------------------------------
     # ADIM 1 — Pozisyon seçimi
     # ------------------------------------------------------------------
     poz_context, poz_atoms = build_pozisyon_context(
         conn, candidate_fasils, title, desc, keywords,
-        product_details, note_max_chars, retrieval_top_n,
+        product_details, note_max_chars,
         izahname_max_chars=izahname_max_chars, return_atoms=True,
     )
     if do_token_breakdown:
@@ -1095,8 +976,13 @@ def classify_product(client, product_info, conn, opts=None):
     adim1b_raw_response = None
     reasoning_1b = None
     usage_1b = None
+    parsed_1b_turn1 = None  # Turn 1 snapshot — Turn 2 override etse bile debug'da kalır
+    adim1b_turn2_raw = None
+    reasoning_1b_turn2 = None
+    parsed_1b_turn2 = None
+    usage_1b_turn2 = None
     try:
-        poz_resp = _api_call_ctx_with_retry(client, model, 900, pozisyon_system_prompt,
+        poz_resp = _api_call_ctx_with_retry(client, model, 1500, pozisyon_system_prompt,
                                             poz_context_block, poz_query)
         pozisyon_raw_response, reasoning_1a = _extract_text_and_reasoning(poz_resp)
         usage_1 = {'in': poz_resp.usage.input_tokens, 'out': poz_resp.usage.output_tokens,
@@ -1105,8 +991,10 @@ def classify_product(client, product_info, conn, opts=None):
         poz_parsed = extract_first_json_object(pozisyon_raw_response)
         if poz_parsed and poz_parsed.get('pozisyon_kod'):
             poz_result = poz_parsed
-    except Exception:
-        pass
+    except Exception as _e:
+        import sys as _sys, traceback as _tb
+        print(f"[ADIM_1a HATA] {type(_e).__name__}: {_e}", file=_sys.stderr)
+        _tb.print_exc(file=_sys.stderr)
 
     # ------------------------------------------------------------------
     # ADIM 1b — İzahname doğrulaması
@@ -1137,7 +1025,7 @@ def classify_product(client, product_info, conn, opts=None):
                 f"Yanitini SADECE JSON olarak ver (degerlendirme ONCE, karar SONRA)."
             )
             try:
-                adim1b_max_tokens = 8000 if _is_ds else 1200
+                adim1b_max_tokens = 10000 if _is_ds else 1200
                 resp1b = _api_call_ctx_with_retry(
                     client, adim1b_model, adim1b_max_tokens, _POZISYON_1B_PROMPT,
                     f"ADAY POZİSYONLAR:\n{iz_context}", adim1b_query,
@@ -1150,10 +1038,56 @@ def classify_product(client, product_info, conn, opts=None):
                     'cache_read':  getattr(resp1b.usage, 'cache_read_input_tokens', 0) or 0,
                 }
                 parsed_1b = extract_first_json_object(adim1b_raw_response)
+                parsed_1b_turn1 = parsed_1b  # snapshot for debug
                 if parsed_1b and parsed_1b.get('pozisyon_kod'):
                     poz_result = parsed_1b
-            except Exception:
-                pass  # 1b başarısız olursa 1a sonucu korunur
+            except Exception as _e:
+                import sys as _sys; print(f"[ADIM_1b HATA] {type(_e).__name__}: {_e}", file=_sys.stderr)
+                # 1b başarısız olursa 1a sonucu korunur
+
+            # --- Turn 2: Interactive follow-up ---
+            if parsed_1b and question_fn is not None:
+                has_alt      = bool((parsed_1b.get('alternatif_pozisyon') or '').strip())
+                has_karar    = bool((parsed_1b.get('karar_noktasi') or '').strip())
+                has_soru     = bool((parsed_1b.get('soru') or '').strip())
+                _vars_clean  = (parsed_1b.get('varsayimlar') or '').strip()
+                has_varsayim = bool(_vars_clean) and _vars_clean != '(yok)'
+                if has_alt or has_karar or has_soru or has_varsayim:
+                    answer = question_fn(product_info, parsed_1b)
+                    if answer:
+                        turn2_user_msg = (
+                            f"Kullanici ek bilgi verdi: {answer}\n\n"
+                            f"Bu bilgiyle varsayimlarini, karar_noktasini ve pozisyon secimini "
+                            f"yeniden degerlendir. Gerekiyorsa pozisyon_kod'u guncelle. "
+                            f"Ayni JSON formatinda yanit ver."
+                        )
+                        turn1_user_content = (
+                            f"{_POZISYON_1B_PROMPT}\n\n"
+                            f"ADAY POZİSYONLAR:\n{iz_context}\n\n{adim1b_query}"
+                        )
+                        try:
+                            turn2_messages = [
+                                {"role": "user",      "content": turn1_user_content},
+                                {"role": "assistant", "content": adim1b_raw_response},
+                                {"role": "user",      "content": turn2_user_msg},
+                            ]
+                            resp_t2 = _api_call_messages_with_retry(
+                                client, adim1b_model, adim1b_max_tokens, turn2_messages
+                            )
+                            adim1b_turn2_raw, reasoning_1b_turn2 = _extract_text_and_reasoning(resp_t2)
+                            usage_1b_turn2 = {
+                                'in':  resp_t2.usage.input_tokens,
+                                'out': resp_t2.usage.output_tokens,
+                                'cache_write': getattr(resp_t2.usage, 'cache_creation_input_tokens', 0) or 0,
+                                'cache_read':  getattr(resp_t2.usage, 'cache_read_input_tokens', 0) or 0,
+                            }
+                            parsed_1b_turn2 = extract_first_json_object(adim1b_turn2_raw)
+                            if parsed_1b_turn2 and parsed_1b_turn2.get('pozisyon_kod'):
+                                parsed_1b = parsed_1b_turn2
+                                poz_result = parsed_1b_turn2
+                        except Exception as _e:
+                            import sys as _sys; print(f"[TURN_2 HATA] {type(_e).__name__}: {_e}", file=_sys.stderr)
+                            # Turn 2 başarısız → Turn 1 korunur
 
     def _make_debug(pozisyon_kod=None, fasil_no=None, usage_2=None, tbd=tbd):
         token_log = {
@@ -1161,6 +1095,7 @@ def classify_product(client, product_info, conn, opts=None):
             'adim_0b': usage_0b,
             'adim_1':  usage_1,
             'adim_1b': usage_1b,
+            'adim_1b_turn2': usage_1b_turn2,
             'adim_2':  usage_2,
         }
         total_in    = sum(u['in']          for u in token_log.values() if u)
@@ -1184,7 +1119,10 @@ def classify_product(client, product_info, conn, opts=None):
             'pozisyon_context_block': poz_context_block,
             'pozisyon_query':        poz_query,
             'adim1a_parsed':         poz_parsed,
-            'adim1b_parsed':         parsed_1b,
+            'adim1b_parsed':         parsed_1b_turn1 if parsed_1b_turn1 is not None else parsed_1b,
+            'adim1b_turn2_raw':      adim1b_turn2_raw,
+            'adim1b_turn2_parsed':   parsed_1b_turn2,
+            'reasoning_1b_turn2':    reasoning_1b_turn2,
             'secilen_pozisyon':      pozisyon_kod,
             'secilen_fasil':         fasil_no,
             'gtip_context_block':    gtip_context_block if pozisyon_kod else None,
@@ -1198,28 +1136,34 @@ def classify_product(client, product_info, conn, opts=None):
             'token_breakdown':       tbd if tbd else None,
         }
 
-    # Pozisyon seçimi başarısızsa eski flat yönteme düş
+    # Pozisyon seçimi başarısızsa hata döndür (FTS fallback kapalı)
     if not poz_result:
-        out = _classify_flat(client, product_info, conn, opts,
-                             candidate_fasils, note_max_chars,
-                             gtip_rows_per_fasil, retrieval_top_n)
-        dbg = _make_debug()
-        dbg['flat_mode'] = 'adim_1_parse_fail'
-        out['debug'] = dbg
-        return out
+        return {
+            'gtip_code': '',
+            'fasil': None,
+            'gerekce': '',
+            'guven': 'dusuk',
+            'alternatifler': [],
+            'soru': '',
+            'error': 'adim_1_parse_fail',
+            'debug': _make_debug(),
+        }
 
     fasil_no     = poz_result.get('fasil')
     pozisyon_kod = str(poz_result.get('pozisyon_kod', '')).strip()
 
     gtips_check = get_gtips_by_pozisyon(conn, pozisyon_kod)
     if not gtips_check:
-        out = _classify_flat(client, product_info, conn, opts,
-                             candidate_fasils, note_max_chars,
-                             gtip_rows_per_fasil, retrieval_top_n)
-        dbg = _make_debug(pozisyon_kod, fasil_no)
-        dbg['flat_mode'] = 'adim_1_pozisyon_db_yok'
-        out['debug'] = dbg
-        return out
+        return {
+            'gtip_code': '',
+            'fasil': fasil_no,
+            'gerekce': '',
+            'guven': 'dusuk',
+            'alternatifler': [],
+            'soru': '',
+            'error': f'adim_1_pozisyon_db_yok: {pozisyon_kod}',
+            'debug': _make_debug(pozisyon_kod, fasil_no),
+        }
 
     # ------------------------------------------------------------------
     # Adım 2 kapalıysa pozisyon sonucunu doğrudan döndür
@@ -1323,59 +1267,6 @@ def classify_product(client, product_info, conn, opts=None):
         return out
     except Exception as e:
         return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e)[:100], "debug": locals().get('debug', {})}
-
-
-def _classify_flat(client, product_info, conn, opts, candidate_fasils,
-                   note_max_chars, gtip_rows_per_fasil, retrieval_top_n):
-    """Eski tek-adımlı flat sınıflandırma (fallback)."""
-    model             = opts.get('model', 'claude-haiku-4-5-20251001')
-    max_tokens        = int(opts.get('max_tokens', 1200))
-    do_refine         = bool(opts.get('refine'))
-    refine_model      = opts.get('refine_model', 'claude-sonnet-4-20250514')
-    refine_max_tokens = int(opts.get('refine_max_tokens', 1200))
-
-    title           = product_info.get('title', '')
-    desc            = product_info.get('description', '')
-    keywords        = product_info.get('keywords', '')
-    product_details = product_info.get('product_details', '')
-    sku_variants    = product_info.get('sku_variants', '')
-
-    tarife_context, _ = build_tarife_context(
-        conn, title, desc, keywords, product_details,
-        note_max_chars, gtip_rows_per_fasil, retrieval_top_n
-    )
-    user_msg = (
-        f"Asagidaki urun icin dogru 12 haneli GTIP kodunu belirle.\n\n"
-        f"URUN BILGILERI:\nBaslik: {title}\nAciklama: {desc}\n"
-        f"Urun Detaylari: {product_details or '(belirtilmemis)'}\n"
-        f"Varyantlar: {sku_variants or '(yok)'}\n\n"
-        f"TARIFE CETVELI VERILERI:\n{tarife_context}\n\n"
-        f"Yanitini SADECE JSON olarak ver."
-    )
-
-    def run_once(sys_p, mdl, mtok):
-        resp = _api_call_with_retry(client, mdl, mtok, sys_p, user_msg)
-        text, _ = _extract_text_and_reasoning(resp)
-        text = text.strip()
-        parsed = extract_first_json_object(text)
-        if parsed is None:
-            return {"gtip_code": "", "gerekce": text[:300], "guven": "dusuk",
-                    "error": "JSON parse edilemedi", "parse_hatasi": True}
-        return sanitize_classification(conn, parsed)
-
-    try:
-        out = run_once(SYSTEM_PROMPT, model, max_tokens)
-        out.pop('parse_hatasi', None)
-        if do_refine and _needs_refine(out):
-            refined = run_once(REFINE_SYSTEM_PROMPT, refine_model, refine_max_tokens)
-            refined.pop('parse_hatasi', None)
-            if (not refined.get('error') and refined.get('gtip_code')
-                    and gtip_exists(conn, refined['gtip_code'])):
-                refined['gerekce'] = ('[Ikinci gecis] ' + str(refined.get('gerekce', '')))[:2500]
-                return refined
-        return out
-    except Exception as e:
-        return {"gtip_code": "", "gerekce": "", "guven": "", "error": str(e)[:100]}
 
 
 # ---------------------------------------------------------------------------
@@ -1661,25 +1552,11 @@ def main():
         help='Fasil notundan modele giden max karakter (0=kapali)',
     )
     parser.add_argument(
-        '--gtip-rows',
-        type=int,
-        default=120,
-        metavar='N',
-        help='Fallback modda her aday fasil icin GTIP satir sayisi',
-    )
-    parser.add_argument(
         '--izahname-chars',
         type=int,
         default=0,
         metavar='N',
         help='Izahname metninden modele giden max karakter (0=kapali)',
-    )
-    parser.add_argument(
-        '--retrieval',
-        type=int,
-        default=50,
-        metavar='N',
-        help='Urun metnine gore FTS ile getirilecek oncelikli GTIP satiri',
     )
     parser.add_argument(
         '--refine',
@@ -1758,8 +1635,6 @@ def main():
         'max_tokens':        args.max_tokens,
         'note_max_chars':    args.note_chars,
         'izahname_max_chars': args.izahname_chars,
-        'gtip_rows_per_fasil': args.gtip_rows,
-        'retrieval_top_n':   args.retrieval,
         'refine':            args.refine,
         'refine_model':      args.refine_model,
         'refine_max_tokens': args.refine_max_tokens,
