@@ -371,10 +371,7 @@ def main():
                 'soru':           parsed_1b.get('soru', ''),
                 'response_q':     response_q,
             })
-            try:
-                return response_q.get(timeout=300)
-            except queue.Empty:
-                return ''
+            return response_q.get()
         return ask
 
     if args.interactive:
@@ -427,10 +424,10 @@ def main():
                 if q['soru']:
                     print(f"  Soru        : {q['soru']}")
                 print(f"  [enter]=onayla  [cevap yaz]=düzelt/bilgi ver  [s]=atla")
-            try:
-                answer = input("  > ").strip()
-            except EOFError:
-                answer = ''
+                try:
+                    answer = input("  > ").strip()
+                except EOFError:
+                    answer = ''
             if answer.lower() == 's':
                 answer = ''
             q['response_q'].put(answer)
