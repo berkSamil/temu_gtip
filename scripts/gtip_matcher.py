@@ -775,19 +775,27 @@ def _extract_text_and_reasoning(response):
     return text, reasoning
 
 
+_TRANSIENT_API_ERRORS = (
+    anthropic.RateLimitError,
+    anthropic.APIConnectionError,
+    anthropic.APITimeoutError,
+    anthropic.InternalServerError,
+)
+
+
 def _api_call_with_retry(client, model, max_tokens, system_prompt, user_msg):
-    """Rate limit retry mantığıyla API çağrısı yapar."""
-    try:
-        return _call_classify(client, model, max_tokens, system_prompt, user_msg)
-    except anthropic.RateLimitError:
-        for wait in [30, 60]:
-            print(f"\n    Rate limit, {wait}s bekleniyor...", end="", flush=True)
+    """Geçici API hatalarında (rate limit, network, timeout, 5xx) retry yapar."""
+    last_err = None
+    for wait in [0, 10, 30, 60, 120]:
+        if wait:
+            print(f"\n    {type(last_err).__name__}, {wait}s bekleniyor...", end="", flush=True)
             time.sleep(wait)
-            try:
-                return _call_classify(client, model, max_tokens, system_prompt, user_msg)
-            except anthropic.RateLimitError:
-                continue
-        raise
+        try:
+            return _call_classify(client, model, max_tokens, system_prompt, user_msg)
+        except _TRANSIENT_API_ERRORS as _e:
+            last_err = _e
+            continue
+    raise last_err
 
 
 def _api_call_ctx_with_retry(client, model, max_tokens, system_prompt, context_text, query_text):
@@ -797,7 +805,7 @@ def _api_call_ctx_with_retry(client, model, max_tokens, system_prompt, context_t
 
 
 def _api_call_messages_with_retry(client, model, max_tokens, messages):
-    """Multi-turn messages için rate-limit retry'lı API çağrısı (system YOK, messages içinde)."""
+    """Multi-turn messages için geçici hata retry'lı API çağrısı (system YOK, messages içinde)."""
     def _call():
         return client.messages.create(
             model=model,
@@ -805,17 +813,17 @@ def _api_call_messages_with_retry(client, model, max_tokens, messages):
             temperature=0,
             messages=messages,
         )
-    try:
-        return _call()
-    except anthropic.RateLimitError:
-        for wait in [30, 60]:
-            print(f"\n    Rate limit, {wait}s bekleniyor...", end="", flush=True)
+    last_err = None
+    for wait in [0, 10, 30, 60, 120]:
+        if wait:
+            print(f"\n    {type(last_err).__name__}, {wait}s bekleniyor...", end="", flush=True)
             time.sleep(wait)
-            try:
-                return _call()
-            except anthropic.RateLimitError:
-                continue
-        raise
+        try:
+            return _call()
+        except _TRANSIENT_API_ERRORS as _e:
+            last_err = _e
+            continue
+    raise last_err
 
 
 def classify_product(client, product_info, conn, opts=None, question_fn=None):
@@ -844,10 +852,10 @@ def classify_product(client, product_info, conn, opts=None, question_fn=None):
     # DeepSeek V4 Flash thinking-by-default — reasoning blokları cikti budget'ini
     # yiyor. Adim 0a/0b/1a/2 icin daha yuksek limit; anthropic icin eski degerler.
     # (Adim 1b zaten 10000 ile handle ediyor.)
-    _mt_0a = 5000 if _is_ds else 400
-    _mt_0b = 5000 if _is_ds else 400
+    _mt_0a = 8000 if _is_ds else 400
+    _mt_0b = 8000 if _is_ds else 400
     _mt_1a = 8000 if _is_ds else 1500
-    _mt_2  = 6000 if _is_ds else max_tokens
+    _mt_2  = 8000 if _is_ds else max_tokens
 
     title           = product_info.get('title', '')
     desc            = product_info.get('description', '')
