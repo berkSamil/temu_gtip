@@ -1,4 +1,6 @@
-# GTİP Sınıflandırma Sistemi — CLAUDE.md
+# GTİP Müşaviri — CLAUDE.md
+
+*Mevzuat tabanlı, kaynak-agnostik dijital gümrük müşaviri robotu.*
 
 Bu dosya Cursor ve Claude Code için ortak bağlam kaynağıdır. Her session başında oku.
 
@@ -8,8 +10,7 @@ Bu dosya Cursor ve Claude Code için ortak bağlam kaynağıdır. Her session ba
 
 **Aktif:** `scripts/gtip_matcher.py`, `scripts/build_db.py`, `scripts/eval_gtip.py`, `data/`
 **Arşivlendi:** `scripts/temu_scraper.py` — scraping tamamen bırakıldı, dokunma.
-**Hedef:** Ürün adı + açıklama + material + kategori + görsel → 12 haneli GTİP önerisi.
-  Şu an TEMU manifest'leri için çalışıyor, hedef: kaynak-agnostik genel GTİP robotu.
+**Hedef:** Türk gümrük mevzuatına (fasıl notları + izahname + yorum kuralları + içindekiler) hâkim, structured reasoning ile sınıflandırma yapan **dijital müşavir**. Herhangi bir ürün tanımı (TEMU manifest, broker XLSX, elle giriş, BSX elektronik, ileride PDF/görsel/dikte) → gerekçeli pozisyon/GTİP önerisi + alternatifler + varsayımlar + bilgi talepleri. TEMU sadece ilk gold set kaynağı; sistem her input kaynağına genelleşmeli.
 
 **Sayısal durum (güncel):**
 - DB: 15,718 GTİP, 3,986 pozisyon, 96 fasıl notu, 97 izahname, 6 yorum kuralı, 99 bölüm-fasıl kaydı
@@ -18,10 +19,48 @@ Bu dosya Cursor ve Claude Code için ortak bağlam kaynağıdır. Her session ba
 
 ---
 
+## KAPI GİBİ KURALLAR — PROJENİN YÖNÜ
+
+**Bu sistem bir sınıflandırıcı değil, dijital gümrük müşaviri.**
+GTİP gri-alan domain'i — aynı ürün koşula göre farklı pozisyona gider (3924/3925 montaj, balıkçılık misinası mamul/hammadde → 9507 vs 5404/5406, yapışkanlı klips form/fonksiyon). "Doğru cevap" tek değildir, "doğru muhakeme" vardır. Gold set bile koşullu — etiketler sabit değil, tartışmalı vakalar gold set'i güncelleyebilir.
+
+**Müşavir tanımı:** uzman gibi muhakeme eden, mevzuatı (fasıl notu/izahname/yorum kuralları) ürünle karşılaştıran, **varsayımlarını açık eden**, eksik bilgi talep eden, alternatifleri yan yana koyup farkı söyleyen aktör. Bir TEMU sınıflandırıcı DEĞİL — TEMU tarihsel bir gold set kaynağı, sistem kaynak-agnostik genelleşmeli.
+
+**Sistemin değeri:** Çıktının "ne dediği" değil **"niye dediği"**. Her adımın JSON şeması bir muhakeme artefaktı: varsayım, alternatif, karar noktası, eksik bilgi talebi.
+
+### Evrim eksenleri (mimari yol haritası)
+
+| Eksen | Şu an | Hedef |
+|---|---|---|
+| **Etkileşim** | Tek-turn + 1b Turn 2 (opsiyonel) | Multi-turn default; her adım proaktif soru sorabilir; kullanıcı dallar arasında dolanır |
+| **Çıktı tipi** | Tek GTİP kodu | Koşullu çıktı: "X eğer monte; Y değilse" — branching reasoning |
+| **Adımlar arası** | İzole (her adım kendi promptu) | Reasoning continuity: 0a varsayımı 0b'ye, 1a kararı 1b'ye taşınır, geri sorgulanır |
+| **Modalite** | Metin | + Görsel (vision), uzun vadede tablo/PDF/dikte |
+| **Gold set** | Sabit XLSX | Living dataset: koşullu etiketler, vaka-bazlı revizyon |
+| **Domain** | TEMU manifest | Kaynak agnostik (BSX elektronik, broker, manuel) |
+| **Değerlendirme** | Eval metric ortalaması | Reasoning trace inspection — metric alt veri |
+
+### Kapı gibi 4 kural
+
+1. **Eval metric düştü/çıktı diye AĞLAMA.** "Pozisyon %X düştü, regresyon" yazma. Run-to-run varyasyonu ~20pp (bkz `[[feedback_eval_yorumlama]]`). Karar reasoning trace okumakla verilir, metric tablosuyla değil.
+2. **Bana SORMADAN kod yazma.** Hipotez teklif et → onay bekle → tek değişiklik. "Önce diff göster sonra uygula" değil — önce **sor**, sonra yaz. Bu CLAUDE.md edit'leri için bile geçerli; küçük yazım dahil.
+3. **Reasoning trace birincil çıktı.** JSON'da `degerlendirme` (kapsam/haric/eslestirme/karar), `varsayimlar`, `karar_noktasi`, `alternatif_pozisyon`, `soru` — bu alanların varlığı + yapısı + içeriği sistemin gerçek değeri. Sınıflandırma kodu sadece bir özet.
+4. **"Emin değilim, şu bilgi lazım" failure değil, feature.** Modelin epistemik alçakgönüllülüğü (uncertainty + bilgi talebi) sistemin olgunluğudur. Sistem ne kadar açıkça "şu varsayımı yaptım, şu durumda farklı olur" diyebiliyorsa o kadar iyi. Belirsizliği gizleyen yüksek-güven cevaplar daha kötüdür.
+
+### Pratik sonuçlar
+
+- Hipotez önerirken "%X'i %Y'ye çıkarır" yerine "reasoning şu yönde zenginleşir / şu varsayımı açık eder / şu yeni soru çıkar" diye çerçevele
+- Eval sonucu özetlerken önce trace inceleme, sonra (varsa) metric — metric başlık değil
+- Yeni feature önerirken birincil eksen: interaktivite, reasoning continuity, koşullu çıktı, multimodal
+- Tek run "kötü" diye revert ETME; reasoning trace bozulduysa revert et
+
+---
+
 ## MİMARİ
 
 ```
-INPUT (herhangi bir Excel — Temu manifest, elle giriş, başka kaynak)
+INPUT (ürün tanımı — kaynak agnostik: TEMU manifest, broker XLSX, elle giriş,
+       BSX elektronik, ileride PDF/görsel/dikte)
   ürün adı, açıklama, material, kategori, [görsel URL]
        ↓
   [ADIM 0a] BÖLÜM SEÇİMİ (21 bölüm → 5 aday)
@@ -110,7 +149,7 @@ temu_gtip/
 ├── scripts/
 │   ├── gtip_matcher.py        ← ana program
 │   ├── build_db.py            ← tüm veri kaynakları → gtip_2026.db
-│   ├── eval_gtip.py           ← gold set ile accuracy ölçümü
+│   ├── eval_gtip.py           ← gold set üzerinde reasoning trace + sinyal toplama (metric alt veri)
 │   ├── analyze_run.py         ← offline eval karşılaştırma raporu
 │   ├── _test_live.py          ← canlı test
 │   └── temu_scraper.py        ← ARŞİVLENDİ, dokunma
@@ -207,7 +246,9 @@ python scripts/eval_gtip.py data/gold_set_30.xlsx \
 
 ## INPUT/OUTPUT FORMAT
 
-**Input Excel kolonları** (normalize_product_row() tüm varyantları handle eder):
+*Input formatı kaynak-agnostik; aşağıdaki kolonlar TEMU'dan miras ama herhangi bir kaynaktan map edilebilir (`normalize_product_row()` varyantları handle eder).*
+
+**Input Excel kolonları:**
 ```
   title / product_title
   description / aciklama
@@ -283,19 +324,22 @@ DEEPSEEK_API_KEY=sk-...        # deepseek provider için (varsayılan)
 
 ---
 
-## DEĞİŞİKLİK CYCLE'I (prompt değişiklikleri için)
+## DEĞİŞİKLİK CYCLE'I (prompt / pipeline değişiklikleri için)
 
-1. **Hipotez öner** — değişikliği ve gerekçeyi açıkla, kullanıcı onayı bekle
-2. **Tek değişiklik yap** — iki değişikliği asla birleştirme
-3. **Eval çalıştır:**
+1. **Hipotez öner — reasoning ekseni üzerinden çerçevele.** "Bu değişiklik şu reasoning yapısını şu yönde zenginleştirir / şu varsayımı açık eder / şu yeni soru çıkar." Sadece "metric'i artırır" gerekçesi YETERSİZ. Kullanıcı onayını **mutlaka** bekle.
+2. **Tek değişiklik yap** — iki değişikliği asla birleştirme; sebep-sonuç izlenemez olur.
+3. **Eval çalıştır** (sinyal toplamak için, hüküm vermek için değil):
    ```bash
    python3 scripts/eval_gtip.py data/gold_set_pozisyon_33.xlsx --workers 50
    ```
-4. **Sonucu yorumla** → `feedback_eval_yorumlama.md` kuralları:
-   - Tek run baseline değil, run-to-run varyasyon var (2-3 run ile değerlendir)
-   - Metric düşüşü ≠ otomatik regresyon; vaka-vaka bak
-   - Multi-Uyar normal davranış (Kural 3a), failure sadece "1b yanlış olanı seçti"
-5. **İyi/Belirsiz** → commit. **Kötü** → revert.
+4. **Reasoning trace üzerinden yorumla** (`[[feedback_eval_yorumlama]]` + KAPI GİBİ KURALLAR):
+   - **Önce trace oku**: `adim1a_parsed.degerlendirme`, `adim1b_parsed` (kapsam/haric/eslestirme/karar), `varsayimlar`, `karar_noktasi`, `alternatif_pozisyon`, `soru` — yapı zenginleşti mi? Model varsayımlarını açık ediyor mu? Doğru soruları soruyor mu? Alternatifleri karşılaştırıyor mu?
+   - **Sonra (opsiyonel) metric**: pozisyon_secim vs sadece destek sinyali. Tek run baseline değil — varyasyon ~20pp. "%X düştü" başlık DEĞİL.
+   - **Vaka-vaka bak**: hipotezin niyetlediği yere etki etti mi? Yan etki var mı?
+5. **Karar: reasoning kalitesi ekseninde.**
+   - Trace zenginleşti → commit
+   - Trace değişmedi veya bozuldu → revert (metric ne derse desin)
+   - Belirsiz → 2-3 run daha; hâlâ belirsizse trace inspeksiyonu derinleştir
 
 **Sabit parametreler:** `--note-chars 0 --izahname-chars 0` (varsayılan).
 **fix_loop** pause'da — `_check_regression` mantığı tek-run baseline kabul ediyordu, GTİP gri-alan domainine uygun değil.
